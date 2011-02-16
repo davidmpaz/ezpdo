@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<config>
+    <options>
+        <domain>nauhygon.net</domain>
+        <email>info@sitepoint.com</email>
+        <docroot>/www</docroot>
+        <tmp>/tmp</tmp>
+        <db>
+            <db_host>db.sitepoint.com</db_host>
+            <db_user>phpclient</db_user>
+            <db_pass>secret</db_pass>
+            <db_name>sitepointdb</db_name>
+        </db>
+    </options>
+</config>

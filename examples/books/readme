@@ -1,0 +1,18 @@
+To test the scripts: 
+
+1. add objects into db
+
+$ php add.php
+$ php print.php
+
+2. find objects in db
+
+$php find.php
+
+3. delete objects in db
+
+$ php delete.php
+$ php print.php
+
+$Id: readme 210 2005-04-18 10:11:15Z nauhygon $
+

@@ -1,0 +1,6 @@
+To kick off EZPDO tests, at command line type
+
+$ php index.php
+
+$Id: readme 211 2005-04-18 10:15:25Z nauhygon $
+

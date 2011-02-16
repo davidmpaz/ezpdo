@@ -1,0 +1,11 @@
+This directory contains the minimalistic set of PEAR packages that are
+required by EZPDO. 
+
+This is an attempt to make EZPDO a self-contained package as requested
+by many EZPDO users. To avoid multiple declarations of classes, we have
+modified the class names by adding prefix "epLib_". 
+
+All credits are due to the original authors of the packages. The
+original licences and copyrights should be respected and retained. 
+
+The EZPDO team

@@ -1,0 +1,89 @@
+/**
+ * $Id: bnf.txt 1038 2007-02-11 01:38:59Z nauhygon $
+ *
+ * The BNF for EZOQL
+ *  
+ * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
+ * 
+ * @author Oak Nauhygon <ezpdo4php@gmail.com>
+ * @author Trevan Richins <developer@ckiweb.com>
+ * @version $Revision: 1038 $
+ * @package ezpdo
+ * @subpackage ezpdo.query
+ */
+
+<query> ::=
+   [ ["select"] <aggregate_clause> ] 
+   "from" <class_clause> 
+   "where" <where_clause> 
+   [ "order by" <orderby_clause> ] 
+   [ "limit" <limit_clause> ]
+
+<aggregate_clause> ::=
+   ( "avg" | "count" | "max" | "min" | "sum" ) "(" <variable> ")" | "count(*)"
+
+<class_clause> ::=
+   <class_name> [ ["as"] <class_alias> ] ["," <class_clause>]
+
+<where_clause> ::=
+   <logical_term> { [ "or" | "||" ] <logical_term> }
+
+<orderby_clause> ::=
+   "random()" | ( <orderby_item> [ { , <orderby_item> } ] )
+
+<orderby_item> ::=
+   <variable> [ "asc" | "desc" ]
+   
+<limit_clause>
+   [ <number> "," ] <number>
+
+<logical_term> ::=
+   <logical_factor> { ["and" | "&&"] ( <logical_factor> | ( "(" <where_clause> ")" ) }
+
+<logical_factor> ::=
+   <variable> (
+         ( <comparison_op> <exp_simple> )
+       | ( [ "not" ] "between" <exp_simple> "and" <exp_simple> )
+       | ( [ "not" ] "like" <string> )
+       | ( "is" [ "not" ] "null" )
+       | ( ".contains(" <variable_identifier> ")" ) )
+       | ( "in(" <constant> ["," <constant>] ")" )
+
+<comparison_op> ::=
+   "=" | "==" | "<" | ">" | "<>" | "!=" | "^=" | "<=" | ">="
+
+<exp_simple> ::=
+   [ "+" | "-" ] <term> { ( "+" | "-" ) <term> }
+
+<term> ::=
+   <factor> { ( "*" | "/" ) ( <factor> | ( "(" <exp_simple> ")" ) }
+
+<factor> ::=
+   ( <variable> | <constant> )
+
+<constant> ::=
+   ( <string> | <number> )
+
+<string> ::=
+   ( """ { <any character> } """ ) | ( "'" { <any character> } "'" )
+
+<number> ::=
+   <digit> { <digit> }
+
+<variable> ::=
+   [ <class_identifier> "." ] { <variable_identifier> "." } <variable_identifier>
+
+<class_identifier> ::=
+   ( <class_name> | <class_alias> )
+
+<class_name> ::=
+   <identifier>
+
+<class_alias> ::=
+   <identifier>
+
+<variable_identifier> ::=
+   <identifier>
+
+<identifier> ::=
+   <letter> { <letter> | <digit> | "_" } | "`" <letter> { <letter> | <digit> | "_" } "`"

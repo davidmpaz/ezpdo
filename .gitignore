@@ -1,0 +1,8 @@
+/.settings
+/.buildpath
+/.project
+*.log
+*.db
+output/
+compiled/
+compiled.ezpdo

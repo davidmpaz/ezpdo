@@ -1,0 +1,21 @@
+This example is to test the cyclic access to one-valued 
+("has one") overloaded properties. 
+
+note that print.php & print_a.php print out the same contents in objects, 
+but use different access methods. print.php uses the conventional '->' 
+operator to access vars in objects, while print_a.php accesses vars as 
+values of associated arrays by keys. 
+
+1. add objects into db
+
+$ php add.php
+$ php print.php
+$ php print_a.php
+
+2. delete objects in db
+
+$ php delete.php
+$ php print.php
+$ php print_a.php
+
+$Id: readme 371 2005-08-04 04:39:38Z nauhygon $

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<options>
+    
+    <!-- compiler options -->
+    <source_dirs>../classes/bookstore/src</source_dirs>
+    <compiled_dir>output</compiled_dir>
+    <recursive>true</recursive>
+    <default_dsn>mysql://ezpdo:pdoiseasy@localhost/ezpdo</default_dsn>    
+    <compiled_file>compiled.ezpdo</compiled_file>
+    
+    <!-- log conifg for compiler -->
+    <log>
+        <console>
+            <enabled>false</enabled>
+            <stream>stdout</stream>
+        </console>
+        <file>
+            <enabled>false</enabled>
+            <log_file>output/ezpdo.log</log_file>
+        </file>
+        <db>
+            <enabled>false</enabled>
+            <dsn>mysql://ezpdo:pdoiseasy@localhost/ezpdo</dsn>
+            <log_table>ezpdo_log</log_table>
+        </db>
+    </log>
+
+</options>
