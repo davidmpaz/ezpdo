@@ -1,0 +1,6 @@
+To recompile API docs:
+
+phpdoc -c phpdoc.ini
+
+
+$Id: readme 14 2005-02-22 14:23:15Z nauhygon $

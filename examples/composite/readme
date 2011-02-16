@@ -1,0 +1,28 @@
+This is an example to show how EZPDO can handle complicated object 
+relationships. The class hierarchy looks like this.
+
+Graphic -+- Point
+         |
+         +- Line
+         |
+         +- Text
+
+This is a simple example of the Composite design pattern. Each Graphic 
+object can have a parent Graphic object and a set of child Graphic 
+objects. EZPDO can persist all the composition relationships and you will 
+find it is fairly easy to do with EZPDO.
+
+To test the scripts: 
+
+1. add Graphic objects into db
+
+$ php add.php
+$ php print.php
+
+2. delete objects in db
+
+$ php delete.php
+$ php print.php
+
+$Id: readme 258 2005-06-18 03:51:23Z nauhygon $
+

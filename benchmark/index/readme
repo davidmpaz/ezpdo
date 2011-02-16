@@ -1,0 +1,37 @@
+This is a benchmarking case that has the minimalist access coontrol 
+implemented. Three classes: iUser, iGroup, iThingy. User and group 
+form a many-to-many relationship. Each thingy (iThingy) is accessible 
+to several groups. 
+
+The default setting for object creation: 2000 users, 20 groups and 
+2000 thingies. Each group contains 20 randomly picked users, and each 
+thingy is accessible to 5 randomly picked groups. This is all done 
+in add.php.
+
+The query is to find all thingies that a user is allowed to access: 
+$thingies = $m->find(
+    'from iThingy where groups.contains(g) and g.users.contains(u) and u.name = ?', 
+    $username);
+
+We want to observe the difference bewteen with and without indexing. 
+To start with, run the scripts with ezpdo.1.1.3 (the version that 
+does not have index/key support), and an empty database. Then run 
+the scripts with the latest version. 
+
+Steps to run the scripts: 
+
+1. add objects into db
+
+$ php add.php
+$ php print.php
+
+2. find one object (by a random author name) in db
+
+$php find.php
+
+3. delete all objects (authors and books) in db
+
+$ php delete.php
+$ php print.php
+
+$Id: readme 273 2005-06-27 02:07:49Z nauhygon $

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<options>
+    
+    <!-- compiler options -->
+    <source_dirs>../classes/bookstore/src</source_dirs>
+    <compiled_dir>output</compiled_dir>
+    <recursive>true</recursive>
+    <default_dsn>sqlite://output%2ftest.adodb.db</default_dsn>
+    <compiled_file>compiled.ezpdo</compiled_file>
+    <validate_after_compile>false</validate_after_compile>
+    <backup_compiled>false</backup_compiled>
+    
+    <!-- config for testing -->
+    <test>
+        
+        <!-- compiled file for testing different dbs -->
+        <compiled_file>
+            <mysql>compiled.ezpdo.mysql</mysql>
+            <pgsql>compiled.ezpdo.pgsql</pgsql>
+            <sqlite>
+                <adodb>compiled.ezpdo.adodb</adodb>
+                <peardb>compiled.ezpdo.peardb</peardb>
+                <pdo>compiled.ezpdo.pdo</pdo>
+            </sqlite>
+        </compiled_file>
+
+        <!-- default dsn for testing different dbs -->
+        <default_dsn>
+            <mysql>mysql://ezpdo:pdoiseasy@localhost/ezpdo</mysql>
+            <pgsql>pgsql://ezpdo:pdoiseasy@localhost/ezpdo</pgsql>
+            <sqlite>
+                <adodb>sqlite://output%2ftest.adodb.db</adodb>
+                <peardb>sqlite://./output/test.peardb.db</peardb>
+                <pdo>sqlite://output/test.pdo.db</pdo>
+            </sqlite>
+        </default_dsn>
+
+    </test>
+
+</options>

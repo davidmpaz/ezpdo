@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<options>
+    
+  <!-- The intput directory that contains class source files to be compiled -->
+  <!-- Use commma for multiple directories -->
+  <source_dirs>classes</source_dirs>
+ 
+  <!-- Whether to compile subdirs recursively: true(default)|false -->
+  <recursive>true</recursive>
+ 
+  <!-- The output directory that the compiled runtime info is stored -->
+  <!-- You need to make it writable to the user who runs your web app -->
+  <compiled_dir>compiled</compiled_dir>
+  
+  <!-- The file to contain the compiled information: default to compiled.ezpdo --> 
+  <compiled_file>compiled.ezpdo</compiled_file>
+  
+  <!-- The default DSN to the database you want to store your objects -->
+  <!-- This will be the default DSN for classes that do not have DSN specified -->
+  <!-- <default_dsn>mysql://ezpdo_ex:pdoiseasy@localhost/ezpdo_ex</default_dsn> -->
+  <default_dsn>sqlite://books.db</default_dsn>
+  <!-- For PEAR DB, you must write this -->
+  <!-- <default_dsn>sqlite://./books.db</default_dsn> -->
+ 
+  <!-- Whether to enable auto-compile: true(default)|false -->
+  <!-- Class will be auto-compiled for the first time to be persisted -->
+  <auto_compile>true</auto_compile>
+ 
+  <!-- Whether you want to enable auto-flush: true(default)|false -->
+  <!-- All 'dirty' objects are commit beore your script exits-->
+  <auto_flush>true</auto_flush>
+  
+  <!-- The database abstraction library you want to use: default to adodb-->
+  <!-- Currently available options: adodb, peardb -->
+  <!-- 
+  <db_lib>peardb</db_lib>
+  -->
+  <db_lib>adodb</db_lib>
+  
+  <!-- Whether to write log on console: true(default)|false -->
+  <!-- Note that console log only works on command line)    -->
+  <log_console>true</log_console>
+
+  <!-- Log file name (string). If unspecified, no log is generated. -->
+  <!-- Note that 'relative' path is relative path to this config file   -->
+  <log_file>ezpdo.log</log_file>
+
+</options>

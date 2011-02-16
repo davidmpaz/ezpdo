@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<options>
+    <log_console>false</log_console>
+    <log_file>output/test.log</log_file>
+</options>

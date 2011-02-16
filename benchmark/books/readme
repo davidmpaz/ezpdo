@@ -1,0 +1,35 @@
+This is a small benchmarking suite, in which Author and Book have
+a many-to-many relationship. You can specify the cardinalities in
+common.php (NUM_AUTHORS and NUM_BOOKS). 
+
+Simply run the scripts. At the end of each script run, the time 
+used to execute the script and the number of queries made will be 
+printed out. 
+
+Scripts provided are listed below. 
+
+1. add objects into db
+
+$ php add.php
+$ php print.php
+
+2. find one object (by a random author name) in db
+
+$php find.php
+
+3. update an object (by a random author name) in db
+
+$php update.php
+$php find.php
+
+4. delete 1 object (by a random author name) in db
+
+$ php delete1.php
+$ php find.php
+
+5. delete all objects (authors and books) in db
+
+$ php delete.php
+$ php print.php
+
+$Id: readme 273 2005-06-27 02:07:49Z nauhygon $
