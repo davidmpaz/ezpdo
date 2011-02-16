@@ -113,7 +113,12 @@ class epLib_Log
 
         /* If the class exists, return a new instance of it. */
         if (class_exists($class)) {
+/*
+	    New code because assigning the return valure of new by reference is deprecated
             $object =& new $class($name, $ident, $conf, $maxLevel);
+*/
+	    $objectObj = new $class($name, $ident, $conf, $maxLevel);
+	    $object =& $objectObj;
             return $object;
         }
 

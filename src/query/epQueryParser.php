@@ -2,9 +2,9 @@
 
 /**
  * $Id: epQueryParser.php 1048 2007-04-13 02:31:17Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1048 $
  * @package ezpdo
@@ -55,21 +55,21 @@ epDefine('EPQ_N_WHERE');
 /**#@-*/
 
 /**
- * The class of an EZOQL syntax node 
- * 
- * A syntax node is part of the syntax tree and can have its 
- * children nodes and a parent. A node without parent is the 
- * root of the syntax tree. A node can also have named 
- * parameters. 
- * 
+ * The class of an EZOQL syntax node
+ *
+ * A syntax node is part of the syntax tree and can have its
+ * children nodes and a parent. A node without parent is the
+ * root of the syntax tree. A node can also have named
+ * parameters.
+ *
  * There are two parameters 'line' and 'char' that the parser
- * always installs for a node, which indicate the location 
- * in the source code from which this node is parsed from. 
- * 
+ * always installs for a node, which indicate the location
+ * in the source code from which this node is parsed from.
+ *
  * A node can also keep records of parsing errors, but so far
  * not used (as the parser {@epQueryParser} also collects errors
  * during parsing).
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1048 $
  * @package ezpdo
@@ -79,7 +79,7 @@ class epQueryNode extends epBase {
     
     /**
      * Parent of the node (It's a root node if empty.)
-     * @var false|epQueryNode 
+     * @var false|epQueryNode
      */
     protected $parent = false;
     
@@ -97,18 +97,18 @@ class epQueryNode extends epBase {
     
     /**
      * Parameters of the node (an associative array)
-     * @var array 
+     * @var array
      */
     protected $params = array();
     
     /**
      * Erros when parsing the node
-     * @var array 
+     * @var array
      */
     protected $errors = array();
     
     /**
-     * Constructor 
+     * Constructor
      * @param false|epQueryNode $parent
      */
     public function __construct($type = EPQ_N_UNKNOW, $parent = false) {
@@ -164,7 +164,7 @@ class epQueryNode extends epBase {
         $false = false;
         if (!isset($this->children[$key])) {
             return $false;
-        } 
+        }
         return $this->children[$key];
     }
     
@@ -215,7 +215,7 @@ class epQueryNode extends epBase {
         foreach($children as $k => $n) {
             if (is_integer($k)) {
                 $status &= $this->addChild($n);
-            } 
+            }
             else if (is_string($k)) {
                 $status &= $this->addChild($n, $k);
             }
@@ -236,7 +236,7 @@ class epQueryNode extends epBase {
             
             if (!isset($this->children[$key_or_node])) {
                 return false;
-            } 
+            }
             
             $this->children[$key_or_node]->setParent(false);
             unset($this->children[$key_or_node]);
@@ -274,7 +274,7 @@ class epQueryNode extends epBase {
             
             if (!isset($this->children[$key_or_node])) {
                 return false;
-            } 
+            }
             
             // remove parent from child
             $this->children[$key_or_node]->setParent(false);
@@ -300,7 +300,7 @@ class epQueryNode extends epBase {
                     // remove parent from child
                     $this->children[$key]->setParent(false);
                     
-                    // replace child with new node 
+                    // replace child with new node
                     $this->children[$key] = $node;
 
                     // set parent to child node
@@ -323,14 +323,14 @@ class epQueryNode extends epBase {
     }
 
     /**
-     * Get the value of a parameter 
+     * Get the value of a parameter
      * @param string $name
      * @return null|else (null if not found)
      */
     public function getParam($name) {
         if (!isset($this->params[$name])) {
             return null;
-        } 
+        }
         return $this->params[$name];
     }
     
@@ -350,7 +350,7 @@ class epQueryNode extends epBase {
     }
     
     /**
-     * Get all errors when parsing the node 
+     * Get all errors when parsing the node
      * @return array
      */
     public function getErrors() {
@@ -367,12 +367,12 @@ class epQueryNode extends epBase {
     
     /**
      * Implement magic method __toString()
-     * 
-     * Note that all the Parser testing depend on the output of this method. 
-     * Changing this method may break all the tests. 
+     *
+     * Note that all the Parser testing depend on the output of this method.
+     * Changing this method may break all the tests.
      */
-    public function __toString($indent = '') {
-        
+    //public function __toString($indent = '') {
+    public function __invoke($indent = '') {
         // indent
         $s = $indent;
         
@@ -403,11 +403,11 @@ class epQueryNode extends epBase {
 
                 // child may be an array
                 if (is_array($child)) {
-                    foreach($child as $child_) { 
-                        $s .= $child_->__toString($indent);
+                    foreach($child as $child_) {
+                        $s .= $child_->__invoke($indent);
                     }
                 } else {
-                    $s .= $child->__toString($indent);
+                    $s .= $child->__invoke($indent);
                 }
             }
         }
@@ -426,7 +426,7 @@ class epQueryNode extends epBase {
     private function _pv2str($v) {
         if (is_bool($v)) {
             return $v ? 'true' : 'false';
-        } 
+        }
         else if (is_array($v)) {
             
             // stringify array $v
@@ -443,16 +443,16 @@ class epQueryNode extends epBase {
 
 /**
  * The class of EZOQL Parser
- * 
- * Put it simply, the parser converts the EZOQL query string into a 
- * syntax tree that contains syntax nodes. 
- * 
- * This is a recursive-descent parser (see 
- * {@link http://en.wikipedia.org/wiki/Recursive_descent_parser}) 
- * for EZOQL and uses lexical and semantic feedback to disambiguate 
- * non-LL(1) structures. The '1' in LL(1) means that the parser uses 
- * only 1-token lookahead ({@link epQueryParser::peek()}). 
- * 
+ *
+ * Put it simply, the parser converts the EZOQL query string into a
+ * syntax tree that contains syntax nodes.
+ *
+ * This is a recursive-descent parser (see
+ * {@link http://en.wikipedia.org/wiki/Recursive_descent_parser})
+ * for EZOQL and uses lexical and semantic feedback to disambiguate
+ * non-LL(1) structures. The '1' in LL(1) means that the parser uses
+ * only 1-token lookahead ({@link epQueryParser::peek()}).
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1048 $
  * @package ezpdo
@@ -461,7 +461,7 @@ class epQueryNode extends epBase {
 class epQueryParser extends epParser {
     
     /**
-     * The current node 
+     * The current node
      * @var false|epQueryNode
      */
     protected $n = false;
@@ -585,7 +585,7 @@ class epQueryParser extends epParser {
         if ($this->peek() != EPQ_T_FROM) {
             $this->syntax_error("'from' expected");
             return false;
-        } 
+        }
 
         // parse 'from'
         if ($from = $this->from()) {
@@ -598,7 +598,7 @@ class epQueryParser extends epParser {
             if ($where = $this->where()) {
                 $node->addChild($where, 'where');
             }
-        } 
+        }
 
         // check if 'order by' exists
         if ($this->peek() == EPQ_T_ORDER) {
@@ -819,7 +819,7 @@ class epQueryParser extends epParser {
         $this->next();
         
         // parse expression (simple expression)
-        if (!($e = $this->logic())) { 
+        if (!($e = $this->logic())) {
             $this->syntax_error("Invalid expression in parentheses");
         }
         
@@ -1079,10 +1079,10 @@ class epQueryParser extends epParser {
     protected function primary() {
         $this->message(__METHOD__);
         
-        // simple expression in ()? 
+        // simple expression in ()?
         if (($t = $this->peek()) == '(') {
             return $this->paren_a();
-        } 
+        }
         // string
         else if ($t == EPQ_T_STRING) {
             $this->next();
@@ -1121,7 +1121,7 @@ class epQueryParser extends epParser {
         else if ($v = $this->functions()) {
             return $v;
         }
-        // try variable 
+        // try variable
         else if ($v = $this->variable()) {
             return $v;
         }
@@ -1143,7 +1143,7 @@ class epQueryParser extends epParser {
         $this->next();
         
         // parse expression (simple expression)
-        if (!($e = $this->add())) { 
+        if (!($e = $this->add())) {
             $this->syntax_error("Invalid expression in parentheses");
         }
         
@@ -1207,7 +1207,7 @@ class epQueryParser extends epParser {
     }
 
     /**
-     * Parses 'not': not [like | between <expr1> and <expr2>] 
+     * Parses 'not': not [like | between <expr1> and <expr2>]
      * @return false|epQueryNode
      */
     protected function not() {
@@ -1233,14 +1233,14 @@ class epQueryParser extends epParser {
             return $like;
         }
         
-        // between 
+        // between
         if ($t == EPQ_T_BETWEEN) {
             if (!($between = $this->between())) {
                 return false;
             }
             $between->addChild($node, 'not');
             return $between;
-        } 
+        }
 
         $this->syntax_error("'between' or 'like' is expected");
         return false;
@@ -1253,13 +1253,13 @@ class epQueryParser extends epParser {
     protected function between() {
         $this->message(__METHOD__);
         
-        // expect 'between' 
+        // expect 'between'
         if ($this->peek() != EPQ_T_BETWEEN) {
             return false;
         }
         $this->next();
 
-        // expr1 
+        // expr1
         if (!($e1 = $this->add())) {
             $this->syntax_error('Invalid expression after between');
             return false;
@@ -1297,7 +1297,7 @@ class epQueryParser extends epParser {
     protected function like() {
         $this->message(__METHOD__);
         
-        // expect 'like' 
+        // expect 'like'
         if ($this->peek() != EPQ_T_LIKE) {
             return false;
         }
@@ -1337,11 +1337,11 @@ class epQueryParser extends epParser {
         $t = $this->peek();
         while ($t == EPQ_T_IDENTIFIER
                || $t == EPQ_T_STRING
-               || $t == '?' 
-               || $t == '_' 
-               || $t == '['  
-               || $t == '-' 
-               || $t == ']' 
+               || $t == '?'
+               || $t == '_'
+               || $t == '['
+               || $t == '-'
+               || $t == ']'
                || $t == '^') {
             $this->next();
             $pattern .= $this->t->value;
@@ -1420,7 +1420,7 @@ class epQueryParser extends epParser {
             $ph = $this->node(EPQ_N_PLACEHOLDER);
             $ph->setParam('aindex', $this->aindex ++);
             $node->addChild($ph, 'arg');
-        } 
+        }
         else {
             // regular string
             $node->setParam('arg', $name);
@@ -1539,7 +1539,7 @@ class epQueryParser extends epParser {
             $this->next();
         }
         
-        // expect string 
+        // expect string
         $arg = false;
         if (($t = $this->peek()) == EPQ_T_STRING) {
             $this->next();
@@ -1595,7 +1595,7 @@ class epQueryParser extends epParser {
             $this->next();
         }
         
-        // expect string 
+        // expect string
         if (!($arg1 = $this->primary())) {
             $this->syntax_error("string or variable expected as argument for 'strcmp'");
             return false;
@@ -1607,7 +1607,7 @@ class epQueryParser extends epParser {
             $this->next();
         }
 
-        // expect string 
+        // expect string
         if (!($arg2 = $this->primary())) {
             $this->syntax_error("string or variable expected as argument for 'strcmp'");
             return false;
@@ -1700,7 +1700,7 @@ class epQueryParser extends epParser {
                 break;
             }
             
-            // put part into parts 
+            // put part into parts
             $parts[] = $part;
             
             // peek next
@@ -1785,7 +1785,7 @@ class epQueryParser extends epParser {
                 if (!($var = $this->variable())) {
                     $this->syntax_error("Invalid variable after 'order by'");
                     continue;
-                } 
+                }
 
                 // make an orderby item node
                 if (!($item = $this->node(EPQ_N_ORDERBY_ITEM))) {
@@ -1873,7 +1873,7 @@ class epQueryParser extends epParser {
      * @return boolean
      */
     protected function _isAggregateFunc($t) {
-        return $t == EPQ_T_AVG 
+        return $t == EPQ_T_AVG
             || $t == EPQ_T_COUNT
             || $t == EPQ_T_MAX
             || $t == EPQ_T_MIN
@@ -1913,7 +1913,7 @@ class epQueryParser extends epParser {
         }
 
         // return this node
-        return $this->n; 
+        return $this->n;
     }
 
     /**

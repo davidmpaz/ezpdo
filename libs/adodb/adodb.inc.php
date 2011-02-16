@@ -885,7 +885,12 @@
 		} 
 		
 		if ($this->_queryID === true) { // return simplified recordset for inserts/updates/deletes with lower overhead
+/*
+			New code because assigning the return valure of new by reference is deprecated
 			$rs =& new ADORecordSet_empty();
+*/
+			$rsObj = new ADORecordSet_empty();
+			$rs =& $rsObj;
 			return $rs;
 		}
 		
@@ -1853,7 +1858,14 @@
 		
 		if (empty($this->_metars)) {
 			$rsclass = $this->rsPrefix.$this->databaseType;
+/*
+			New code because assigning the return valure of new by reference is deprecated
 			$this->_metars =& new $rsclass(false,$this->fetchMode); 
+*/
+			$rsObj = new $rsclass(false,$this->fetchMode); 
+			$rs =& $rsObj;
+
+			$this->_metars = $rs;
 		}
 		
 		return $this->_metars->MetaType($t,$len,$fieldobj);

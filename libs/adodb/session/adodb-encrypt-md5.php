@@ -21,14 +21,24 @@ class ADODB_Encrypt_MD5 {
 	/**
 	 */
 	function write($data, $key) {
+/*
+		New code because assigning the return valure of new by reference is deprecated
 		$md5crypt =& new MD5Crypt();
+*/
+		$md5cryptObj = new MD5Crypt();
+		$md5crypt =& $md5crypt;
 		return $md5crypt->encrypt($data, $key);
 	}
 
 	/**
 	 */
 	function read($data, $key) {
+/*
+		New code because assigning the return valure of new by reference is deprecated
 		$md5crypt =& new MD5Crypt();
+*/
+		$md5cryptObj = new MD5Crypt();
+		$md5crypt =& $md5crypt;
 		return $md5crypt->decrypt($data, $key);
 	}
 

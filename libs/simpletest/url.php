@@ -216,7 +216,7 @@
             }
             if (preg_match('/(.*?)@(.*)/', $url, $matches)) {
                 $url = $prefix . $matches[2];
-                $parts = split(":", $matches[1]);
+                $parts = explode(":", $matches[1]);
                 return array(
                         urldecode($parts[0]),
                         isset($parts[1]) ? urldecode($parts[1]) : false);
@@ -292,7 +292,7 @@
          */
         function _parseRequest($raw) {
             $request = new SimpleQueryString();
-            foreach (split("&", $raw) as $pair) {
+            foreach (explode("&", $raw) as $pair) {
                 if (preg_match('/(.*?)=(.*)/', $pair, $matches)) {
                     $request->add($matches[1], urldecode($matches[2]));
                 } elseif ($pair) {

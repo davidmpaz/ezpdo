@@ -422,7 +422,12 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
 		}
 		if (empty($qid)) return $false;
 		
+/*
+		New code because assigning the return valure of new by reference is deprecated
 		$rs =& new ADORecordSet_odbc($qid);
+*/
+		$rsObj = new ADORecordSet_odbc($qid);
+		$rs =& $rsObj;
 		$ADODB_FETCH_MODE = $savem;
 		
 		if (!$rs) return $false;

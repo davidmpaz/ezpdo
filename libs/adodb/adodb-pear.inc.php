@@ -113,7 +113,15 @@ class DB
 	{
 		include_once(ADODB_DIR."/drivers/adodb-$type.inc.php");
 		$obj = &NewADOConnection($type);
+/*
+		New code because assigning the return valure of new by reference is deprecated
 		if (!is_object($obj)) $obj =& new PEAR_Error('Unknown Database Driver: '.$dsninfo['phptype'],-1);
+*/
+		if (!is_object($obj))
+		{
+		    $objObj = new PEAR_Error('Unknown Database Driver: '.$dsninfo['phptype'],-1);
+		    $obj =& $objObj;
+		}
 		return $obj;
 	}
 
@@ -159,7 +167,12 @@ class DB
 
 		@$obj =& NewADOConnection($type);
 		if (!is_object($obj)) {
+/*
+			New code because assigning the return valure of new by reference is deprecated
 			$obj =& new PEAR_Error('Unknown Database Driver: '.$dsninfo['phptype'],-1);
+*/
+			$objObj = new PEAR_Error('Unknown Database Driver: '.$dsninfo['phptype'],-1);
+			$obj =& $objObj;
 			return $obj;
 		}
 		if (is_array($options)) {

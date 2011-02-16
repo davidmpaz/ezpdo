@@ -493,7 +493,13 @@ abstract class epQueryPathNode extends epContainer {
         if ($fm && !$fm->isPrimitive() && $fm->isMany()) {
             
             // create a child - an alias root 
+/*
+	    New code because assigning the return valure of new by reference is deprecated
             if (!($child = & new epQueryPathRoot($cm, $piece, epQueryPathRoot::CONTAINED))) {
+*/
+	    $childObj = new epQueryPathRoot($cm, $piece, epQueryPathRoot::CONTAINED);
+	    $child =& $childObj;
+	    if (!($child)) {
                 throw new epExceptionQueryPath("cannot create a node for '$piece'");
                 return false;
             }
@@ -523,11 +529,17 @@ abstract class epQueryPathNode extends epContainer {
         }
 
         // create a child
+/*
+	New code because assigning the return valure of new by reference is deprecated
         if (!($child = & new epQueryPathField($fm))) {
+*/
+        $childObj = new epQueryPathField($fm);
+        $child =& $childObj;
+        if (!($child)) {
             throw new epExceptionQueryPath("cannot create a node for '$piece'"); 
             return self::$false;
         }
-        
+
         // add it into parent
         $this->addChild($child);
 

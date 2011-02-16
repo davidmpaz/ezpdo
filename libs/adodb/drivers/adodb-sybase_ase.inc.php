@@ -77,7 +77,12 @@ class ADODB_sybase_ase extends ADODB_sybase {
 
 			$retarr = array();
 			while (!$rs->EOF) {
+/*
+				New code because assigning the return valure of new by reference is deprecated
 				$fld =& new ADOFieldObject();
+*/
+				$fldObj = new ADOFieldObject();
+				$fld =& $fldObj;
 				$fld->name = $rs->Fields('field_name');
 				$fld->type = $rs->Fields('type');
 				$fld->max_length = $rs->Fields('width');
