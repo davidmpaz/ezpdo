@@ -6,7 +6,7 @@
     // The following URL will depend on your own installation.
     $base_url = 'http://uno/simple/';
     
-    $test = &new GroupTest('Remote tests');
+    $test = new GroupTest('Remote tests');
     $test->addTestCase(new RemoteTestCase(
             $base_url . 'test/visual_test.php?xml=yes',
             $base_url . 'test/visual_test.php?xml=yes&dry=yes'));

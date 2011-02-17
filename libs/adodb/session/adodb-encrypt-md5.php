@@ -2,7 +2,7 @@
 
 /*
 V4.65 22 July 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
-         Contributed by Ross Smith (adodb@netebb.com). 
+         Contributed by Ross Smith (adodb@netebb.com).
   Released under both BSD license and Lesser GPL library license.
   Whenever there is any discrepancy between the two licenses,
   the BSD license will take precedence.
@@ -23,7 +23,7 @@ class ADODB_Encrypt_MD5 {
 	function write($data, $key) {
 /*
 		New code because assigning the return valure of new by reference is deprecated
-		$md5crypt =& new MD5Crypt();
+		$md5crypt = new MD5Crypt();
 */
 		$md5cryptObj = new MD5Crypt();
 		$md5crypt =& $md5crypt;
@@ -35,7 +35,7 @@ class ADODB_Encrypt_MD5 {
 	function read($data, $key) {
 /*
 		New code because assigning the return valure of new by reference is deprecated
-		$md5crypt =& new MD5Crypt();
+		$md5crypt = new MD5Crypt();
 */
 		$md5cryptObj = new MD5Crypt();
 		$md5crypt =& $md5crypt;

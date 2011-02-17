@@ -449,7 +449,7 @@
             if (! $parameters) {
                 return '';
             }
-            $query = &new SimpleQueryString();
+            $query = new SimpleQueryString();
             foreach ($parameters as $key => $value) {
                 $query->add($key, $value);
             }
@@ -493,7 +493,7 @@
          *    @access public
          */
         function clearRequest() {
-            $this->_request = &new SimpleQueryString();
+            $this->_request = new SimpleQueryString();
         }
         
         /**

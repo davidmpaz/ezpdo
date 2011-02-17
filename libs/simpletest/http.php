@@ -764,13 +764,13 @@
         function _parse($raw) {
             if (! $raw) {
                 $this->_setError('Nothing fetched');
-                $this->_headers = &new SimpleHttpHeaders('');
+                $this->_headers = new SimpleHttpHeaders('');
             } elseif (! strstr($raw, "\r\n\r\n")) {
                 $this->_setError('Could not parse headers');
-                $this->_headers = &new SimpleHttpHeaders($raw);
+                $this->_headers = new SimpleHttpHeaders($raw);
             } else {
                 list($headers, $this->_content) = explode("\r\n\r\n", $raw, 2);
-                $this->_headers = &new SimpleHttpHeaders($headers);
+                $this->_headers = new SimpleHttpHeaders($headers);
             }
         }
         

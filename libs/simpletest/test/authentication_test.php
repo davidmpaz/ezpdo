@@ -10,7 +10,7 @@
         }
         
         function testWithinSameUrl() {
-            $realm = &new SimpleRealm(
+            $realm = new SimpleRealm(
                     'Basic',
                     new SimpleUrl('http://www.here.com/path/hello.html'));
             $this->assertTrue($realm->isWithin(
@@ -18,7 +18,7 @@
         }
         
         function testInsideWithLongerUrl() {
-            $realm = &new SimpleRealm(
+            $realm = new SimpleRealm(
                     'Basic',
                     new SimpleUrl('http://www.here.com/path/'));
             $this->assertTrue($realm->isWithin(
@@ -26,7 +26,7 @@
         }
         
         function testBelowRootIsOutside() {
-            $realm = &new SimpleRealm(
+            $realm = new SimpleRealm(
                     'Basic',
                     new SimpleUrl('http://www.here.com/path/'));
             $this->assertTrue($realm->isWithin(
@@ -34,7 +34,7 @@
         }
         
         function testOldNetscapeDefinitionIsOutside() {
-            $realm = &new SimpleRealm(
+            $realm = new SimpleRealm(
                     'Basic',
                     new SimpleUrl('http://www.here.com/path/'));
             $this->assertFalse($realm->isWithin(
@@ -42,7 +42,7 @@
         }
         
         function testDifferentPageNameStillInside() {
-            $realm = &new SimpleRealm(
+            $realm = new SimpleRealm(
                     'Basic',
                     new SimpleUrl('http://www.here.com/path/hello.html'));
             $this->assertTrue($realm->isWithin(
@@ -50,7 +50,7 @@
         }
         
         function testNewUrlInSameDirectoryDoesNotChangeRealm() {
-            $realm = &new SimpleRealm(
+            $realm = new SimpleRealm(
                     'Basic',
                     new SimpleUrl('http://www.here.com/path/hello.html'));
             $realm->stretch(new SimpleUrl('http://www.here.com/path/goodbye.html'));
@@ -61,7 +61,7 @@
         }
         
         function testNewUrlMakesRealmTheCommonPath() {
-            $realm = &new SimpleRealm(
+            $realm = new SimpleRealm(
                     'Basic',
                     new SimpleUrl('http://www.here.com/path/here/hello.html'));
             $realm->stretch(new SimpleUrl('http://www.here.com/path/there/goodbye.html'));
@@ -86,15 +86,15 @@
         }
         
         function testNoRealms() {
-            $request = &new MockSimpleHttpRequest($this);
+            $request = new MockSimpleHttpRequest($this);
             $request->expectNever('addHeaderLine');
-            $authenticator = &new SimpleAuthenticator();
+            $authenticator = new SimpleAuthenticator();
             $authenticator->addHeaders($request, new SimpleUrl('http://here.com/'));
             $request->tally();
         }
         
         function &createSingleRealm() {
-            $authenticator = &new SimpleAuthenticator();
+            $authenticator = new SimpleAuthenticator();
             $authenticator->addRealm(
                     new SimpleUrl('http://www.here.com/path/hello.html'),
                     'Basic',
@@ -104,7 +104,7 @@
         }
         
         function testOutsideRealm() {
-            $request = &new MockSimpleHttpRequest($this);
+            $request = new MockSimpleHttpRequest($this);
             $request->expectNever('addHeaderLine');
             $authenticator = &$this->createSingleRealm();
             $authenticator->addHeaders(
@@ -114,7 +114,7 @@
         }
         
         function testWithinRealm() {
-            $request = &new MockSimpleHttpRequest($this);
+            $request = new MockSimpleHttpRequest($this);
             $request->expectOnce('addHeaderLine');
             $authenticator = &$this->createSingleRealm();
             $authenticator->addHeaders(
@@ -124,7 +124,7 @@
         }
         
         function testDifferentHostIsOutsideRealm() {
-            $request = &new MockSimpleHttpRequest($this);
+            $request = new MockSimpleHttpRequest($this);
             $request->expectNever('addHeaderLine');
             $authenticator = &$this->createSingleRealm();
             $authenticator->addHeaders(

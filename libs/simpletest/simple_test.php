@@ -599,7 +599,7 @@
             for ($i = 0; $i < count($this->_test_cases); $i++) {
                 if (is_string($this->_test_cases[$i])) {
                     $class = $this->_test_cases[$i];
-                    $test = &new $class();
+                    $test = new $class();
                     $test->run($reporter);
                 } else {
                     $this->_test_cases[$i]->run($reporter);

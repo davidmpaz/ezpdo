@@ -9,8 +9,8 @@
         }
         
         function testFormAttributes() {
-            $tag = &new SimpleFormTag(array('Method' => 'GET', 'action' => 'here.php', 'id' => '33'));
-            $form = &new SimpleForm($tag, new SimpleUrl('http://host/a/index.html'));
+            $tag = new SimpleFormTag(array('Method' => 'GET', 'action' => 'here.php', 'id' => '33'));
+            $form = new SimpleForm($tag, new SimpleUrl('http://host/a/index.html'));
             $this->assertEqual($form->getMethod(), 'get');
             $this->assertEqual(
                     $form->getAction(),
@@ -21,32 +21,32 @@
         }
         
         function testEmptyAction() {
-            $tag = &new SimpleFormTag(array('Method' => 'GET', 'action' => '', 'id' => '33'));
-            $form = &new SimpleForm($tag, new SimpleUrl('http://host/a/index.html'));
+            $tag = new SimpleFormTag(array('Method' => 'GET', 'action' => '', 'id' => '33'));
+            $form = new SimpleForm($tag, new SimpleUrl('http://host/a/index.html'));
             $this->assertEqual(
                     $form->getAction(),
                     new SimpleUrl('http://host/a/'));
         }
         
         function testMissingAction() {
-            $tag = &new SimpleFormTag(array('Method' => 'GET', 'id' => '33'));
-            $form = &new SimpleForm($tag, new SimpleUrl('http://host/a/index.html'));
+            $tag = new SimpleFormTag(array('Method' => 'GET', 'id' => '33'));
+            $form = new SimpleForm($tag, new SimpleUrl('http://host/a/index.html'));
             $this->assertEqual(
                     $form->getAction(),
                     new SimpleUrl('http://host/a/index.html'));
         }
         
         function testRootAction() {
-            $tag = &new SimpleFormTag(array('Method' => 'GET', 'action' => '/', 'id' => '33'));
-            $form = &new SimpleForm($tag, new SimpleUrl('http://host/a/index.html'));
+            $tag = new SimpleFormTag(array('Method' => 'GET', 'action' => '/', 'id' => '33'));
+            $form = new SimpleForm($tag, new SimpleUrl('http://host/a/index.html'));
             $this->assertEqual(
                     $form->getAction(),
                     new SimpleUrl('http://host/'));
         }
         
         function testDefaultFrameTargetOnForm() {
-            $tag = &new SimpleFormTag(array('Method' => 'GET', 'action' => 'here.php', 'id' => '33'));
-            $form = &new SimpleForm($tag, new SimpleUrl('http://host/a/index.html'));
+            $tag = new SimpleFormTag(array('Method' => 'GET', 'action' => 'here.php', 'id' => '33'));
+            $form = new SimpleForm($tag, new SimpleUrl('http://host/a/index.html'));
             $form->setDefaultTarget('frame');
             
             $expected = new SimpleUrl('http://host/a/here.php');
@@ -55,7 +55,7 @@
         }
         
         function testTextWidget() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('htp://host'));
             $form->addWidget(new SimpleTextTag(
@@ -69,7 +69,7 @@
         }
         
         function testTextWidgetById() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('htp://host'));
             $form->addWidget(new SimpleTextTag(
@@ -81,14 +81,14 @@
         }
         
         function testSubmitEmpty() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('htp://host'));
             $this->assertIdentical($form->submit(), array());
         }
         
         function testSubmitButton() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('http://host'));
             $form->addWidget(new SimpleSubmitTag(
@@ -102,7 +102,7 @@
         }
         
         function testImageSubmitButton() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('htp://host'));
             $form->addWidget(new SimpleImageSubmitTag(array(
@@ -126,10 +126,10 @@
         }
         
         function testButtonTag() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('http://host'));
-            $widget = &new SimpleButtonTag(
+            $widget = new SimpleButtonTag(
                     array('type' => 'submit', 'name' => 'go', 'value' => 'Go', 'id' => '9'));
             $widget->addContent('Go!');
             $form->addWidget($widget);
@@ -141,10 +141,10 @@
         }
         
         function testSingleSelectFieldSubmitted() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('htp://host'));
-            $select = &new SimpleSelectionTag(array('name' => 'a'));
+            $select = new SimpleSelectionTag(array('name' => 'a'));
             $select->addTag(new SimpleOptionTag(
                     array('value' => 'aaa', 'selected' => '')));
             $form->addWidget($select);
@@ -152,7 +152,7 @@
         }
         
         function testUnchecked() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('htp://host'));
             $form->addWidget(new SimpleCheckboxTag(
@@ -165,7 +165,7 @@
         }
         
         function testChecked() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('htp://host'));
             $form->addWidget(new SimpleCheckboxTag(
@@ -178,7 +178,7 @@
         }
         
         function testSingleUncheckedRadioButton() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('htp://host'));
             $form->addWidget(new SimpleRadioButtonTag(
@@ -189,7 +189,7 @@
         }
         
         function testSingleCheckedRadioButton() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('htp://host'));
             $form->addWidget(new SimpleRadioButtonTag(
@@ -199,7 +199,7 @@
         }
         
         function testUncheckedRadioButtons() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('htp://host'));
             $form->addWidget(new SimpleRadioButtonTag(
@@ -216,7 +216,7 @@
         }
         
         function testCheckedRadioButtons() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('htp://host'));
             $form->addWidget(new SimpleRadioButtonTag(
@@ -229,7 +229,7 @@
         }
         
         function testMultipleFieldsWithSameKey() {
-            $form = &new SimpleForm(
+            $form = new SimpleForm(
                     new SimpleFormTag(array()),
                     new SimpleUrl('htp://host'));
             $form->addWidget(new SimpleCheckboxTag(

@@ -14,7 +14,7 @@
             return $this->_mock_shell;
         }
         function testExitCode() {
-            $this->_mock_shell = &new MockSimpleShell($this);
+            $this->_mock_shell = new MockSimpleShell($this);
             $this->_mock_shell->setReturnValue('execute', 0);
             $this->_mock_shell->expectOnce('execute', array('ls'));
             $this->assertTrue($this->execute('ls'));
@@ -22,13 +22,13 @@
             $this->_mock_shell->tally();
         }
         function testOutput() {
-            $this->_mock_shell = &new MockSimpleShell($this);
+            $this->_mock_shell = new MockSimpleShell($this);
             $this->_mock_shell->setReturnValue('execute', 0);
             $this->_mock_shell->setReturnValue('getOutput', "Line 1\nLine 2\n");
             $this->assertOutput("Line 1\nLine 2\n");
         }
         function testOutputPatterns() {
-            $this->_mock_shell = &new MockSimpleShell($this);
+            $this->_mock_shell = new MockSimpleShell($this);
             $this->_mock_shell->setReturnValue('execute', 0);
             $this->_mock_shell->setReturnValue('getOutput', "Line 1\nLine 2\n");
             $this->assertOutputPattern('/line/i');

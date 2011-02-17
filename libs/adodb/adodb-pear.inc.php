@@ -1,12 +1,12 @@
 <?php
-/** 
+/**
  * @version V4.65 22 July 2005 (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
- * Released under both BSD license and Lesser GPL library license. 
- * Whenever there is any discrepancy between the two licenses, 
- * the BSD license will take precedence. 
+ * Released under both BSD license and Lesser GPL library license.
+ * Whenever there is any discrepancy between the two licenses,
+ * the BSD license will take precedence.
  *
  * Set tabs to 4 for best viewing.
- * 
+ *
  * PEAR DB Emulation Layer for ADODB.
  *
  * The following code is modelled on PEAR DB code by Stig Bakken <ssb@fast.no>								   |
@@ -115,7 +115,7 @@ class DB
 		$obj = &NewADOConnection($type);
 /*
 		New code because assigning the return valure of new by reference is deprecated
-		if (!is_object($obj)) $obj =& new PEAR_Error('Unknown Database Driver: '.$dsninfo['phptype'],-1);
+		if (!is_object($obj)) $obj = new PEAR_Error('Unknown Database Driver: '.$dsninfo['phptype'],-1);
 */
 		if (!is_object($obj))
 		{
@@ -225,7 +225,7 @@ class DB
 	{
 		if (!is_object($value)) return false;
 		$class = get_class($value);
-		return $class == 'pear_error' || is_subclass_of($value, 'pear_error') || 
+		return $class == 'pear_error' || is_subclass_of($value, 'pear_error') ||
 				$class == 'db_error' || is_subclass_of($value, 'db_error');
 	}
 

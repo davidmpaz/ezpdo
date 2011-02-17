@@ -45,7 +45,7 @@
          *    @access public
          */
         function assertNull($value, $message = "%s") {
-            $dumper = &new SimpleDumper();
+            $dumper = new SimpleDumper();
             $message = sprintf(
                     $message,
                     "[" . $dumper->describeValue($value) . "] should be null");
@@ -60,7 +60,7 @@
          *    @access public
          */
         function assertNotNull($value, $message = "%s") {
-            $dumper = &new SimpleDumper();
+            $dumper = new SimpleDumper();
             $message = sprintf(
                     $message,
                     "[" . $dumper->describeValue($value) . "] should not be null");
@@ -175,7 +175,7 @@
          *    @access public
          */
         function assertReference(&$first, &$second, $message = "%s") {
-            $dumper = &new SimpleDumper();
+            $dumper = new SimpleDumper();
             $message = sprintf(
                     $message,
                     "[" . $dumper->describeValue($first) .
@@ -198,7 +198,7 @@
          *    @access public
          */
         function assertCopy(&$first, &$second, $message = "%s") {
-            $dumper = &new SimpleDumper();
+            $dumper = new SimpleDumper();
             $message = sprintf(
                     $message,
                     "[" . $dumper->describeValue($first) .

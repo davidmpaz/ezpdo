@@ -9,7 +9,7 @@
         }
         
         function testEmpty() {
-            $query = &new SimpleQueryString();
+            $query = new SimpleQueryString();
             $this->assertIdentical($query->getValue('a'), false);
             $this->assertIdentical($query->getKeys(), array());
             $this->assertIdentical($query->asString(), '');
@@ -17,7 +17,7 @@
         }
         
         function testPrefilled() {
-            $query = &new SimpleQueryString(array('a' => 'aaa'));
+            $query = new SimpleQueryString(array('a' => 'aaa'));
             $this->assertIdentical($query->getValue('a'), 'aaa');
             $this->assertIdentical($query->getKeys(), array('a'));
             $this->assertIdentical($query->asString(), 'a=aaa');
@@ -25,48 +25,48 @@
         }
         
         function testPrefilledWithObject() {
-            $query = &new SimpleQueryString(new SimpleQueryString(array('a' => 'aaa')));
+            $query = new SimpleQueryString(new SimpleQueryString(array('a' => 'aaa')));
             $this->assertIdentical($query->getValue('a'), 'aaa');
             $this->assertIdentical($query->getKeys(), array('a'));
             $this->assertIdentical($query->asString(), 'a=aaa');
         }
         
         function testMultiplePrefilled() {
-            $query = &new SimpleQueryString(array('a' => array('a1', 'a2')));
+            $query = new SimpleQueryString(array('a' => array('a1', 'a2')));
             $this->assertIdentical($query->getValue('a'), array('a1', 'a2'));
             $this->assertIdentical($query->asString(), 'a=a1&a=a2');
             $this->assertIdentical($query->getAll(), array('a' => array('a1', 'a2')));
         }
         
         function testSingleParameter() {
-            $query = &new SimpleQueryString();
+            $query = new SimpleQueryString();
             $query->add('a', 'Hello');
             $this->assertEqual($query->getValue('a'), 'Hello');
             $this->assertIdentical($query->asString(), 'a=Hello');
         }
         
         function testUrlEncoding() {
-            $query = &new SimpleQueryString();
+            $query = new SimpleQueryString();
             $query->add('a', 'Hello there!');
             $this->assertIdentical($query->asString(), 'a=Hello+there%21');
         }
         
         function testMultipleParameter() {
-            $query = &new SimpleQueryString();
+            $query = new SimpleQueryString();
             $query->add('a', 'Hello');
             $query->add('b', 'Goodbye');
             $this->assertIdentical($query->asString(), 'a=Hello&b=Goodbye');
         }
         
         function testEmptyParameters() {
-            $query = &new SimpleQueryString();
+            $query = new SimpleQueryString();
             $query->add('a', '');
             $query->add('b', '');
             $this->assertIdentical($query->asString(), 'a=&b=');
         }
         
         function testRepeatedParameter() {
-            $query = &new SimpleQueryString();
+            $query = new SimpleQueryString();
             $query->add('a', 'Hello');
             $query->add('a', 'Goodbye');
             $this->assertIdentical($query->getValue('a'), array('Hello', 'Goodbye'));
@@ -74,21 +74,21 @@
         }
         
         function testAddingLists() {
-            $query = &new SimpleQueryString();
+            $query = new SimpleQueryString();
             $query->add('a', array('Hello', 'Goodbye'));
             $this->assertIdentical($query->getValue('a'), array('Hello', 'Goodbye'));
             $this->assertIdentical($query->asString(), 'a=Hello&a=Goodbye');
         }
         
         function testMergeInHash() {
-            $query = &new SimpleQueryString(array('a' => 'A1', 'b' => 'B'));
+            $query = new SimpleQueryString(array('a' => 'A1', 'b' => 'B'));
             $query->merge(array('a' => 'A2'));
             $this->assertIdentical($query->getValue('a'), array('A1', 'A2'));
             $this->assertIdentical($query->getValue('b'), 'B');
         }
         
         function testMergeInObject() {
-            $query = &new SimpleQueryString(array('a' => 'A1', 'b' => 'B'));
+            $query = new SimpleQueryString(array('a' => 'A1', 'b' => 'B'));
             $query->merge(new SimpleQueryString(array('a' => 'A2')));
             $this->assertIdentical($query->getValue('a'), array('A1', 'A2'));
             $this->assertIdentical($query->getValue('b'), 'B');
@@ -174,17 +174,17 @@
         
         function testEncodingParameters() {
             $url = new SimpleUrl('');
-            $url->addRequestParameter('a', '?!"\'#~@[]{}:;<>,./|£$%^&*()_+-=');
+            $url->addRequestParameter('a', '?!"\'#~@[]{}:;<>,./|<A3>$%^&*()_+-=');
             $this->assertIdentical(
                     $request = $url->getEncodedRequest(),
                     '?a=%3F%21%22%27%23%7E%40%5B%5D%7B%7D%3A%3B%3C%3E%2C.%2F%7C%A3%24%25%5E%26%2A%28%29_%2B-%3D');
         }
         
-        function testDecodingParameters() {            
+        function testDecodingParameters() {
             $url = new SimpleUrl('?a=%3F%21%22%27%23%7E%40%5B%5D%7B%7D%3A%3B%3C%3E%2C.%2F%7C%A3%24%25%5E%26%2A%28%29_%2B-%3D');
             $this->assertEqual(
                     $url->getRequest(),
-                    array('a' => '?!"\'#~@[]{}:;<>,./|£$%^&*()_+-='));
+                    array('a' => '?!"\'#~@[]{}:;<>,./|<A3>$%^&*()_+-='));
         }
         
         function testSettingCordinates() {
@@ -249,9 +249,9 @@
         
         function testUsernameAndPasswordAreUrlDecoded() {
             $url = new SimpleUrl('http://' . urlencode('test@test') .
-                    ':' . urlencode('$!£@*&%') . '@www.lastcraft.com');
+                    ':' . urlencode('$!<A3>@*&%') . '@www.lastcraft.com');
             $this->assertEqual($url->getUsername(), 'test@test');
-            $this->assertEqual($url->getPassword(), '$!£@*&%');
+            $this->assertEqual($url->getPassword(), '$!<A3>@*&%');
         }
         
         function testRequestEncoding() {

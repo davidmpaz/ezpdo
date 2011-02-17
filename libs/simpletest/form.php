@@ -140,7 +140,7 @@
          */
         function _addRadioButton($tag) {
             if (! isset($this->_widgets[$tag->getName()])) {
-                $this->_widgets[$tag->getName()] = &new SimpleRadioGroup();
+                $this->_widgets[$tag->getName()] = new SimpleRadioGroup();
             }
             $this->_widgets[$tag->getName()]->addWidget($tag);
         }
@@ -155,7 +155,7 @@
                 $this->_widgets[$tag->getName()] = &$tag;
             } elseif (! SimpleTestCompatibility::isA($this->_widgets[$tag->getName()], 'SimpleCheckboxGroup')) {
                 $previous = &$this->_widgets[$tag->getName()];
-                $this->_widgets[$tag->getName()] = &new SimpleCheckboxGroup();
+                $this->_widgets[$tag->getName()] = new SimpleCheckboxGroup();
                 $this->_widgets[$tag->getName()]->addWidget($previous);
                 $this->_widgets[$tag->getName()]->addWidget($tag);
             } else {

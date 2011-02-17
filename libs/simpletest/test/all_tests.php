@@ -18,7 +18,7 @@
         }
     }
 
-    $test = &new AllTests();
+    $test = new AllTests();
     if (SimpleReporter::inCli()) {
         exit ($test->run(new TextReporter()) ? 0 : 1);
     }

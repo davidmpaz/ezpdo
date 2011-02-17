@@ -15,7 +15,7 @@
         }
         
         function testBadSocket() {
-            $socket = &new SimpleSocket('bad_url', 111, 5);
+            $socket = new SimpleSocket('bad_url', 111, 5);
             $this->assertTrue($socket->isError());
             $this->assertWantedPattern(
                     '/Cannot open \\[bad_url:111\\] with \\[.*?\\] within \\[5\\] seconds/',
@@ -25,7 +25,7 @@
         }
         
         function testSocketClosure() {
-            $socket = &new SimpleSocket('www.lastcraft.com', 80, 15);
+            $socket = new SimpleSocket('www.lastcraft.com', 80, 15);
             $this->assertTrue($socket->isOpen());
             $this->assertTrue($socket->write("GET /test/network_confirm.php HTTP/1.0\r\n"));
             $socket->write("Host: www.lastcraft.com\r\n");
@@ -36,7 +36,7 @@
         }
         
         function testRecordOfSentCharacters() {
-            $socket = &new SimpleSocket('www.lastcraft.com', 80, 15);
+            $socket = new SimpleSocket('www.lastcraft.com', 80, 15);
             $this->assertTrue($socket->write("GET /test/network_confirm.php HTTP/1.0\r\n"));
             $socket->write("Host: www.lastcraft.com\r\n");
             $socket->write("Connection: close\r\n\r\n");

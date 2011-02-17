@@ -107,13 +107,13 @@
             $this->UnitTestCase();
         }
         function testDefaultGetRequest() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectArgumentsAt(0, 'write', array("GET /here.html HTTP/1.0\r\n"));
             $socket->expectArgumentsAt(1, 'write', array("Host: a.valid.host\r\n"));
             $socket->expectArgumentsAt(2, 'write', array("Connection: close\r\n"));
             $socket->expectCallCount('write', 3);
             
-            $route = &new PartialSimpleRoute($this);
+            $route = new PartialSimpleRoute($this);
             $route->setReturnReference('_createSocket', $socket);
             $route->SimpleRoute(new SimpleUrl('http://a.valid.host/here.html'));
             
@@ -121,13 +121,13 @@
             $socket->tally();
         }
         function testDefaultPostRequest() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectArgumentsAt(0, 'write', array("POST /here.html HTTP/1.0\r\n"));
             $socket->expectArgumentsAt(1, 'write', array("Host: a.valid.host\r\n"));
             $socket->expectArgumentsAt(2, 'write', array("Connection: close\r\n"));
             $socket->expectCallCount('write', 3);
             
-            $route = &new PartialSimpleRoute($this);
+            $route = new PartialSimpleRoute($this);
             $route->setReturnReference('_createSocket', $socket);
             $route->SimpleRoute(new SimpleUrl('http://a.valid.host/here.html'));
             
@@ -135,13 +135,13 @@
             $socket->tally();
         }
         function testGetWithPort() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectArgumentsAt(0, 'write', array("GET /here.html HTTP/1.0\r\n"));
             $socket->expectArgumentsAt(1, 'write', array("Host: a.valid.host:81\r\n"));
             $socket->expectArgumentsAt(2, 'write', array("Connection: close\r\n"));
             $socket->expectCallCount('write', 3);
             
-            $route = &new PartialSimpleRoute($this);
+            $route = new PartialSimpleRoute($this);
             $route->setReturnReference('_createSocket', $socket);
             $route->SimpleRoute(new SimpleUrl('http://a.valid.host:81/here.html'));
             
@@ -149,13 +149,13 @@
             $socket->tally();
         }
         function testGetWithParameters() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectArgumentsAt(0, 'write', array("GET /here.html?a=1&b=2 HTTP/1.0\r\n"));
             $socket->expectArgumentsAt(1, 'write', array("Host: a.valid.host\r\n"));
             $socket->expectArgumentsAt(2, 'write', array("Connection: close\r\n"));
             $socket->expectCallCount('write', 3);
             
-            $route = &new PartialSimpleRoute($this);
+            $route = new PartialSimpleRoute($this);
             $route->setReturnReference('_createSocket', $socket);
             $route->SimpleRoute(new SimpleUrl('http://a.valid.host/here.html?a=1&b=2'));
             
@@ -169,13 +169,13 @@
             $this->UnitTestCase();
         }
         function testDefaultGetRequest() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectArgumentsAt(0, 'write', array("GET http://a.valid.host/here.html HTTP/1.0\r\n"));
             $socket->expectArgumentsAt(1, 'write', array("Host: my-proxy:8080\r\n"));
             $socket->expectArgumentsAt(2, 'write', array("Connection: close\r\n"));
             $socket->expectCallCount('write', 3);
             
-            $route = &new PartialSimpleProxyRoute($this);
+            $route = new PartialSimpleProxyRoute($this);
             $route->setReturnReference('_createSocket', $socket);
             $route->SimpleProxyRoute(
                     new SimpleUrl('http://a.valid.host/here.html'),
@@ -185,13 +185,13 @@
             $socket->tally();
         }
         function testDefaultPostRequest() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectArgumentsAt(0, 'write', array("POST http://a.valid.host/here.html HTTP/1.0\r\n"));
             $socket->expectArgumentsAt(1, 'write', array("Host: my-proxy:8080\r\n"));
             $socket->expectArgumentsAt(2, 'write', array("Connection: close\r\n"));
             $socket->expectCallCount('write', 3);
             
-            $route = &new PartialSimpleProxyRoute($this);
+            $route = new PartialSimpleProxyRoute($this);
             $route->setReturnReference('_createSocket', $socket);
             $route->SimpleProxyRoute(
                     new SimpleUrl('http://a.valid.host/here.html'),
@@ -201,13 +201,13 @@
             $socket->tally();
         }
         function testGetWithPort() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectArgumentsAt(0, 'write', array("GET http://a.valid.host:81/here.html HTTP/1.0\r\n"));
             $socket->expectArgumentsAt(1, 'write', array("Host: my-proxy:8081\r\n"));
             $socket->expectArgumentsAt(2, 'write', array("Connection: close\r\n"));
             $socket->expectCallCount('write', 3);
             
-            $route = &new PartialSimpleProxyRoute($this);
+            $route = new PartialSimpleProxyRoute($this);
             $route->setReturnReference('_createSocket', $socket);
             $route->SimpleProxyRoute(
                     new SimpleUrl('http://a.valid.host:81/here.html'),
@@ -217,13 +217,13 @@
             $socket->tally();
         }
         function testGetWithParameters() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectArgumentsAt(0, 'write', array("GET http://a.valid.host/here.html?a=1&b=2 HTTP/1.0\r\n"));
             $socket->expectArgumentsAt(1, 'write', array("Host: my-proxy:8080\r\n"));
             $socket->expectArgumentsAt(2, 'write', array("Connection: close\r\n"));
             $socket->expectCallCount('write', 3);
             
-            $route = &new PartialSimpleProxyRoute($this);
+            $route = new PartialSimpleProxyRoute($this);
             $route->setReturnReference('_createSocket', $socket);
             $route->SimpleProxyRoute(
                     new SimpleUrl('http://a.valid.host/here.html?a=1&b=2'),
@@ -235,14 +235,14 @@
         function testGetWithAuthentication() {
             $encoded = base64_encode('Me:Secret');
 
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectArgumentsAt(0, 'write', array("GET http://a.valid.host/here.html HTTP/1.0\r\n"));
             $socket->expectArgumentsAt(1, 'write', array("Host: my-proxy:8080\r\n"));
             $socket->expectArgumentsAt(2, 'write', array("Proxy-Authorization: Basic $encoded\r\n"));
             $socket->expectArgumentsAt(3, 'write', array("Connection: close\r\n"));
             $socket->expectCallCount('write', 4);
             
-            $route = &new PartialSimpleProxyRoute($this);
+            $route = new PartialSimpleProxyRoute($this);
             $route->setReturnReference('_createSocket', $socket);
             $route->SimpleProxyRoute(
                     new SimpleUrl('http://a.valid.host/here.html'),
@@ -260,68 +260,68 @@
             $this->UnitTestCase();
         }
         function testReadingBadConnection() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             
-            $route = &new MockSimpleRoute($this);
+            $route = new MockSimpleRoute($this);
             $route->setReturnReference('createConnection', $socket);
             
-            $request = &new SimpleHttpRequest($route, 'GET');
+            $request = new SimpleHttpRequest($route, 'GET');
             
             $reponse = &$request->fetch(15);
             $this->assertTrue($reponse->isError());
         }
         function testReadingGoodConnection() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectOnce('write', array("\r\n"));
             
-            $route = &new MockSimpleRoute($this);
+            $route = new MockSimpleRoute($this);
             $route->setReturnReference('createConnection', $socket);
             $route->expectArguments('createConnection', array('GET', 15));
             
-            $request = &new SimpleHttpRequest($route, 'GET');
+            $request = new SimpleHttpRequest($route, 'GET');
             
             $this->assertIsA($request->fetch(15), 'SimpleHttpResponse');
             $socket->tally();
             $route->tally();
         }
         function testWritingAdditionalHeaders() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectArgumentsAt(0, 'write', array("My: stuff\r\n"));
             $socket->expectArgumentsAt(1, 'write', array("\r\n"));
             $socket->expectCallCount('write', 2);
             
-            $route = &new MockSimpleRoute($this);
+            $route = new MockSimpleRoute($this);
             $route->setReturnReference('createConnection', $socket);
             
-            $request = &new SimpleHttpRequest($route, 'GET');
+            $request = new SimpleHttpRequest($route, 'GET');
             $request->addHeaderLine('My: stuff');
             $request->fetch(15);
             
             $socket->tally();
         }
         function testCookieWriting() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectArgumentsAt(0, 'write', array("Cookie: a=A\r\n"));
             $socket->expectArgumentsAt(1, 'write', array("\r\n"));
             $socket->expectCallCount('write', 2);
             
-            $route = &new MockSimpleRoute($this);
+            $route = new MockSimpleRoute($this);
             $route->setReturnReference('createConnection', $socket);
             
-            $request = &new SimpleHttpRequest($route, 'GET');
+            $request = new SimpleHttpRequest($route, 'GET');
             $request->setCookie(new SimpleCookie('a', 'A'));
             
             $this->assertIsA($request->fetch(15), 'SimpleHttpResponse');
             $socket->tally();
         }
         function testMultipleCookieWriting() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->expectArgumentsAt(0, 'write', array("Cookie: a=A;b=B\r\n"));
             
-            $route = &new MockSimpleRoute($this);
+            $route = new MockSimpleRoute($this);
             $route->setReturnReference('createConnection', $socket);
             
-            $request = &new SimpleHttpRequest($route, 'GET');
+            $request = new SimpleHttpRequest($route, 'GET');
             $request->setCookie(new SimpleCookie('a', 'A'));
             $request->setCookie(new SimpleCookie('b', 'B'));
             
@@ -389,40 +389,40 @@
             $this->UnitTestCase();
         }
         function testBadRequest() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->setReturnValue('getSent', '');
 
-            $response = &new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
+            $response = new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
             $this->assertTrue($response->isError());
             $this->assertWantedPattern('/Nothing fetched/', $response->getError());
             $this->assertIdentical($response->getContent(), false);
             $this->assertIdentical($response->getSent(), '');
         }
         function testBadSocketDuringResponse() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->setReturnValueAt(0, "read", "HTTP/1.1 200 OK\r\n");
             $socket->setReturnValueAt(1, "read", "Date: Mon, 18 Nov 2002 15:50:29 GMT\r\n");
             $socket->setReturnValue("read", "");
             $socket->setReturnValue('getSent', 'HTTP/1.1 ...');
 
-            $response = &new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
+            $response = new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
             $this->assertTrue($response->isError());
             $this->assertEqual($response->getContent(), '');
             $this->assertEqual($response->getSent(), 'HTTP/1.1 ...');
         }
         function testIncompleteHeader() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->setReturnValueAt(0, "read", "HTTP/1.1 200 OK\r\n");
             $socket->setReturnValueAt(1, "read", "Date: Mon, 18 Nov 2002 15:50:29 GMT\r\n");
             $socket->setReturnValueAt(2, "read", "Content-Type: text/plain\r\n");
             $socket->setReturnValue("read", "");
             
-            $response = &new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
+            $response = new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
             $this->assertTrue($response->isError());
             $this->assertEqual($response->getContent(), "");
         }
         function testParseOfResponseHeaders() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->setReturnValueAt(0, "read", "HTTP/1.1 200 OK\r\nDate: Mon, 18 Nov 2002 15:50:29 GMT\r\n");
             $socket->setReturnValueAt(1, "read", "Content-Type: text/plain\r\n");
             $socket->setReturnValueAt(2, "read", "Server: Apache/1.3.24 (Win32) PHP/4.2.3\r\nConne");
@@ -430,7 +430,7 @@
             $socket->setReturnValueAt(4, "read", "with two lines in it\n");
             $socket->setReturnValue("read", "");
             
-            $response = &new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
+            $response = new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
             $this->assertFalse($response->isError());
             $this->assertEqual(
                     $response->getContent(),
@@ -443,7 +443,7 @@
             $this->assertFalse($headers->getLocation());
         }
         function testParseOfCookies() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->setReturnValueAt(0, "read", "HTTP/1.1 200 OK\r\n");
             $socket->setReturnValueAt(1, "read", "Date: Mon, 18 Nov 2002 15:50:29 GMT\r\n");
             $socket->setReturnValueAt(2, "read", "Content-Type: text/plain\r\n");
@@ -453,7 +453,7 @@
             $socket->setReturnValueAt(6, "read", "\r\n");
             $socket->setReturnValue("read", "");
             
-            $response = &new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
+            $response = new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
             $this->assertFalse($response->isError());
             $headers = $response->getHeaders();
             $cookies = $headers->getNewCookies();
@@ -463,7 +463,7 @@
             $this->assertEqual($cookies[0]->getExpiry(), "Wed, 25 Dec 2002 04:24:20 GMT");
         }
         function testRedirect() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->setReturnValueAt(0, "read", "HTTP/1.1 301 OK\r\n");
             $socket->setReturnValueAt(1, "read", "Content-Type: text/plain\r\n");
             $socket->setReturnValueAt(2, "read", "Location: http://www.somewhere-else.com/\r\n");
@@ -471,13 +471,13 @@
             $socket->setReturnValueAt(4, "read", "\r\n");
             $socket->setReturnValue("read", "");
             
-            $response = &new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
+            $response = new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
             $headers = $response->getHeaders();
             $this->assertTrue($headers->isRedirect());
             $this->assertEqual($headers->getLocation(), "http://www.somewhere-else.com/");
         }
         function testRedirectWithPort() {
-            $socket = &new MockSimpleSocket($this);
+            $socket = new MockSimpleSocket($this);
             $socket->setReturnValueAt(0, "read", "HTTP/1.1 301 OK\r\n");
             $socket->setReturnValueAt(1, "read", "Content-Type: text/plain\r\n");
             $socket->setReturnValueAt(2, "read", "Location: http://www.somewhere-else.com:80/\r\n");
@@ -485,7 +485,7 @@
             $socket->setReturnValueAt(4, "read", "\r\n");
             $socket->setReturnValue("read", "");
             
-            $response = &new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
+            $response = new SimpleHttpResponse($socket, 'GET', new SimpleUrl('here'));
             $headers = $response->getHeaders();
             $this->assertTrue($headers->isRedirect());
             $this->assertEqual($headers->getLocation(), "http://www.somewhere-else.com:80/");
