@@ -348,7 +348,7 @@
          *    @access public
          *    @static
          */
-        function getFormattedAssertionLine($stack, $format = '%d', $prefix = 'assert') {
+        static function getFormattedAssertionLine($stack, $format = '%d', $prefix = 'assert') {
             foreach ($stack as $frame) {
                 if (substr(@dirname($frame['file']), -10) == 'simpletest') {
                     continue;

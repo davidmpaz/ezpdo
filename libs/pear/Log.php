@@ -97,7 +97,7 @@ class epLib_Log
      *                          false on an error.
      * @access public
      */
-    function &factory($type, $name = '', $ident = '', $conf = array(),
+    static function &factory($type, $name = '', $ident = '', $conf = array(),
                      $maxLevel = PEAR_LOG_DEBUG)
     {
         $type = strtolower($type);
@@ -160,7 +160,7 @@ class epLib_Log
      *                          false on an error.
      * @access public
      */
-    function &singleton($type, $name = '', $ident = '', $conf = array(),
+    static function &singleton($type, $name = '', $ident = '', $conf = array(),
                         $maxLevel = PEAR_LOG_DEBUG)
     {
         static $instances;

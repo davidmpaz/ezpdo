@@ -144,7 +144,7 @@ class DB
 	 * @see DB::parseDSN
 	 * @see DB::isError
 	 */
-	function &connect($dsn, $options = false)
+	static function &connect($dsn, $options = false)
 	{
 		if (is_array($dsn)) {
 			$dsninfo = $dsn;
@@ -221,7 +221,7 @@ class DB
 	 *
 	 * @return bool whether $value is an error
 	 */
-	function isError($value)
+	static function isError($value)
 	{
 		if (!is_object($value)) return false;
 		$class = get_class($value);
@@ -239,7 +239,7 @@ class DB
 	 *
 	 * @return bool whether $value is a warning
 	 */
-	function isWarning($value)
+	static function isWarning($value)
 	{
 		return false;
 		/*
@@ -280,7 +280,7 @@ class DB
 	 *
 	 * @author Tomas V.V.Cox <cox@idecnet.com>
 	 */
-	function parseDSN($dsn)
+	static function parseDSN($dsn)
 	{
 		if (is_array($dsn)) {
 			return $dsn;

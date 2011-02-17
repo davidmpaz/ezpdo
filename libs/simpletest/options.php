@@ -285,7 +285,7 @@
          *    @access public
          *    @static
          */
-        function getStackTrace() {
+        static function getStackTrace() {
             if (function_exists('debug_backtrace')) {
                 return array_reverse(debug_backtrace());
             }
