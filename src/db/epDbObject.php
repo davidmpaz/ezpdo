@@ -2,9 +2,9 @@
 
 /**
  * $Id: epDbObject.php 1044 2007-03-08 02:25:07Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @author Trevan Richins <developer@ckiweb.com>
  * @version $Revision: 1044 $ $Date: 2007-03-07 21:25:07 -0500 (Wed, 07 Mar 2007) $
@@ -19,10 +19,10 @@ include_once(EP_SRC_ORM.'/epClassMap.php');
 
 /**
  * Class of SQL statement generator
- * 
- * This class is responsible for converting class map info 
+ *
+ * This class is responsible for converting class map info
  * ({@link epClassMap}) into SQL statements
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1044 $ $Date: 2007-03-07 21:25:07 -0500 (Wed, 07 Mar 2007) $
  * @package ezpdo
@@ -68,7 +68,7 @@ class epObj2Sql {
 
     /**
      * Makes a SQL create index and unique statement for a class map
-     * @param epDbObject $db the db connection 
+     * @param epDbObject $db the db connection
      * @param epClassMap the class map for the object
      * @return false|string|array
      */
@@ -88,8 +88,8 @@ class epObj2Sql {
         $uniques = $dbp->createUnique($cm, $db, $curIndexes[0]);
 
         $sqls = array_merge(
-            $sqls, 
-            $indexes['drop'], $uniques['drop'], 
+            $sqls,
+            $indexes['drop'], $uniques['drop'],
             $indexes['create'], $uniques['create']
             );
 
@@ -98,7 +98,7 @@ class epObj2Sql {
 
     /**
      * Makes a SQL create table statement for a class map
-     * @param epDbObject $db the db connection 
+     * @param epDbObject $db the db connection
      * @param epClassMap the class map for the object
      * @return false|string|array
      */
@@ -112,7 +112,7 @@ class epObj2Sql {
         // array to hold sql stmts
         $sqls = array();
 
-        // call portability object to produce 
+        // call portability object to produce
         $sqls[] = $dbp->createTable($cm, $db);
 
         // build the CREATE INDEX queries as well
@@ -133,7 +133,7 @@ class epObj2Sql {
     
     /**
      * Makes a SQL drop table if exists statement for a class map
-     * @param epDbObject $db the db connection  
+     * @param epDbObject $db the db connection
      * @param epClassMap the class map for the object
      * @return string
      */
@@ -144,13 +144,13 @@ class epObj2Sql {
             return false;
         }
         
-        // call portability object to produce 
+        // call portability object to produce
         return $dbp->dropTable($cm->getTable(), $db);
     }
     
     /**
      * Makes a SQL truncate table if exists statement for a class map
-     * @param epDbObject $db the db connection 
+     * @param epDbObject $db the db connection
      * @param epClassMap the class map for the object
      * @return string
      */
@@ -161,25 +161,25 @@ class epObj2Sql {
             return false;
         }
 
-        // call portability object to produce 
+        // call portability object to produce
         return $dbp->truncateTable($cm->getTable(), $db);
     }
     
     /**
-     * Makes a SQL count statement to get the total number rows in table 
-     * @param epDbObject $db the db connection  
+     * Makes a SQL count statement to get the total number rows in table
+     * @param epDbObject $db the db connection
      * @param epClassMap the class map for the object
      * @return string
      */
     static public function sqlCount($db, $cm) {
-        return 'SELECT COUNT(' . $db->quoteId($cm->getOidColumn()) . 
+        return 'SELECT COUNT(' . $db->quoteId($cm->getOidColumn()) .
             ') FROM ' . $db->quoteId($cm->getTable());
     }
 
     /**
      * Makes a SQL select statement from object variables
      * If the object is null, select all from table
-     * @param epDbObject $db the db connection  
+     * @param epDbObject $db the db connection
      * @param epObject the object for query
      * @param epClassMap the class map for the object
      * @param array (of integers) $oids_ex object ids to be excluded
@@ -191,8 +191,8 @@ class epObj2Sql {
     static public function sqlSelect($db, $cm, $o = null, $oids_ex = null, $oids_in = null) {
         
         // !!!important!!! with a large db, the list of oid to be excluded
-        // $oids_ex can grown really large and can significantly slow down 
-        // queries. so it is suppressed and moved to epDbObject::_rs2obj() 
+        // $oids_ex can grown really large and can significantly slow down
+        // queries. so it is suppressed and moved to epDbObject::_rs2obj()
         // to process.
         $oids_ex = null;
 
@@ -203,8 +203,8 @@ class epObj2Sql {
         // add table for the object in 'from'
         $from[] = $db->quoteId($cm->getTable());
         
-        // if object is specified, recursively collect 'from' and 'where' 
-        // for the select statement 
+        // if object is specified, recursively collect 'from' and 'where'
+        // for the select statement
         if ($o) {
             $from_where = epObj2Sql::sqlSelectChildren($db, $o, 1, $cm->getTable());
             $from = array_merge($from, $from_where['from']);
@@ -237,12 +237,12 @@ class epObj2Sql {
     }
 
     /**
-     * Assemble a select statement from parts. 
+     * Assemble a select statement from parts.
      * Note identifiers and values in all parts should have been properly quoted.
-     * @param string|array $columns 
+     * @param string|array $columns
      * @param array $from from expressions
-     * @param array $where where expressions ('1=1' if empty) 
-     * @return string 
+     * @param array $where where expressions ('1=1' if empty)
+     * @return string
      */
     static protected function _sqlSelectAssemble($columns, $from, $where = array()) {
         
@@ -261,7 +261,7 @@ class epObj2Sql {
 
     /**
      * Make where part of a SQL select to get children values
-     * @param epDbObject $db the db connection  
+     * @param epDbObject $db the db connection
      * @param epObject $o the child object for query
      * @param int $depth how many children down we are
      * @param string $parent the parent of this child
@@ -285,7 +285,7 @@ class epObj2Sql {
         
         // if object has oid, select use oid
         if ($oid = $o->epGetObjectId()) {
-            $where[] = $db->quoteId($cm->getOidColumn()) . ' = ' . $oid; 
+            $where[] = $db->quoteId($cm->getOidColumn()) . ' = ' . $oid;
             return array('from'=>$from, 'where'=>$where);
         }
         
@@ -298,11 +298,11 @@ class epObj2Sql {
         // new depth
         $depth ++;
 
-        // number of non-primitive (relationship) fields collected 
+        // number of non-primitive (relationship) fields collected
         $nprim_id = 0;
 
         // loop through vars
-        while (list($var, $val) = each($vars)) { 
+        while (list($var, $val) = each($vars)) {
             
             // get field map
             if (!($fm = & $cm->getField($var))) {
@@ -317,7 +317,7 @@ class epObj2Sql {
             
             // is it a primitive var?
             if ($fm->isPrimitive()) {
-                $where[] = $db->quoteId($parent) . '.' . $db->quoteId($fm->getColumnName()) . ' = ' . $db->quote($val, $fm); 
+                $where[] = $db->quoteId($parent) . '.' . $db->quoteId($fm->getColumnName()) . ' = ' . $db->quote($val, $fm);
                 // done for this var
                 $n ++;
                 continue;
@@ -333,15 +333,15 @@ class epObj2Sql {
                         continue;
                     }
                     
-                    // get 'where' and 'from' from relationship 
+                    // get 'where' and 'from' from relationship
                     $from_where = epObj2Sql::sqlSelectRelations(
-                        $db, $fm, $cm, $obj->epGetClassMap()->getTable(), 
+                        $db, $fm, $cm, $obj->epGetClassMap()->getTable(),
                         $depth.$nprim_id, $parent
                         );
                     $where = array_merge($where, $from_where['where']);
                     $from = array_merge($from, $from_where['from']);
 
-                    // get 'where' and 'from' from relationship 
+                    // get 'where' and 'from' from relationship
                     $from_where = epObj2Sql::sqlSelectChildren($db, $obj, $depth, '_'.$depth.$nprim_id);
                     $where = array_merge($where, $from_where['where']);
                     $from = array_merge($from, $from_where['from']);
@@ -351,15 +351,15 @@ class epObj2Sql {
 
             } else if ($val instanceof epObject && !$val->epIsSearching()) {
                 
-                // get 'where' and 'from' from relationship 
+                // get 'where' and 'from' from relationship
                 $from_where = epObj2Sql::sqlSelectRelations(
-                    $db, $fm, $cm, $val->epGetClassMap()->getTable(), 
+                    $db, $fm, $cm, $val->epGetClassMap()->getTable(),
                     $depth.$nprim_id, $parent
                     );
                 $where = array_merge($where, $from_where['where']);
                 $from = array_merge($from, $from_where['from']);
 
-                // get 'where' and 'from' from relationship 
+                // get 'where' and 'from' from relationship
                 $from_where = epObj2Sql::sqlSelectChildren($db, $val, $depth, '_'.$depth.$nprim_id);
                 $where = array_merge($where, $from_where['where']);
                 $from = array_merge($from, $from_where['from']);
@@ -368,7 +368,7 @@ class epObj2Sql {
             }
 
             $n ++;
-        } 
+        }
         
         // reset search flag on child object
         $o->epSetSearching(false);
@@ -378,7 +378,7 @@ class epObj2Sql {
 
     /**
      * Make where part of a SQL select for relationship fields
-     * @param epDbObject $db the db connection  
+     * @param epDbObject $db the db connection
      * @param epFieldMap $fm the field map
      * @param epClassMap $cm the child object for query
      * @param string $alias the alias of this table in the previous part
@@ -412,10 +412,10 @@ class epObj2Sql {
         // compute expressions 'where'
         $where = array();
         
-        // rt.class_a = 
+        // rt.class_a =
         $where[] = $rtAlias_q.'.'.$db->quoteId('class_a').' = '.$db->quote($class_a);
         
-        // rt.var_a = 
+        // rt.var_a =
         $where[] = $rtAlias_q.'.'.$db->quoteId('var_a').' = '.$db->quote($var_a);
         
         // rt.base_b =
@@ -435,7 +435,7 @@ class epObj2Sql {
     
     /**
      * Make a SQL insert statement from object variables
-     * @param epDbObject $db the db connection 
+     * @param epDbObject $db the db connection
      * @param epObject the object for query
      * @param epClassMap the class map for the object
      * @return false|string
@@ -448,10 +448,10 @@ class epObj2Sql {
         }
         
         // make select statement
-        $sql = 'INSERT INTO ' . $db->quoteId($cm->getTable()) . ' (' ; 
+        $sql = 'INSERT INTO ' . $db->quoteId($cm->getTable()) . ' (' ;
 
         // get column names
-        $i = 0; 
+        $i = 0;
         foreach ($vars as $var => $val) {
             
             // exclude 'oid'
@@ -469,10 +469,10 @@ class epObj2Sql {
                 continue;
             }
             
-            $sql .= $db->quoteId($fm->getColumnName()) . ', '; 
+            $sql .= $db->quoteId($fm->getColumnName()) . ', ';
             
             $i ++;
-        } 
+        }
         
         // no need to insert if we don't have any var to insert
         if ($i == 0) {
@@ -483,9 +483,9 @@ class epObj2Sql {
         // remove the last ', '
         if ($i > 0) {
             $sql = substr($sql, 0, strlen($sql) - 2);
-        } 
+        }
         
-        $sql .= ') VALUES ('; 
+        $sql .= ') VALUES (';
         
         // get values
         $i = 0;
@@ -506,10 +506,10 @@ class epObj2Sql {
             }
             
             // get quoted field value
-            $sql .= $db->quote($val, $fm) . ', '; 
+            $sql .= $db->quote($val, $fm) . ', ';
             
             ++ $i;
-        }   
+        }
         
         // remove the last ', '
         if ($i > 0) {
@@ -517,14 +517,14 @@ class epObj2Sql {
         }
         
         // end of statement
-        $sql .= ');'; 
+        $sql .= ');';
         
         return $sql;
     }
     
     /**
      * Make a SQL delete statement from object variables
-     * @param epDbObject $db the db connection 
+     * @param epDbObject $db the db connection
      * @param epObject the object for query
      * @param epClassMap the class map for the object
      * @return false|string
@@ -557,9 +557,9 @@ class epObj2Sql {
             return false;
         }
 
-        $sql = 'UPDATE ' . $db->quoteId($cm->getTable()) . ' SET '; 
-        $i = 0; 
-        while (list($var, $val) = each($vars)) { 
+        $sql = 'UPDATE ' . $db->quoteId($cm->getTable()) . ' SET ';
+        $i = 0;
+        while (list($var, $val) = each($vars)) {
             
             // get field map
             if (!($fm = & $cm->getField($var))) {
@@ -578,10 +578,10 @@ class epObj2Sql {
             }
             
             // get column name
-            $sql .= $db->quoteId($fm->getColumnName()) . '=' . $db->quote($val, $fm) . ', '; 
+            $sql .= $db->quoteId($fm->getColumnName()) . '=' . $db->quote($val, $fm) . ', ';
             
             $i ++;
-        } 
+        }
         
         if ($i == 0) {
             return false;
@@ -592,14 +592,14 @@ class epObj2Sql {
             $sql = substr($sql, 0, strlen($sql) - 2);
         }
         
-        $sql .= ' WHERE ' . $db->quoteId($cm->getOidColumn()) . ' = ' . $o->epGetObjectId(); 
+        $sql .= ' WHERE ' . $db->quoteId($cm->getOidColumn()) . ' = ' . $o->epGetObjectId();
         
-        return $sql; 
+        return $sql;
     }
 
     /**
      * Update relationships for a relationship var
-     * 
+     *
      * @param string $rtable the name of the relationship table
      * @param string $base_a name of base class a
      * @param string $class_a name of class a
@@ -608,7 +608,7 @@ class epObj2Sql {
      * @param string $base_b name of base b
      * @param array $oids_b_new oids of the class b object related to the class a object that are new
      * @param array $oids_b_old oids of the class b object related to the class a object that are old
-     * 
+     *
      * @return false|array
      */
     static public function sqlUpdateRelationship($db, $rtable, $class_a, $var_a, $oid_a, $base_b, $oids_b_new, $oids_b_old) {
@@ -719,7 +719,7 @@ class epObj2Sql {
     
     /**
      * Returns the random function
-     * @param epDbObject $db the db connection 
+     * @param epDbObject $db the db connection
      * @return false|string
      */
     static public function sqlRandom($db) {
@@ -736,33 +736,33 @@ class epObj2Sql {
 
 /**
  * Exception class for {@link epDbObject}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1044 $ $Date: 2007-03-07 21:25:07 -0500 (Wed, 07 Mar 2007) $
  * @package ezpdo
- * @subpackage ezpdo.base 
+ * @subpackage ezpdo.base
  */
 class epExceptionDbObject extends epException {
 }
 
 /**
  * Class for object operations with databases
- * 
- * This class provides a layer between the database access (i.e. 
- * {@link epDb}) and the persisent objects. 
- * 
- * It translates persistence-related operations into SQL statements 
- * and executes them by calling {@link epDb::execute()}. 
- * 
- * It implements the two-way conversions, from database rows to 
- * persistent objects, and vice versa. 
- * 
- * It also supports table-level operations for mapped classes - 
- * table creation, table dropping, and emptying. 
- * 
- * Objects of this class is managed by the db factory, {@link 
- * epDbFactory}. 
- * 
+ *
+ * This class provides a layer between the database access (i.e.
+ * {@link epDb}) and the persisent objects.
+ *
+ * It translates persistence-related operations into SQL statements
+ * and executes them by calling {@link epDb::execute()}.
+ *
+ * It implements the two-way conversions, from database rows to
+ * persistent objects, and vice versa.
+ *
+ * It also supports table-level operations for mapped classes -
+ * table creation, table dropping, and emptying.
+ *
+ * Objects of this class is managed by the db factory, {@link
+ * epDbFactory}.
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1044 $ $Date: 2007-03-07 21:25:07 -0500 (Wed, 07 Mar 2007) $
  * @package ezpdo
@@ -861,7 +861,7 @@ class epDbObject {
     
     /**
      * Fetchs objects using the variable values specified in epObject
-     * If the object is null, get all objects in table. 
+     * If the object is null, get all objects in table.
      * @param array $cms an array of epClassMap
      * @param array $sql_stmts an array of SQL statements
      * @param string $aggr_func
@@ -880,7 +880,7 @@ class epDbObject {
 
     /**
      * Fetchs objects using the variable values specified in epObject
-     * If the object is null, get all objects in table. 
+     * If the object is null, get all objects in table.
      * @param string $sql
      * @param array $cms an array of epClassMap
      * @param string $orderbys
@@ -893,7 +893,7 @@ class epDbObject {
         $result = array();
         foreach ($sql_stmts as $index => $sql_stmt) {
 
-            // stmt preproc 
+            // stmt preproc
             $sql_stmt = $this->_queryPreproc($sql_stmt);
             
             // execute sql stmt
@@ -913,8 +913,8 @@ class epDbObject {
             // random orderby
             if (count($orderbys) && $orderbys[0]['dir'] == 'random') {
                 shuffle($result);
-            } 
-            // asc|desc orderbys 
+            }
+            // asc|desc orderbys
             else {
                 $this->orderbys = $orderbys;
                 usort($result, array($this, '__sort'));
@@ -940,7 +940,7 @@ class epDbObject {
 
     /**
      * Preprocesses a SQL statement before query
-     * @return string 
+     * @return string
      */
     private function _queryPreproc($sql_stmt) {
         
@@ -959,7 +959,7 @@ class epDbObject {
     }
 
     /**
-     * Sorts two objects 
+     * Sorts two objects
      * @param epObject $a
      * @param epObject $b
      * @throws epExceptionDbObject
@@ -993,7 +993,7 @@ class epDbObject {
                     return +1 * $sign;
                 }
                 continue;
-            } 
+            }
 
             // string
             if (is_string($va)) {
@@ -1041,7 +1041,7 @@ class epDbObject {
     }
 
     /**
-     * Execute a single SQL stmt with aggregate function 
+     * Execute a single SQL stmt with aggregate function
      * @param array $cms an array of class maps (epClassMap)
      * @param array $sql_stmts an array of SQL statements
      * @param string $aggr_func
@@ -1160,15 +1160,15 @@ class epDbObject {
     
     /**
      * Fetchs objects using the variable values specified in epObject
-     * If the object is null, get all objects in table. 
+     * If the object is null, get all objects in table.
      * @param epObject $o
      * @param epClassMap
      * @param array (of integer) $oids_ex object ids to be excluded
-     * @param array (of integer) $oids_in object ids to be included 
+     * @param array (of integer) $oids_in object ids to be included
      * @param bool $objs convert the rows into objects or leave as uoids
      * @return false|array
      */
-    public function fetch($cm, $o = null, $oids_ex = null, $oids_in = null, $objs = true) {
+    public function &fetch($cm, $o = null, $oids_ex = null, $oids_in = null, $objs = true) {
 
         // check if class is abstract
         if ($cm->isAbstract()) {
@@ -1282,15 +1282,15 @@ class epDbObject {
     
     /**
      * Create a table specified in class map if not exists
-     * @param epClassMap $cm The class map 
-     * @param bool $force Whether to force creating table 
+     * @param epClassMap $cm The class map
+     * @param bool $force Whether to force creating table
      * @return bool
      */
     public function create($cm, $force = false) {
 
         // check if class is abstract
         if ($cm->isAbstract()) {
-            // if so, no need to actually create 
+            // if so, no need to actually create
             return true;
         }
         
@@ -1311,14 +1311,14 @@ class epDbObject {
     
     /**
      * Drop a table specified in class map if exists
-     * @param epClassMap $cm The class map 
+     * @param epClassMap $cm The class map
      * @return bool
      */
     public function drop($cm) {
 
         // check if class is abstract
         if ($cm->isAbstract()) {
-            // if so, no need to actually create 
+            // if so, no need to actually create
             return true;
         }
 
@@ -1343,8 +1343,8 @@ class epDbObject {
     }
     
     /**
-     * Create indexes and uniques specified in class map 
-     * @param epClassMap $cm The class map 
+     * Create indexes and uniques specified in class map
+     * @param epClassMap $cm The class map
      * @param bool Whether to force to create table or not
      * @return bool
      */
@@ -1352,7 +1352,7 @@ class epDbObject {
 
         // check if class is abstract
         if ($cm->isAbstract()) {
-            // if so, no need to actually create 
+            // if so, no need to actually create
             return true;
         }
         
@@ -1373,7 +1373,7 @@ class epDbObject {
             return false;
         }
 
-        // preapre sql statement for creating index 
+        // preapre sql statement for creating index
         $sqls = epObj2Sql::sqlCreateIndex($this, $cm, $curIndexes);
 
         if (!$sqls) {
@@ -1386,7 +1386,7 @@ class epDbObject {
     
     /**
      * Retrieves the current indexes in a given table
-     * @param epClassMap $cm The class map 
+     * @param epClassMap $cm The class map
      * @return bool
      */
     protected function checkIndex($cm) {
@@ -1492,7 +1492,7 @@ class epDbObject {
      * Formats input so it can be safely used as a literal
      * Wraps around {@link epDb::quote()}
      * @param mixed $v
-     * @param epFieldMap 
+     * @param epFieldMap
      * @return mixed
      */
     public function quote($v, $fm = null) {
@@ -1525,7 +1525,7 @@ class epDbObject {
                 $v = epStr2Hex($v);
                 break;
             }
-        } 
+        }
 
         return $this->db->quote($v);
     }
@@ -1602,7 +1602,7 @@ class epDbObject {
     }
     
     /**
-     * Returns the aggregate function result 
+     * Returns the aggregate function result
      * @return integer|float
      * @throws epExceptionDb
      */
@@ -1626,8 +1626,8 @@ class epDbObject {
     protected function _rs2obj($cm, $oids_ex = null) {
         
         // !!!important!!! with a large db, the list of oid to be excluded
-        // $oids_ex can grown really large and can significantly slow down 
-        // queries. so it is suppressed in the select statement and moved 
+        // $oids_ex can grown really large and can significantly slow down
+        // queries. so it is suppressed in the select statement and moved
         // to this method to process.
 
         // get epManager instance and cache it
@@ -1651,7 +1651,7 @@ class epDbObject {
         
         while ($okay) {
 
-            // get oid column 
+            // get oid column
             $oid = $this->db->rsGetCol($cn=$cm->getOidColumn(), $class.'.'.$cn);
 
             // exclude it?
@@ -1683,11 +1683,11 @@ class epDbObject {
                 $val = $this->db->rsGetCol($cn=$fm->getColumnName(),$class.'.'.$cn);
                 
                 // set value to var (true: no dirty flag change)
-                $o->epSet($fm->getName(), $this->_castType($val, $fm->getType()), true); 
+                $o->epSet($fm->getName(), $this->_castType($val, $fm->getType()), true);
             }
 
-            // set oid 
-            $o->epSetObjectId($oid); 
+            // set oid
+            $o->epSetObjectId($oid);
 
             // collect return result
             $ret[] = $o;
@@ -1709,8 +1709,8 @@ class epDbObject {
     protected function _rs2uoid($cm, $oids_ex = null) {
         
         // !!!important!!! with a large db, the list of oid to be excluded
-        // $oids_ex can grown really large and can significantly slow down 
-        // queries. so it is suppressed in the select statement and moved 
+        // $oids_ex can grown really large and can significantly slow down
+        // queries. so it is suppressed in the select statement and moved
         // to this method to process.
 
         // get the class name
@@ -1724,7 +1724,7 @@ class epDbObject {
         
         while ($okay) {
 
-            // get oid column 
+            // get oid column
             $oid = $this->db->rsGetCol($cn=$cm->getOidColumn(), $class.'.'.$cn);
 
             // exclude it?
@@ -1755,7 +1755,7 @@ class epDbObject {
 
     /**
      * Cast type according to field type
-     * @param mixed $val 
+     * @param mixed $val
      * @param string $ftype
      * @return mixed (casted value)
      * @access protected
@@ -1804,21 +1804,21 @@ class epDbObject {
 
 /**
  * Exception class for {@link epDbFactory}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1044 $ $Date: 2007-03-07 21:25:07 -0500 (Wed, 07 Mar 2007) $
  * @package ezpdo
- * @subpackage ezpdo.db 
+ * @subpackage ezpdo.db
  */
 class epExceptionDbFactory extends epException {
 }
 
 /**
  * Class of database connection factory
- * 
+ *
  * The factory creates databases with given DSNs and maintains
  * a one(DSN)-to-one(epDbObject isntance) mapping.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1044 $ $Date: 2007-03-07 21:25:07 -0500 (Wed, 07 Mar 2007) $
  * @package ezpdo
@@ -1869,7 +1869,7 @@ class epDbFactory implements epFactory, epSingleton  {
     /**
      * Constructor
      */
-    private function __construct() { 
+    private function __construct() {
     }
 
     /**
@@ -1922,7 +1922,7 @@ class epDbFactory implements epFactory, epSingleton  {
     }
     
     /**
-     * Either create a class map (if not tracking) or retrieve it from cache 
+     * Either create a class map (if not tracking) or retrieve it from cache
      * @param $dsn
      * @param bool tracking or not
      * @return null|epDbObject
@@ -1930,7 +1930,7 @@ class epDbFactory implements epFactory, epSingleton  {
      */
     private function &get($dsn, $tracking = false) {
         
-        // check if dsn is empty 
+        // check if dsn is empty
         if (empty($dsn)) {
             throw new epExceptionDbFactory('DSN is empty');
             return self::$null;
@@ -1950,12 +1950,12 @@ class epDbFactory implements epFactory, epSingleton  {
         switch($this->dbl) {
         
             case self::DBL_ADODB:
-                include_once(EP_SRC_DB.'/epDbAdodb.php'); 
+                include_once(EP_SRC_DB.'/epDbAdodb.php');
                 $this->dbs[$dsn] = new epDbObject(new epDbAdodb($dsn));
                 break;
         
             case self::DBL_ADODB_PDO:
-                include_once(EP_SRC_DB.'/epDbAdodbPdo.php'); 
+                include_once(EP_SRC_DB.'/epDbAdodbPdo.php');
                 $this->dbs[$dsn] = new epDbObject(new epDbAdodbPdo($dsn));
                 break;
         
@@ -1985,7 +1985,7 @@ class epDbFactory implements epFactory, epSingleton  {
     
     /**
      * Implement factory method {@link epFactory::removeAll()}
-     * Remove all db connections made 
+     * Remove all db connections made
      * @return void
      */
     public function removeAll() {
@@ -2015,7 +2015,7 @@ class epDbFactory implements epFactory, epSingleton  {
     
     /**
      * Implement {@link epSingleton} interface
-     * Forcefully destroy old instance (only used for tests). 
+     * Forcefully destroy old instance (only used for tests).
      * After reset(), {@link instance()} returns a new instance.
      */
     static public function destroy() {
@@ -2028,7 +2028,7 @@ class epDbFactory implements epFactory, epSingleton  {
     /**
      * epDbFactory instance
      */
-    static private $instance; 
+    static private $instance;
 }
 
 ?>

@@ -3150,7 +3150,7 @@ class epManager extends epManagerBase implements epSingleton {
      * @param string $uoid The universal object id
      * @return false|epObject
      */
-    public function getByUoid($uoid) {
+    public function &getByUoid($uoid) {
         
         // string: encoded objected id
         if (!is_string($uoid)) {

@@ -2,9 +2,9 @@
 
 /**
  * $Id: epTestQueryParser.php 1038 2007-02-11 01:38:59Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1038 $ $Date: 2007-02-10 20:38:59 -0500 (Sat, 10 Feb 2007) $
  * @package ezpdo.tests
@@ -23,8 +23,8 @@ include_once(EP_SRC_QUERY.'/epQueryParser.php');
 /**#@-*/
 
 /**
- * The unit test class for {@link epQueryParser}  
- * 
+ * The unit test class for {@link epQueryParser}
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1038 $ $Date: 2007-02-10 20:38:59 -0500 (Sat, 10 Feb 2007) $
  * @package ezpdo.tests
@@ -40,7 +40,7 @@ class epTestQueryParser extends epTestCase {
     function _match($node, $expect) {
         
         // get result from node
-        $result = $node->__toString();
+        $result = $node->__invoke();
         
         // remove \r and space
         $expect = str_replace(array("\n", "\r", ' '), '', $expect);
@@ -54,7 +54,7 @@ class epTestQueryParser extends epTestCase {
     }
 
     /**
-     * test parsing an empty string 
+     * test parsing an empty string
      */
     function testEmpty() {
         $p = new epQueryParser("");
@@ -63,7 +63,7 @@ class epTestQueryParser extends epTestCase {
     }
 
     /**
-     * test parsing select from  
+     * test parsing select from
      * (select is optional)
      */
     function testSelectFrom() {
@@ -80,7 +80,7 @@ EXPECT;
     }
 
     /**
-     * test parsing from  
+     * test parsing from
      */
     function testFrom() {
         $p = new epQueryParser("from MyClass");
@@ -96,7 +96,7 @@ EXPECT;
     }
     
     /**
-     * test parsing from as  
+     * test parsing from as
      */
     function testFromAs() {
         $p = new epQueryParser("from MyClass as myc");
@@ -138,7 +138,7 @@ EXPECT;
     }
 
     /**
-     * test parsing where  with complex expression 
+     * test parsing where  with complex expression
      */
     function testFromAsWhere2() {
         $p = new epQueryParser("from MyClass as myc where myc.a = -(c+d)*(e+f)");
@@ -186,7 +186,7 @@ EXPECT;
     }
 
     /**
-     * test parsing from/where/between  
+     * test parsing from/where/between
      */
     function testFromWhereBetweenAnd() {
         $p = new epQueryParser("from MyClass as myc where myc.a between x+1 and y*2");
@@ -224,7 +224,7 @@ EXPECT;
     }
 
     /**
-     * test parsing where/like 
+     * test parsing where/like
      */
     function testFromWhereLike1() {
         $p = new epQueryParser("from MyClass as myc where myc.a like %ABC%");
@@ -250,7 +250,7 @@ EXPECT;
     }
 
     /**
-     * test parsing where/like 
+     * test parsing where/like
      */
     function testFromAsWhereLike2() {
         $p = new epQueryParser("from MyClass as myc where myc.a like %[a-f]ABC_%");

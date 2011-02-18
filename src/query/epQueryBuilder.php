@@ -2,9 +2,9 @@
 
 /**
  * $Id: epQueryBuilder.php 1048 2007-04-13 02:31:17Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @author Trevan Richins <developer@ckiweb.com>
  * @version $Revision: 1048 $
@@ -19,101 +19,101 @@ include_once(EP_SRC_QUERY.'/epQueryParser.php');
 
 /**
  * Exception class for {@link epQueryBuilder}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1048 $
  * @package ezpdo
- * @subpackage ezpdo.query 
+ * @subpackage ezpdo.query
  */
 class epExceptionQueryBuilder extends epException {
 }
 
 /**
  * The EZOQL SQL builder
- * 
- * The class builds standard SQL statement(s) from the syntax tree parsed 
- * by {@link epQueryParser}. 
- * 
- * Here is the basic idea behind query building. 
- * 
- * The essential part of the process is to translate the EZOQL variable 
- * paths (or path expressions) into the SQL expressions. Let us explain 
+ *
+ * The class builds standard SQL statement(s) from the syntax tree parsed
+ * by {@link epQueryParser}.
+ *
+ * Here is the basic idea behind query building.
+ *
+ * The essential part of the process is to translate the EZOQL variable
+ * paths (or path expressions) into the SQL expressions. Let us explain
  * variable path first.
- * 
+ *
  * <b>Path expressions</b>
- * 
- * Here is an example of a variable path: 
+ *
+ * Here is an example of a variable path:
  * <pre>
  *   book.publisher.contact
  * </pre>
- * It starts with an alias to the root class (book) and is followed by a 
+ * It starts with an alias to the root class (book) and is followed by a
  * sequence of ".var". In an EZOQL query, the root alias may not always
- * be explicit, for example, we may write 
+ * be explicit, for example, we may write
  * <pre>
  *   from Book where publisher.contact.zipcode = '12345'
  * </pre>
- * However, we can always assign an alias to the root class to work on an 
+ * However, we can always assign an alias to the root class to work on an
  * equivalent query like this
  * <pre>
  *   from Book as book where book.publisher.contact.zipcode = '12345'
  * </pre>
  * We refer this as 'path normalization'.
- * 
- * In a path expression, each of item following the root alias relates 
- * to a field map ({@link epFieldMap}). So essentially a path is 
+ *
+ * In a path expression, each of item following the root alias relates
+ * to a field map ({@link epFieldMap}). So essentially a path is
  * equivalent to a sequece of field maps following a root class.
- * 
- * The trailing part in a path expression is normally a primtive variable. 
- * In the above example, 
+ *
+ * The trailing part in a path expression is normally a primtive variable.
+ * In the above example,
  * <pre>
- *   book.publisher.contact.zipcode, 
+ *   book.publisher.contact.zipcode,
  * </pre>
- * 'zipcode' is a string value, a primitive type. It corresponds to a 
- * primtive field map ({@link epFieldMapPrimitive}). In some cases, we 
- * may have expressions that do not immedidately end with a primitive var, 
+ * 'zipcode' is a string value, a primitive type. It corresponds to a
+ * primtive field map ({@link epFieldMapPrimitive}). In some cases, we
+ * may have expressions that do not immedidately end with a primitive var,
  * for instance,
  * <pre>
- *   book.publisher.contact = ? 
+ *   book.publisher.contact = ?
  *   book.authors.contains(a) AND a.name = 'James'
  *   book.authors.contains(?)
  * </pre>
  * But by parsing deep into the placeholders (or alias in the contains()
  * function), we can always make paths end with a primitive var.
- * 
- * Now if we leave the primitive variable out, the rest of the path is the 
+ *
+ * Now if we leave the primitive variable out, the rest of the path is the
  * sequence of relationship field maps ({@link epFieldMapRelationship}).
- * This sequence has great significance in defining how the tables should 
- * be joined. 
- * 
- * The joined table is the set of all potential candidates for the query 
- * result and will be filtered by a predicate expression which is composed 
- * of -only- primitive variables. 
- * 
- * From the above discussion, we know that a path expressions is composed of 
+ * This sequence has great significance in defining how the tables should
+ * be joined.
+ *
+ * The joined table is the set of all potential candidates for the query
+ * result and will be filtered by a predicate expression which is composed
+ * of -only- primitive variables.
+ *
+ * From the above discussion, we know that a path expressions is composed of
  * three parts, 1. the alias to the root class, 2. the sequence of relationship
- * field maps, and 3. the trailing primitive field map. 
- * 
+ * field maps, and 3. the trailing primitive field map.
+ *
  * <b>Helper classes</b>
- * 
+ *
  * To facilitate the implemenation of the builder, we venture to use two
- * helper classes to make the code more readable and maintainable. 
+ * helper classes to make the code more readable and maintainable.
  * <ol>
  * <li>
- * Alias manager ({@link epQueryAliasManager}):  
- * The alias manager generates unique aliases for classes and relationship tables. 
+ * Alias manager ({@link epQueryAliasManager}):
+ * The alias manager generates unique aliases for classes and relationship tables.
  * </li>
  * <li>
  * Path expression manager ({@link epQueryPathManager})
- * The path expression manager uses path expression trees as the internal 
+ * The path expression manager uses path expression trees as the internal
  * representation for EZOQL variable paths, from which it generates table join
- * statements. 
+ * statements.
  * </li>
  * </ol>
- * 
+ *
  * The information contained in the path manager will later be used to create
- * the table joins that will be filtered by the predicate expression from the 
+ * the table joins that will be filtered by the predicate expression from the
  * query builder. These parts work in concert to translate EZOQL to SQL.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @author Trevan Richins <developer@ckiweb.com>
  * @version $Revision: 1048 $
@@ -166,11 +166,11 @@ class epQueryBuilder extends epBase {
 
     /**
      * Aggreation function involved in the query
-     * @var false|string 
+     * @var false|string
      */
     protected $aggr_func = false;
 
-    /**  
+    /**
      * Order by in the query
      * @var false|string
      */
@@ -273,7 +273,7 @@ class epQueryBuilder extends epBase {
 
     /**
      * Build the SQL query from syntax tree
-     * @return false|string 
+     * @return false|string
      */
     public function build() {
 
@@ -326,7 +326,7 @@ class epQueryBuilder extends epBase {
             return false;
         }
         
-        // process 'contains' and 'variable' nodes 
+        // process 'contains' and 'variable' nodes
         while (!$this->walk($this->root, 'processVariable')) {
             // loop until all aliases and vars are set up
         }
@@ -341,11 +341,11 @@ class epQueryBuilder extends epBase {
     }
 
     /**
-     * Computes and returns the sql statement 
+     * Computes and returns the sql statement
      * @return string
      */
     protected function outputSql() {
-        return $this->buildSqlSelect($this->root); 
+        return $this->buildSqlSelect($this->root);
     }
 
     /**
@@ -363,7 +363,7 @@ class epQueryBuilder extends epBase {
 
     /**
      * Preprocess on the from clause to add super and secondary roots
-     * @return boolean 
+     * @return boolean
      * @throws epExceptionQueryBuilder
      */
     private function processFrom() {
@@ -406,7 +406,7 @@ class epQueryBuilder extends epBase {
                 continue;
             }
             
-            // keep track of aliases for secondary 
+            // keep track of aliases for secondary
             $this->aliases_secondary[] = $alias;
 
             // add class as a secondary root
@@ -419,11 +419,11 @@ class epQueryBuilder extends epBase {
     /**
      * Walks through the syntax tree in either depth-first (by default)
      * or breath-first mode. A process method is applied on each node
-     * visited. 
+     * visited.
      * @param epQueryNode &$node the starting node
      * @param string $proc the node process method
      * @param boolean $df whether it is depth-first or breath-firth
-     * @return boolean 
+     * @return boolean
      * @throws epExceptionQueryBuilder
      */
     protected function walk(epQueryNode &$node, $proc, $df = true) {
@@ -534,7 +534,7 @@ class epQueryBuilder extends epBase {
 
         // check if the first var is a known alias
         if (!$this->_isAlias($parts[0])) {
-            // prepend super root alias 
+            // prepend super root alias
             array_unshift($parts, $this->primary_alias);
         }
         
@@ -570,7 +570,7 @@ class epQueryBuilder extends epBase {
     }
 
     /**
-     * Process variable/contains 
+     * Process variable/contains
      * @return boolean
      * @throws epExceptionQueryBuilder
      */
@@ -639,7 +639,7 @@ class epQueryBuilder extends epBase {
 	}
 
     /**
-     * Process a placeholder node if it's part of 'contains()' 
+     * Process a placeholder node if it's part of 'contains()'
      * or equals ('=' or '==') expression.
      * @param epQueryNode &$node
      * @return boolean
@@ -676,7 +676,7 @@ class epQueryBuilder extends epBase {
                     $this->pm->addContainedRoot($path, $prefix);
                 }
             }
-        } 
+        }
         
         // or is it a part of equals expr?
         else if ($parent_t == EPQ_N_EXPR_COMPARISON) {
@@ -699,12 +699,12 @@ class epQueryBuilder extends epBase {
             return true;
         }
 
-		// check if prefix points to an object and the placehodler 
-		// is a *persisted* epObject. a non-persisted object is 
+		// check if prefix points to an object and the placehodler
+		// is a *persisted* epObject. a non-persisted object is
 		// treated as an example object.
 		if ($this->pm->isObject($prefix)) {
 			if ($v instanceof epObject && $v->oid) {
-				// if so, set 'specific' class on query path 
+				// if so, set 'specific' class on query path
 				$this->pm->specificClass($prefix, $v->epGetClass());
 			}
 		}
@@ -724,7 +724,7 @@ class epQueryBuilder extends epBase {
             return true;
         }
 
-        // call grand-parent to replace with parent this 'and' node 
+        // call grand-parent to replace with parent this 'and' node
         $grand_parent->replaceChild($parent, $and_node);
 
 		// keep the replaced node so later we can reverse
@@ -735,7 +735,7 @@ class epQueryBuilder extends epBase {
 
     /**
      * Undo replacement done in processPlaceholder(). This method
-	 * is called in postproc() so the parsed syntax tree can be 
+	 * is called in postproc() so the parsed syntax tree can be
 	 * reused next time for the same query with different args.
      * @return boolean
      * @throws epExceptionQueryBuilder
@@ -770,13 +770,13 @@ class epQueryBuilder extends epBase {
      */
     private function _andNodes($nodes) {
 
-        // if nodes array empty 
+        // if nodes array empty
         if (!$nodes) {
             // simply return it back
             return $nodes;
         }
         
-        // if only one node 
+        // if only one node
         if (1 == count($nodes)) {
             // simply return it back
             return $nodes[0];
@@ -889,16 +889,16 @@ class epQueryBuilder extends epBase {
                 continue;
             }
 
-            // append key to prefix 
+            // append key to prefix
             $_prefix = $prefix . '.' . $_k;
             
             // if value is array or object. recursion.
             if (is_array($_v) || ($_v instanceof epObject)) {
                 $exprs = array_merge($exprs, $this->_getPrimitiveExprs($_v, $_prefix));
-            } 
+            }
             // otherwise only deal with scalar
             else if (is_scalar($_v)) {
-                $exprs[$_prefix] = $_v; 
+                $exprs[$_prefix] = $_v;
             }
         }
 
@@ -913,10 +913,10 @@ class epQueryBuilder extends epBase {
      */
     private function _getContainsArg(epQueryNode &$node) {
 
-        // get arg param 
+        // get arg param
         if ($arg = $node->getParam('arg')) {
             return $arg;
-        } 
+        }
 
         // get arg child (placeholder)
         if ($arg = $node->getChild('arg')) {
@@ -931,7 +931,7 @@ class epQueryBuilder extends epBase {
     }
 
     /**
-     * Returns the value for a placeholder node 
+     * Returns the value for a placeholder node
      * @return mixed
      * @throws epExceptionQueryBuilder
      */
@@ -949,26 +949,26 @@ class epQueryBuilder extends epBase {
             return self::$null;
         }
         
-        // return the placeholder value 
+        // return the placeholder value
         return $this->args[$aindex];
     }
 
     /**
-     * Builds SQL statement from a node. 
-     * 
-     * The method uses node type to dispatche actual SQL generation to the 
-     * node's proper handler - a method start with buildSql and appended 
-     * with the node type. Examples: 
-     * 
-     * buildSqlAdd() handles all nodes with type EXP_N_EXPR_ADD, and 
+     * Builds SQL statement from a node.
+     *
+     * The method uses node type to dispatche actual SQL generation to the
+     * node's proper handler - a method start with buildSql and appended
+     * with the node type. Examples:
+     *
+     * buildSqlAdd() handles all nodes with type EXP_N_EXPR_ADD, and
      * buildSqlSelect() handles the EXP_N_EXPR_SELECT node.
-     * 
+     *
      * @return string
      * @throws epExceptionQueryBuilder
      */
     protected function buildSql(epQueryNode &$node) {
         
-        // get type without 
+        // get type without
         $type = str_replace(array('EPQ_N_EXPR_', 'EPQ_N_FUNC_', 'EPQ_N_'), '', $node->getType());
         
         // the build sql method for this type
@@ -1002,7 +1002,7 @@ class epQueryBuilder extends epBase {
             if ($argv && is_array($argv)) {
                 $argv = $argv[0];
             }
-        } 
+        }
         // param arg
         else {
             $argv = $node->getParam('arg');
@@ -1011,7 +1011,8 @@ class epQueryBuilder extends epBase {
         // quote argv
         $argv = trim($argv);
         if ($argv != '*') {
-            $this->_qq($dummy = '', $argv);
+            $dummy = '';
+            $this->_qq($dummy, $argv);
         }
 
         // return aggregate function with argv expr
@@ -1113,7 +1114,7 @@ class epQueryBuilder extends epBase {
      */
     protected function buildSqlIs(epQueryNode &$node) {
         $var_exprs = $this->buildSql($var = & $node->getChild('var'));
-        $is_what = $node->getParam('op'); 
+        $is_what = $node->getParam('op');
         $is_what = strtoupper(str_replace('is ', '', $is_what));
         // use node type EPQ_N_EXPR_UNARY to force no quoting
         return $this->_buildSqlOpera($var_exprs, $var->getType(), $is_what, EPQ_N_EXPR_UNARY, ' IS ');
@@ -1201,13 +1202,16 @@ class epQueryBuilder extends epBase {
      * @throws epExceptionQueryBuilder
      */
     protected function buildSqlIn(epQueryNode &$node) {
-        $left_exprs = $this->buildSql($left = $node->getChild('var'));
-        $right_exprs = $this->buildSql($right = $node->getChild('items'));
+        $left = $node->getChild('var');
+        $left_exprs = $this->buildSql($left);
+        $right = $node->getChild('items');
+        $right_exprs = $this->buildSql($right);
         $sql = array();
         $left_nt = $left->getType();
         foreach ($left_exprs as $left) {
             if ($left_nt == EPQ_N_VARIABLE) {
-                $this->_qq($dummy = '', $left);
+                $dummy_v = '';
+                $this->_qq($dummy, $left);
             }
             $sql[] = $left . ' in' . $right_exprs;
         }
@@ -1354,7 +1358,8 @@ class epQueryBuilder extends epBase {
         // make sql for this orderby item
         $vars = $this->buildSql($var_node);
         $var = $vars[0];
-        $this->_qq($dummy_v = '', $var); // $var will be altered
+        $dummy_v = '';
+        $this->_qq($dummy_v, $var); // $var will be altered
         return  $var . ' ' . $dir;
     }
 
@@ -1406,11 +1411,11 @@ class epQueryBuilder extends epBase {
             $aggregate = $this->aggr_func = $this->buildSqlAggregate($n);
         }
 
-        // build where 
+        // build where
         $where = 'WHERE 1=1';
         if ($n = $node->getChild('where')) {
             $where = $this->buildSqlWhere($n);
-        } 
+        }
 
         // build limit
         $limit = '';
@@ -1544,11 +1549,11 @@ class epQueryBuilder extends epBase {
 
     /**
      * Builds SQL statement from 'variable' node
-     * 
+     *
      * The returning array is an associative array keyed by the primitive
      * variable in the form of '<alias>.<var_name>' and the value is the
-     * condition for the relationship fields. 
-     * 
+     * condition for the relationship fields.
+     *
      * @return false|array
      * @throws epExceptionQueryBuilder
      */
@@ -1564,7 +1569,7 @@ class epQueryBuilder extends epBase {
         $pieces = explode('.', $path);
         $var = $pieces[count($pieces) - 1];
 
-        // array to hold SQL expressions for primitive vars 
+        // array to hold SQL expressions for primitive vars
         $pvars = array();
 
         // if the path points to an object
@@ -1680,45 +1685,49 @@ class epQueryBuilder extends epBase {
      */
     protected function qq(&$left_v, $left_nt, &$right_v, $right_nt) {
         // case one: left variable, right value
-        if ($left_nt == EPQ_N_VARIABLE 
-            && $right_nt != EPQ_N_VARIABLE 
+        if ($left_nt == EPQ_N_VARIABLE
+            && $right_nt != EPQ_N_VARIABLE
             && false === strpos($right_nt, 'EPQ_N_EXPR_')) {
             if ($right_nt != EPQ_N_NUMBER) {
                 return $this->_qq($right_v, $left_v);
             } else {
-                return $this->_qq($dummy='', $left_v);
+                $dummy = '';
+                return $this->_qq($dummy, $left_v);
             }
-        } 
+        }
         // case two: left value, right variable
-        else if ($left_nt != EPQ_N_VARIABLE 
+        else if ($left_nt != EPQ_N_VARIABLE
                  && false === strpos($left_nt, 'EPQ_N_EXPR_')
                  && $right_nt == EPQ_N_VARIABLE) {
             if ($left_nt != EPQ_N_NUMBER) {
                 return $this->_qq($left_v, $right_v);
             } else {
-                return $this->_qq($dummy='', $right_v);
+                $dummy = '';
+                return $this->_qq($dummy, $right_v);
             }
         }
         // case three: left func, right value
         if (false !== strpos($left_nt, 'EPQ_N_FUNC_')
-            && $right_nt != EPQ_N_VARIABLE 
+            && $right_nt != EPQ_N_VARIABLE
             && false === strpos($right_nt, 'EPQ_N_EXPR_')) {
             if ($right_nt != EPQ_N_NUMBER) {
                 $right_v = $this->pm->quote($right_v);
             }
             return true;
-        } 
+        }
         // case four: left variable, right null (for oid)
         else if ($right_nt == EPQ_N_EXPR_UNARY
                  && $left_nt == EPQ_N_VARIABLE
                  && ($right_v == 'NULL' || $right_v == 'NOT NULL')) {
-            return $this->_qq($dummy='', $left_v);
+            $dummy = '';
+            return $this->_qq($dummy, $left_v);
         }
         // case five: left variable, right variable
         else if ($right_nt == EPQ_N_VARIABLE
                  && $left_nt == EPQ_N_VARIABLE) {
-            $this->_qq($dummy='', $left_v);
-            $this->_qq($dummy='', $right_v);
+            $dummy = '';
+            $this->_qq($dummy, $left_v);
+            $this->_qq($dummy, $right_v);
         }
         // done for all else
         return true;

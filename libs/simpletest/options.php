@@ -4,13 +4,13 @@
      *	@package	SimpleTest
      *	@version	$Id: options.php 188 2005-04-17 17:18:58Z nauhygon $
      */
-    
+
     /**
      *    Static global directives and options.
      *	  @package	SimpleTest
      */
     class SimpleTestOptions {
-        
+
         /**
          *    Reads the SimpleTest version from the release file.
          *    @return string        Version string.
@@ -21,7 +21,7 @@
             $content = file(dirname(__FILE__) . '/VERSION');
             return trim($content[0]);
         }
-        
+
         /**
          *    Sets the name of a test case to ignore, usually
          *    because the class is an abstract case that should
@@ -34,7 +34,7 @@
             $registry = &SimpleTestOptions::_getRegistry();
             $registry['IgnoreList'][] = strtolower($class);
         }
-        
+
         /**
          *    Test to see if a test case is in the ignore
          *    list.
@@ -47,7 +47,7 @@
             $registry = &SimpleTestOptions::_getRegistry();
             return in_array(strtolower($class), $registry['IgnoreList']);
         }
-        
+
         /**
          *    The base class name is settable here. This is the
          *    class that a new stub will inherited from.
@@ -62,7 +62,7 @@
             $registry = &SimpleTestOptions::_getRegistry();
             $registry['StubBaseClass'] = $stub_base;
         }
-        
+
         /**
          *    Accessor for the currently set stub base class.
          *    @return string        Class name to inherit from.
@@ -73,7 +73,7 @@
             $registry = &SimpleTestOptions::_getRegistry();
             return $registry['StubBaseClass'];
         }
-        
+
         /**
          *    The base class name is settable here. This is the
          *    class that a new mock will inherited from.
@@ -88,7 +88,7 @@
             $registry = &SimpleTestOptions::_getRegistry();
             $registry['MockBaseClass'] = $mock_base;
         }
-        
+
         /**
          *    Accessor for the currently set mock base class.
          *    @return string           Class name to inherit from.
@@ -99,7 +99,7 @@
             $registry = &SimpleTestOptions::_getRegistry();
             return $registry['MockBaseClass'];
         }
-        
+
         /**
          *    Adds additional mock code.
          *    @param string $code    Extra code that can be added
@@ -113,7 +113,7 @@
             $registry = &SimpleTestOptions::_getRegistry();
             $registry['AdditionalPartialMockCode'] = $code;
         }
-        
+
         /**
          *    Accessor for additional partial mock code.
          *    @return string       Extra code.
@@ -123,7 +123,7 @@
             $registry = &SimpleTestOptions::_getRegistry();
             return $registry['AdditionalPartialMockCode'];
         }
-        
+
         /**
          *    Sets proxy to use on all requests for when
          *    testing from behind a firewall. Set host
@@ -140,7 +140,7 @@
             $registry['DefaultProxyUsername'] = $username;
             $registry['DefaultProxyPassword'] = $password;
         }
-        
+
         /**
          *    Accessor for default proxy host.
          *    @return string       Proxy URL.
@@ -150,7 +150,7 @@
             $registry = &SimpleTestOptions::_getRegistry();
             return $registry['DefaultProxy'];
         }
-        
+
         /**
          *    Accessor for default proxy username.
          *    @return string    Proxy username for authentication.
@@ -160,7 +160,7 @@
             $registry = &SimpleTestOptions::_getRegistry();
             return $registry['DefaultProxyUsername'];
         }
-        
+
         /**
          *    Accessor for default proxy password.
          *    @return string    Proxy password for authentication.
@@ -170,7 +170,7 @@
             $registry = &SimpleTestOptions::_getRegistry();
             return $registry['DefaultProxyPassword'];
         }
-        
+
         /**
          *    Accessor for global registry of options.
          *    @return hash           All stored values.
@@ -184,7 +184,7 @@
             }
             return $registry;
         }
-        
+
         /**
          *    Constant default values.
          *    @return hash       All registry defaults.
@@ -202,14 +202,14 @@
                     'DefaultProxyPassword' => false);
         }
     }
-    
+
     /**
      *  Static methods for compatibility between different
      *  PHP versions.
      *	@package	SimpleTest
      */
     class SimpleTestCompatibility {
-        
+
         /**
          *    Identity test. Drops back to equality for PHP5
          *    objects as the === operator counts as the
@@ -244,7 +244,7 @@
             }
             return ($first === $second);
         }
-        
+
         /**
          *    Test to see if an object is a member of a
          *    class hiearchy.
@@ -253,7 +253,7 @@
          *    @access public
          *    @static
          */
-        function isA($object, $class) {
+        static function isA($object, $class) {
             if (version_compare(phpversion(), '5') >= 0) {
                 if (! class_exists($class)) {
                     return false;
@@ -267,7 +267,7 @@
             return ((strtolower($class) == get_class($object))
                     or (is_subclass_of($object, $class)));
         }
-        
+
         /**
          *    Sets a socket timeout for each chunk.
          *    @param resource $handle    Socket handle.
@@ -278,7 +278,7 @@
         function setTimeout($handle, $timeout) {
             stream_set_timeout($handle, $timeout, 0);
         }
-        
+
         /**
          *    Gets the current stack trace topmost first.
          *    @return array        List of stack frames.

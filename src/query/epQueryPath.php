@@ -315,7 +315,7 @@ abstract class epQueryPathNode extends epContainer {
      * Returns either field map or class map
      * @return epFieldMap|epClassMap
      */
-    abstract public function getMap();
+    abstract public function &getMap();
 
     /**
      * Recursively generates SQL statement for this node (calls
@@ -425,7 +425,7 @@ abstract class epQueryPathNode extends epContainer {
      * @param string|array $path
      * @return false|epQueryPathNode
      */
-    public function insertPath($path) {
+    public function &insertPath($path) {
         // make path an array if a string
         if (is_string($path)) {
             $path = explode('.', $path);
@@ -440,7 +440,7 @@ abstract class epQueryPathNode extends epContainer {
      * @param string|array $path
      * @return false|epQueryPathNode
      */
-    public function findNode($path) {
+    public function &findNode($path) {
         // make path an array if a string
         if (is_string($path)) {
             $path = explode('.', $path);
@@ -684,7 +684,7 @@ class epQueryPathRoot extends epQueryPathNode {
      * Implements {@link epQueryPathNode::getMap()}
      * @return epClassMap
      */
-    public function getMap() {
+    public function &getMap() {
         return $this->cm;
     }
 
@@ -876,7 +876,7 @@ class epQueryPathField extends epQueryPathNode {
      * Implements {@link epQueryPathNode::getMap()}
      * @return epFieldMap
      */
-    public function getMap() {
+    public function &getMap() {
         return $this->fm;
     }
 
