@@ -2,9 +2,9 @@
 
 /**
  * $Id: epTestManager.php 1019 2006-11-29 06:26:43Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1019 $ $Date: 2006-11-29 01:26:43 -0500 (Wed, 29 Nov 2006) $
  * @package ezpdo.tests
@@ -17,15 +17,15 @@
 include_once(dirname(__FILE__).'/epTestRuntime.php');
 
 /**
- * The unit test class for {@link epManager}  
- * 
+ * The unit test class for {@link epManager}
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1019 $ $Date: 2006-11-29 01:26:43 -0500 (Wed, 29 Nov 2006) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.runtime
  */
 class epTestManager extends epTestRuntime {
-    
+
     /**
      * The cached manager
      * @var epManager
@@ -36,7 +36,7 @@ class epTestManager extends epTestRuntime {
      * Maximum number of items to insert to a table
      */
     const MAX_ITEMS = 10;
-    
+
     /**
      * Maximum number of items to insert to a table
      */
@@ -54,12 +54,12 @@ class epTestManager extends epTestRuntime {
      * create, set/get vars, refresh, commit, delete
      */
     function _testSingleObject() {
-        
+
         $this->assertTrue($m = & $this->m);
-        
+
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
-        
+
         // delete all books
         $m->deleteAll('eptBook');
 
@@ -68,18 +68,18 @@ class epTestManager extends epTestRuntime {
         $this->assertTrue($o = $m->create('eptBook', $title));
         $this->assertFalse($o->epIsDirty());
         $this->assertTrue($o->title === $title);
-		$this->assertFalse($dirty = $o->epIsDirty());
-		
-		// call method doNothing should not change dirty flag
-		$o->doNothing();
+        $this->assertFalse($dirty = $o->epIsDirty());
+
+        // call method doNothing should not change dirty flag
+        $o->doNothing();
         $this->assertTrue($o->epIsDirty() == $dirty);
-        
-        // test commit 
-        $this->assertTrue($m->commit($o)); 
-        
+
+        // test commit
+        $this->assertTrue($m->commit($o));
+
         // check object id
         $this->assertTrue(($oid = $o->epGetObjectId()));
-        
+
         // test setter/getter
         $pages = rand(1, 1000);
         $this->assertFalse(($pages0 = $o->pages) === $pages);
@@ -87,20 +87,20 @@ class epTestManager extends epTestRuntime {
         $this->assertTrue($o->pages === $pages);
         $this->assertTrue($dirty = $o->epIsDirty());
 
-		// call method doNothing should not change dirty flag
-		$o->doNothing();
+        // call method doNothing should not change dirty flag
+        $o->doNothing();
         $this->assertTrue($o->epIsDirty() == $dirty);
-        
+
         // call refresh so $pages will be replace with old value $page0
         $this->assertTrue($m->refresh($o));
 
         $this->assertFalse($dirty = $o->epIsDirty());
         $this->assertTrue($o->pages === $pages0);
-        
-		// call method doNothing should not change dirty flag
-		$o->doNothing();
+
+        // call method doNothing should not change dirty flag
+        $o->doNothing();
         $this->assertTrue($o->epIsDirty() == $dirty);
-        
+
         // set pages again and commit
         $this->assertFalse(($pages0 = $o->pages) === $pages);
         $o->setPages($pages);
@@ -109,18 +109,18 @@ class epTestManager extends epTestRuntime {
         $this->assertTrue($m->commit($o));
         // insert id should not change
         $this->assertTrue($oid == $o->epGetObjectId());
-        
+
         // now refresh again
         $this->assertTrue($o->pages !== $pages0);
         $this->assertTrue($o->pages === $pages);
-        
+
         // try get (should get the cached)
         $this->assertTrue($o2 = & $m->get('eptBook', $oid));
         $this->assertTrue($o2 === $o);
-        
+
         // test delete
         $this->assertTrue($m->delete($o));
-        
+
         // cannot get obj for the oid
         $this->assertFalse($m->get('eptBook', $oid));
 
@@ -129,57 +129,57 @@ class epTestManager extends epTestRuntime {
     }
 
     /**
-     * test {@link epManager}: 
-     * {@link epManager::getAll()} 
-     * {@link epManager::flush()} 
+     * test {@link epManager}:
+     * {@link epManager::getAll()}
+     * {@link epManager::flush()}
      */
     function _testMultiObjects() {
-        
+
         // configure epManager
         $this->assertTrue($m = & $this->m);
-        
+
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
-        
+
         // empty db
         $m->deleteAll('eptBook');
-        
+
         // create self::MAX_ITEMS eptBook's
         $oids = array();
         $all_pages = array();
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             $title = "title" . md5($i);
             $this->assertTrue($o = & $m->create('eptBook', $title));
-            
+
             // check title
             $this->assertFalse($dirty = $o->epIsDirty());
-			
-			// call method doNothing should not change dirty flag
-			$o->doNothing();
-			$this->assertTrue($o->epIsDirty() == $dirty );
+
+            // call method doNothing should not change dirty flag
+            $o->doNothing();
+            $this->assertTrue($o->epIsDirty() == $dirty );
 
             $this->assertTrue($o->title === $title);
-            
+
             // set pages
             $pages = rand(1, 1000);
             $this->assertTrue($o->pages = $pages);
             $this->assertTrue($o->pages === $pages);
-            
+
             // chech dirty flag
             $this->assertTrue($o->epIsDirty());
-            
+
             // commit
             $this->assertTrue($m->commit($o));
-            
+
             // make sure oid are valid
             $this->assertTrue(($oid = $o->epGetObjectId()));
-            
+
             // keep track of oids and pages
             $oids[] = $oid;
             $all_pages[] = $pages;
         }
-        
+
         // change page number for the first self::HALF_ITEMS books
         for($i = 0; $i < self::HALF_ITEMS; $i ++) {
 
@@ -189,9 +189,9 @@ class epTestManager extends epTestRuntime {
             // check dirty flag (false)
             $this->assertFalse($dirty = $o->epIsDirty());
 
-			// call method doNothing should not change dirty flag
-			$o->doNothing();
-			$this->assertTrue($o->epIsDirty() == $dirty);
+            // call method doNothing should not change dirty flag
+            $o->doNothing();
+            $this->assertTrue($o->epIsDirty() == $dirty);
 
             // chanage pages
             $this->assertTrue(($pages = $o->pages) === $all_pages[$i]);
@@ -205,7 +205,7 @@ class epTestManager extends epTestRuntime {
         $this->assertTrue($os = $m->getAll('eptBook'));
         $this->assertTrue(count($os) == self::MAX_ITEMS);
         $this->assertTrue($m->count('eptBook') == self::MAX_ITEMS);
-        
+
         // check: the first self::HALF_ITEMS should be retrieved from cache, page number +1 (dirty))
         for($i = 0; $i < self::HALF_ITEMS; $i ++) {
 
@@ -228,29 +228,29 @@ class epTestManager extends epTestRuntime {
             // check dirty flag (false)
             $this->assertFalse($dirty = $o->epIsDirty());
 
-			// call method doNothing should not change dirty flag
-			$o->doNothing();
-			$this->assertTrue($o->epIsDirty() == $dirty);
+            // call method doNothing should not change dirty flag
+            $o->doNothing();
+            $this->assertTrue($o->epIsDirty() == $dirty);
 
             // chanage pages
             $this->assertTrue($o->pages === $all_pages[$i]);
         }
-        
+
         // test flush
         $this->assertTrue($m->flush());
 
         // before refresh, change values in cached objects
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             // get book by oid
             $this->assertTrue($o = & $m->get('eptBook', $oids[$i]));
 
             // check dirty flag (false)
             $this->assertFalse($dirty = $o->epIsDirty());
 
-			// call method doNothing should not change dirty flag
-			$o->doNothing();
-			$this->assertTrue($o->epIsDirty() == $dirty);
+            // call method doNothing should not change dirty flag
+            $o->doNothing();
+            $this->assertTrue($o->epIsDirty() == $dirty);
 
             // chanage pages
             $pages = $o->pages + rand(1, 1000);
@@ -260,11 +260,11 @@ class epTestManager extends epTestRuntime {
             // check dirty flag (true)
             $this->assertTrue($o->epIsDirty());
         }
-        
+
         // now refresh so get value from db that should all differ from memory
         // before refresh, change values in cached objects
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             // get book by oid
             $this->assertTrue($o = & $m->get('eptBook', $oids[$i]));
 
@@ -273,18 +273,18 @@ class epTestManager extends epTestRuntime {
 
             // refresh
             $this->assertTrue($m->refresh($o));
-            
+
             // check that pages are different from those stored in memory
             $this->assertTrue($o->pages !== $all_pages[$i]);
-            
+
             // check dirty flag (true)
             $this->assertFalse($dirty = $o->epIsDirty());
 
-			// call method doNothing should not change dirty flag
-			$o->doNothing();
-			$this->assertTrue($o->epIsDirty() == $dirty);
+            // call method doNothing should not change dirty flag
+            $o->doNothing();
+            $this->assertTrue($o->epIsDirty() == $dirty);
         }
-        
+
         // delete all objects
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
 
@@ -307,13 +307,13 @@ class epTestManager extends epTestRuntime {
      * test createFromArray and updateFromArray
      */
     function _testCreateFromArray() {
-        
+
         $this->assertTrue($m = & $this->m);
-        
+
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptAuthor.php');
         include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
-        
+
         // delete all books
         $m->deleteAll('eptAuthor');
         $m->deleteAll('eptBook');
@@ -331,7 +331,7 @@ class epTestManager extends epTestRuntime {
 
         // create object from array
         $a = $m->createFromArray('eptAuthor', $author);
-        
+
         // check if all vars are correct
         $this->assertTrue($a->name == $author['name']);
         $this->assertTrue($a->id == $author['id']);
@@ -346,10 +346,10 @@ class epTestManager extends epTestRuntime {
             'age' => rand(1, 120),
             'books' => $a->books
             );
-        
+
         // update object from array
         $a_ = $m->updateFromArray($a, $author_diff);
-        
+
         // check if all vars are correct
         $this->assertTrue($a_ === $a);
         $this->assertTrue($a->name == $author_diff['name']);
@@ -358,31 +358,31 @@ class epTestManager extends epTestRuntime {
         $this->assertNotNull($a->books);
         $this->assertNotNull($a->books[0]->title == $author['books']['title']);
         $this->assertNotNull($a->books[0]->pages == $author_diff['books']['pages']);
-        
+
         // array to be used for object creation
         $author2 = array(
             'name' => "author-".md5('author2'),
             'id' => rand(1, 1000),
             'age' => rand(1, 120),
             'contact' => array(
-                'phone' => '1234567', 
-                'zipcode' => '8901', 
+                'phone' => '1234567',
+                'zipcode' => '8901',
                 ),
             'books' => array(
                 array(
                     'title' => 'title-'.md5('book1'),
                     'pages' => rand(1, 1000),
-                    ), 
+                    ),
                 array(
                     'title' => 'title-'.md5('book2'),
                     'pages' => rand(1, 1000),
-                    ), 
-                ), 
+                    ),
+                ),
             );
 
         // create object from array
         $a2 = $m->createFromArray('eptAuthor', $author2);
-        
+
         // check if all vars are correct
         $this->assertTrue($a2->name == $author2['name']);
         $this->assertTrue($a2->id == $author2['id']);
@@ -405,21 +405,21 @@ class epTestManager extends epTestRuntime {
     }
 
     /**
-     * test {@link epArray}: orderby 
-     * {@link epArray::orderBy()} 
+     * test {@link epArray}: orderby
+     * {@link epArray::orderBy()}
      */
     function _testArraySortBy() {
-        
+
         // configure epManager
         $this->assertTrue($m = & $this->m);
-        
+
         include_once(EP_TESTS.'/classes/bookstore/src/eptAuthor.php');
         include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
-        
+
         // empty db
         $m->deleteAll('eptAuthor');
         $m->deleteAll('eptBook');
-        
+
         // create an author
         $this->assertTrue($author = $m->create('eptAuthor'));
 
@@ -429,7 +429,7 @@ class epTestManager extends epTestRuntime {
         $book_pages = array();
         $book_title_page_oids = array();
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             // create a book
             $this->assertTrue($book = $m->create('eptBook'));
 
@@ -438,7 +438,7 @@ class epTestManager extends epTestRuntime {
             $book->title = $title;
             $this->assertTrue($title === $book->title);
             $book_titles[] = $title;
-            
+
             // set book pages
             $pages = rand(1, 1000);
             $book->pages = $pages;
@@ -514,17 +514,17 @@ class epTestManager extends epTestRuntime {
             $this->assertTrue($book_oids[$i] === $book->oid);
             $i ++;
         }
-    
+
         // multisort
         $this->assertTrue($author->books->sortBy('title', SORT_DESC, 'pages', SORT_ASC, 'oid', SORT_DESC));
-        
+
         foreach ($book_title_page_oids as $key => $row) {
             $_titles[$key] = $row['title'];
             $_pages[$key]  = $row['pages'];
             $_oids[$key] = $row['oid'];
         }
         array_multisort($_titles, SORT_DESC, $_pages, SORT_ASC, $_oids, SORT_DESC, $book_title_page_oids);
-        
+
         $i = 0;
         foreach($author->books as $book) {
             $this->assertTrue($book_title_page_oids[$i]['title'] === $book->title);
@@ -535,28 +535,28 @@ class epTestManager extends epTestRuntime {
     }
 
     /**
-     * test datatypes 
+     * test datatypes
      */
     function _testDataTypes() {
-        
+
         // configure epManager
         $this->assertTrue($m = & $this->m);
 
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
-        
+
         // empty db book
         $m->deleteAll('eptBook');
-        
+
         $title = "title" . md5('whatever');
         $this->assertTrue($b = $m->create('eptBook', $title));
-        
+
         // a new object cannot be dirty
         $this->assertFalse($b->epIsDirty());
 
         //
         // do all the setting here
-        // 
+        //
 
         // set title (char)
         $this->assertTrue($b->title === $title);
@@ -567,7 +567,7 @@ class epTestManager extends epTestRuntime {
         $this->assertTrue($b->pages = $pages);
         $this->assertTrue($b->pages === $pages);
         $this->assertTrue(is_integer($b->pages));
-        
+
         // set recommended (boolean)
         $recommended = true;
         $this->assertTrue($b->recommended = $recommended);
@@ -599,17 +599,17 @@ class epTestManager extends epTestRuntime {
         // commit book
         $this->assertTrue($m->commit($b));
         $this->assertTrue($oid = $b->epGetObjectId());
-    
+
         // now evict the book from memory
         $this->assertTrue($m->evictAll('eptBook'));
         $this->assertFalse($b);
 
         // read it from db
         $this->assertTrue($b = & $m->get('eptBook', $oid));
-        
+
         //
         // do all the re-checking here
-        // 
+        //
 
         // check title (char)
         $this->assertTrue($b->title == $title);
@@ -618,7 +618,7 @@ class epTestManager extends epTestRuntime {
         // check pages (integer)
         $this->assertTrue($b->pages == $pages);
         $this->assertTrue(is_integer($b->pages));
-        
+
         // check recommended (boolean)
         $this->assertTrue($b->recommended == $recommended);
         $this->assertTrue(is_bool($b->recommended));
@@ -640,57 +640,57 @@ class epTestManager extends epTestRuntime {
     }
 
     /**
-     * test {@link epManager}: find 
-     * {@link epManager::find()} 
+     * test {@link epManager}: find
+     * {@link epManager::find()}
      */
     function _testObjectFind() {
-        
+
         // configure epManager
         $this->assertTrue($m = & $this->m);
-        
+
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptAuthor.php');
-        
+
         // empty db
         $m->deleteAll('eptAuthor');
         $m->deleteAll('eptBook');
-        
+
         // create self::MAX_ITEMS eptBook's
         $oids = array(); // object ids
         $names = array(); // author names
         $ages = array(); // author ages
         $ids = array(); // author id
         $objs = array(); // all objects
-        
+
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             $name = "author-" . md5($i);
             $this->assertTrue($o = & $m->create('eptAuthor', $name));
-            
+
             // check title
             $this->assertFalse($o->epIsDirty());
             $this->assertTrue($o->name === $name);
-            
+
             // set id
             $id = rand(1, 1000);
             //$this->assertTrue($o->setId($id));
             $this->assertTrue($o->id = $id);
             $this->assertTrue($o->id === $id);
-            
+
             // set ages
             $age = rand(1, 120);
             $this->assertTrue($o->age = $age);
             $this->assertTrue($o->age === $age);
-            
+
             // chech dirty flag
             $this->assertTrue($o->epIsDirty());
-            
+
             // commit
             $this->assertTrue($m->commit($o));
-            
+
             // make sure oid are valid
             $this->assertTrue(($oid = $o->epGetObjectId()));
-            
+
             // keep track of oids and pages
             $names[] = $name;
             $ages[] = $age;
@@ -698,39 +698,39 @@ class epTestManager extends epTestRuntime {
             $ids[] = $id;
             $objs[] = & $o;
         }
-        
+
         // test find - all objects are in cache
         $eo = & $m->create('eptAuthor'); // example object
-        
+
         // set null to all vars
-        $eo->uuid = ''; 
+        $eo->uuid = '';
         $eo->name = '';
         $eo->id = null;
         $eo->age = null;
-        
+
         // find objects in cache only
         $this->assertTrue($os = $m->find($eo, EP_GET_FROM_CACHE));
         $this->assertTrue(count($os) == self::MAX_ITEMS);
-        
+
         // evict and find in cache
         $this->assertTrue($m->evictAll('eptAuthor'));
         $this->assertFalse($os = $m->find($eo, EP_GET_FROM_CACHE));
-        
-        // after eviction, the objects themselves are deleted (set to null) 
+
+        // after eviction, the objects themselves are deleted (set to null)
         $this->assertFalse($o); // test the last one first
-        
+
         // now check everyone (should all be deleted (ie null))
         foreach($objs as &$o) {
-            $this->assertFalse($o); 
+            $this->assertFalse($o);
         }
-        
-        // find objects from db 
+
+        // find objects from db
         $this->assertTrue($os = $m->find($eo, EP_GET_FROM_DB));
         $this->assertTrue(count($os) == self::MAX_ITEMS);
-        
+
         // delete all objects
         $m->deleteAll('eptAuthor');
-        
+
         // make sure we have deleted all
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
             // get book by oid
@@ -739,26 +739,26 @@ class epTestManager extends epTestRuntime {
     }
 
     /**
-     * test {@link epManager}: find 
-     * {@link epManager::find()} 
+     * test {@link epManager}: find
+     * {@link epManager::find()}
      */
     function _testObjectFindByChild() {
-        
+
         // configure epManager
         $this->assertTrue($m = & $this->m);
-        
+
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptAuthor.php');
         include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
         include_once(EP_TESTS.'/classes/bookstore/src/eptContact.php');
         include_once(EP_TESTS.'/classes/bookstore/src/eptBookstore.php');
-        
+
         // empty db
         $m->deleteAll('eptAuthor');
         $m->deleteAll('eptBook');
         $m->deleteAll('eptContact');
         $m->deleteAll('eptBookstore');
-        
+
         // create self::MAX_ITEMS eptBook's
         $oids = array(); // object ids
         $names = array(); // author names
@@ -769,33 +769,33 @@ class epTestManager extends epTestRuntime {
         $titles = array(); // book titles
         $pages = array(); // book pages
         $objs = array(); // all objects
-        
+
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             $name = "author-" . md5($i);
             $this->assertTrue($o = & $m->create('eptAuthor', $name));
-            
+
             // check title
             $this->assertFalse($dirty = $o->epIsDirty());
-			
-			// call method doNothing should not change dirty flag
-			$o->doNothing();
-			$this->assertTrue($o->epIsDirty() == $dirty);
+
+            // call method doNothing should not change dirty flag
+            $o->doNothing();
+            $this->assertTrue($o->epIsDirty() == $dirty);
 
             // set name
-			$this->assertTrue($o->name === $name);
-            
+            $this->assertTrue($o->name === $name);
+
             // set id
             $id = rand(1, 1000);
             //$this->assertTrue($o->setId($id));
             $this->assertTrue($o->id = $id);
             $this->assertTrue($o->id === $id);
-            
+
             // set ages
             $age = rand(1, 120);
             $this->assertTrue($o->age = $age);
             $this->assertTrue($o->age === $age);
-            
+
             // check dirty flag
             $this->assertTrue($o->epIsDirty());
 
@@ -822,8 +822,8 @@ class epTestManager extends epTestRuntime {
                 $title = 'title-'.$i.'-'.$j;
                 $this->assertTrue($o->books[$j] = $m->create('eptBook', $title));
                 $this->assertFalse($o->books[$j]->epIsDirty());
-                $this->assertTrue($o->books[$j]->title === $title); 
-                
+                $this->assertTrue($o->books[$j]->title === $title);
+
                 // set author
                 $this->assertTrue($o->books[$j]->author = $o);
                 $this->assertTrue($o->books[$j]->author === $o);
@@ -832,7 +832,7 @@ class epTestManager extends epTestRuntime {
                 $page = rand(1, 1000);
                 $this->assertTrue($o->books[$j]->pages = $page);
                 $this->assertTrue($o->books[$j]->pages === $page);
-                
+
                 $titles[$i][] = $title;
                 $pages[$i][] = $page;
             }
@@ -842,7 +842,7 @@ class epTestManager extends epTestRuntime {
 
             // make sure oid are valid
             $this->assertTrue(($oid = $o->epGetObjectId()));
-            
+
             // keep track of oids and pages
             $names[] = $name;
             $ages[] = $age;
@@ -852,14 +852,14 @@ class epTestManager extends epTestRuntime {
             $zipcodes[] = $zipcode;
             $objs[] = & $o;
         }
-        
+
         // test find - all objects are in cache
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
             // find by book title of author
             $eo = & $m->create('eptAuthor'); // example object
-            
+
             // set null to all vars
-            $eo->uuid = ''; 
+            $eo->uuid = '';
             $eo->name = '';
             $eo->id = null;
             $eo->age = null;
@@ -892,7 +892,7 @@ class epTestManager extends epTestRuntime {
                 $eb->excerpt = null;
 
                 $eb->author = $m->create('eptAuthor');
-                $eb->author->uuid = ''; 
+                $eb->author->uuid = '';
                 $eb->author->name = '';
                 $eb->author->id = null;
                 $eb->author->age = null;
@@ -911,20 +911,20 @@ class epTestManager extends epTestRuntime {
             }
 
         }
-        
+
         // evict and find in cache
         $this->assertTrue($m->evictAll('eptAuthor'));
         $this->assertTrue($m->evictAll('eptBook'));
         $this->assertTrue($m->evictAll('eptContact'));
         $this->assertFalse($os = $m->find($eo, EP_GET_FROM_CACHE));
-        
+
         // test find - all objects are in cache
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
             // find by book title of author
             $eo = & $m->create('eptAuthor'); // example object
-            
+
             // set null to all vars
-            $eo->uuid = ''; 
+            $eo->uuid = '';
             $eo->name = '';
             $eo->id = null;
             $eo->age = null;
@@ -957,7 +957,7 @@ class epTestManager extends epTestRuntime {
                 $eb->excerpt = null;
 
                 $eb->author = $m->create('eptAuthor');
-                $eb->author->uuid = ''; 
+                $eb->author->uuid = '';
                 $eb->author->name = '';
                 $eb->author->id = null;
                 $eb->author->age = null;
@@ -981,13 +981,13 @@ class epTestManager extends epTestRuntime {
                 $this->assertTrue($os[$j]->author->name === $names[$i]);
             }
         }
-        
+
         // delete all objects
         $m->deleteAll('eptAuthor');
         $m->deleteAll('eptBook');
         $m->deleteAll('eptContact');
         $m->deleteAll('eptBookstore');
-        
+
         // make sure we have deleted all
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
             // get book by oid
@@ -999,58 +999,58 @@ class epTestManager extends epTestRuntime {
      * test {@link epQuery}: query/find
      * More complete tests are moved to tests/query/epTestQueryRuntime.php
      * !!!Add new test cases there!!!
-     * {@link epManager::find()} 
+     * {@link epManager::find()}
      */
     function _testObjectQueryPrimitive() {
-        
+
         $this->assertTrue($m = & $this->m);
-        
+
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
-        
+
         // empty db
         $m->deleteAll('eptBook');
-        
+
         // create eptBook's (self::MAX_ITEMS in total)
         $bk_oids = array();
         $bk_pages = array();
         $bk_titles = array();
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             $title = "title" . md5($i);
             $this->assertTrue($b = & $m->create('eptBook', $title));
 
             // check title
             $this->assertFalse($b->epIsDirty());
             $this->assertTrue($b->title === $title);
-            
+
             // set pages
             $pages = rand(1, 1000);
             $this->assertTrue($b->pages = $pages);
             $this->assertTrue($b->pages === $pages);
-            
+
             // chech dirty flag
             $this->assertTrue($b->epIsDirty());
-            
+
             // commit book
             $this->assertTrue($m->commit($b));
-            
+
             // make sure oid are valid
             $this->assertTrue(($oid = $b->epGetObjectId()));
-            
+
             // keep track of oids and pages
             $bk_oids[] = $oid;
             $bk_pages[] = $pages;
             $bk_titles[] = $title;
         }
-        
+
         // remove all objects from memory
         $this->assertTrue($m->evictAll('eptBook'));
 
         // -----------------
         // test epQuery here
         // -----------------
-        
+
         // test simple expression
         $this->assertTrue($os = $m->query("from eptBook as book where book.pages > ?", 0));
         $this->assertTrue(count($os) == self::MAX_ITEMS);
@@ -1077,7 +1077,7 @@ class epTestManager extends epTestRuntime {
             $this->assertTrue(count($os) == $value_counts[$bk_pages[$i]]);
         }
 
-        // clean up 
+        // clean up
         $m->deleteAll('eptBook');
         $m->deleteAll('eptAuthor');
     }
@@ -1086,22 +1086,22 @@ class epTestManager extends epTestRuntime {
      * test {@link epQuery}: query/find (with relationship fields)
      * More complete tests are moved to tests/query/epTestQueryRuntime.php
      * !!!Add new test cases there!!!
-     * {@link epManager::find()} 
+     * {@link epManager::find()}
      */
     function _testObjectQueryRelationship() {
-        
+
         $this->assertTrue($m = & $this->m);
-        
+
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptAuthor.php');
         include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
-        
+
         // empty db
         $m->deleteAll('eptAuthor');
         $m->deleteAll('eptBook');
-        
+
         // -----------------------------------------------------
-        
+
         // create one author
         $name = "author-test";
         $this->assertTrue($a = $m->create('eptAuthor', $name));
@@ -1128,67 +1128,67 @@ class epTestManager extends epTestRuntime {
 
         // make sure oid are valid
         $this->assertTrue(($oid = $a->epGetObjectId()));
-        
+
         // -----------------------------------------------------
-        
+
         // create eptBook's (self::MAX_ITEMS in total)
         $bk_oids = array();
         $bk_pages = array();
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             $title = "title" . md5($i);
             $this->assertTrue($b = $m->create('eptBook', $title));
-            
+
             // check title
             $this->assertFalse($b->epIsDirty());
             $this->assertTrue($b->title === $title);
-            
+
             // set pages
             $pages = rand(1, 1000);
             $this->assertTrue($b->pages = $pages);
             $this->assertTrue($b->pages === $pages);
-            
+
             // chech dirty flag
             $this->assertTrue($b->epIsDirty());
-            
-            // set author to book 
+
+            // set author to book
             $this->assertTrue($b->author = $a);
-            
+
             // add book into author
             if (!($books = $a->books)) {
                 $books = array();
             }
             $books[] = $b;
-            
+
             // assign books to author's books
             $this->assertTrue($a->books = $books);
             $this->assertTrue(count($a->books) == count($books));
             $this->assertTrue($b->epIsDirty());
-            
+
             // commit book
             $this->assertTrue($m->commit($b));
-            
+
             // make sure oid are valid
             $this->assertTrue(($oid = $b->epGetObjectId()));
-            
+
             // keep track of oids and pages
             $bk_oids[] = $oid;
             $bk_pages[] = $pages;
         }
-        
+
         // make sure the author has the right number of books
         if (version_compare(phpversion(), "5.1.0", "<")) {
             $this->assertTrue($a->books->count() == self::MAX_ITEMS);
         } else {
             $this->assertTrue(count($a->books) == self::MAX_ITEMS);
         }
-        
+
         // -----------------------------------------------------
 
         // remove all objects from memory
         $this->assertTrue($m->evictAll('eptAuthor'));
         $this->assertTrue($m->evictAll('eptBook'));
-        
+
         // make sure author is gone
         $this->assertFalse($a);
 
@@ -1208,17 +1208,17 @@ class epTestManager extends epTestRuntime {
         $this->assertTrue($os = $m->query("from eptAuthor as a where a.books.contains(b) and b.author.books.contains(b2) and b2.title like 'title%'"));
         $this->assertTrue(count($os) == $m->count('eptAuthor'));
 
-        // clean up 
+        // clean up
         $m->deleteAll('eptBook');
         $m->deleteAll('eptAuthor');
     }
 
     /**
      * test {@link epManager}
-     * {@link epManager::find()} 
+     * {@link epManager::find()}
      */
     function _testObjectRelation() {
-        
+
         // get the manager
         $this->assertTrue($m = & $this->m);
 
@@ -1226,13 +1226,13 @@ class epTestManager extends epTestRuntime {
         include_once(EP_TESTS.'/classes/bookstore/src/eptAuthor.php');
         include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
         include_once(EP_TESTS.'/classes/bookstore/src/eptBookstore.php');
-        
+
         // empty db
         $m->deleteAll('eptAuthor');
         $m->deleteAll('eptBook');
-        
+
         // -----------------------------------------------------
-        
+
         // create one author
         $name = "author-test";
         $this->assertTrue($a = $m->create('eptAuthor', $name));
@@ -1259,7 +1259,7 @@ class epTestManager extends epTestRuntime {
 
         // make sure oid are valid
         $this->assertTrue(($a_oid = $a->epGetObjectId()));
-        
+
         // -----------------------------------------------------
 
         $storename = 'store';
@@ -1276,19 +1276,19 @@ class epTestManager extends epTestRuntime {
         $this->assertTrue(($s_oid = $s->epGetObjectId()));
 
         // -----------------------------------------------------
-        
+
         // create eptBook's (self::MAX_ITEMS in total)
         $bk_oids = array();
         $bk_pages = array();
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             $title = "title" . md5($i);
             $this->assertTrue($b = $m->create('eptBook', $title));
-            
+
             // check title
             $this->assertFalse($b->epIsDirty());
             $this->assertTrue($b->title === $title);
-            
+
             // set pages
             $pages = rand(1, 1000);
             $this->assertTrue($b->pages = $pages);
@@ -1301,7 +1301,7 @@ class epTestManager extends epTestRuntime {
             $this->assertTrue($modified_vars = $b->epGetModifiedVars());
             $this->assertTrue(count($modified_vars) == 1);
             $this->assertTrue($modified_vars['pages'] == $pages);
-            
+
             // check modified vars (primitive)
             $this->assertTrue($modified_vars = $b->epGetModifiedVars(epObject::VAR_PRIMITIVE));
             $this->assertTrue(count($modified_vars) == 1);
@@ -1310,17 +1310,17 @@ class epTestManager extends epTestRuntime {
             // check modified vars (relationship)
             $this->assertFalse($modified_vars = $b->epGetModifiedVars(epObject::VAR_RELATIONSHIP));
 
-            // set author to book 
+            // set author to book
             $this->assertTrue($b->author = $a);
             $this->assertTrue($b->bookstore = $s);
-            
+
             // check modified vars
             $this->assertTrue($modified_vars = $b->epGetModifiedVars());
             $this->assertTrue(count($modified_vars) == 3);
             $this->assertTrue($modified_vars['pages'] == $pages);
             $this->assertTrue($modified_vars['author'] == true);
-            
-            
+
+
             // check modified vars (primitive)
             $this->assertTrue($modified_vars = $b->epGetModifiedVars(epObject::VAR_PRIMITIVE));
             $this->assertTrue(count($modified_vars) == 1);
@@ -1337,7 +1337,7 @@ class epTestManager extends epTestRuntime {
                 $books = array();
             }
             $books[] = $b;
-            
+
             // assign books to author's books
             $this->assertTrue($a->books = $books);
             $this->assertTrue(count($a->books) == count($books));
@@ -1347,24 +1347,24 @@ class epTestManager extends epTestRuntime {
                 $books = array();
             }
             $books[] = $b;
-            
+
             // assign books to author's books
             $this->assertTrue($s->books = $books);
             $this->assertTrue(count($s->books) == count($books));
 
             $this->assertTrue($b->epIsDirty());
-            
+
             // commit book
             $this->assertTrue($m->commit($b));
-            
+
             // make sure oid are valid
             $this->assertTrue(($oid = $b->epGetObjectId()));
-            
+
             // keep track of oids and pages
             $bk_oids[] = $oid;
             $bk_pages[] = $pages;
         }
-        
+
         // make sure the author has the right number of books
         if (version_compare(phpversion(), "5.1.0", "<")) {
             $this->assertTrue($a->books->count() == self::MAX_ITEMS);
@@ -1372,12 +1372,12 @@ class epTestManager extends epTestRuntime {
             $this->assertTrue(count($a->books) == self::MAX_ITEMS);
         }
 
-        // ----------------------------------------------------- 
+        // -----------------------------------------------------
 
         // remove all objects from memory
         $this->assertTrue($m->evictAll('eptAuthor'));
         $this->assertTrue($m->evictAll('eptBook'));
-        
+
         // make sure author is gone
         $this->assertFalse($a);
 
@@ -1405,7 +1405,7 @@ class epTestManager extends epTestRuntime {
         // remove all objects from memory
         $this->assertTrue($m->evictAll('eptAuthor'));
         $this->assertTrue($m->evictAll('eptBook'));
-        
+
         // make sure author is gone
         $this->assertFalse($a);
 
@@ -1421,50 +1421,50 @@ class epTestManager extends epTestRuntime {
 
         // set ages
         $this->assertTrue($a->age === $age);
-        
+
         // make sure the author has the right number of books
         if (version_compare(phpversion(), "5.1.0", "<")) {
             $this->assertTrue($a->books->count() == self::MAX_ITEMS);
         } else {
             $this->assertTrue(count($a->books) == self::MAX_ITEMS);
         }
-        
+
         // -----------------------------------------------------
 
         // remove all objects from memory
         $this->assertTrue($m->evictAll('eptAuthor'));
         $this->assertTrue($m->evictAll('eptBook'));
-        
+
         // make sure author is gone
         $this->assertFalse($a);
-        
+
         // retrieve books one by one and check its author
         $a0 = false;
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             // get book by oid
             $this->assertTrue($b = $m->get('eptBook', $bk_oids[$i]));
-            
+
             // check pages
             $this->assertTrue($b->pages == $bk_pages[$i]);
-            
+
             // check author
             $this->assertNotNull($a = $b->author);
-            
+
             // same author (ref)
             if ($a0 && $a) {
                 $this->assertTrue($a0 === $a);
             }
-            
+
             // does it have the right author
-            $this->assertTrue($a->name === $name); 
-            
+            $this->assertTrue($a->name === $name);
+
             // does it have the right age
             $this->assertTrue($a->age == $age);
-            
+
             // does it have the right id
             $this->assertTrue($a->id == $id);
-            
+
             // check books the author has is self::MAX_ITEMS
             if ($a->books instanceof epArray) {
                 if (version_compare(phpversion(), "5.1.0", "<")) {
@@ -1475,45 +1475,45 @@ class epTestManager extends epTestRuntime {
             } else {
                 $this->assertTrue(count($a->books) == self::MAX_ITEMS);
             }
-            
+
             $a0 = & $a;
         }
 
         // remove author from book
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             // get book by oid
             $this->assertTrue($b = $m->get('eptBook', $bk_oids[$i]));
-            
+
             // check pages
             $this->assertTrue($b->pages == $bk_pages[$i]);
-            
+
             // remove author
             $b->author = null;
-            
+
             // commit
             $m->commit($b);
-            
+
             $this->assertFalse($b->author);
         }
 
         // remove all objects from memory
         $this->assertTrue($m->evictAll('eptAuthor'));
         $this->assertTrue($m->evictAll('eptBook'));
-        
+
         // check if author is removed from each book
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             // get book by oid
             $this->assertTrue($b = $m->get('eptBook', $bk_oids[$i]));
-            
+
             // check pages
             $this->assertTrue($b->pages == $bk_pages[$i]);
-            
+
             // author must have been removed
             $this->assertFalse($b->author);
         }
-        
+
         // check if each book is removed from the author
         $this->assertTrue($a = $m->get('eptAuthor', $a_oid));
         if ($a->books instanceof epArray) {
@@ -1532,7 +1532,7 @@ class epTestManager extends epTestRuntime {
 
             // remove the book
             $a->books[$k] = null;
-            
+
             // commit the changes
             $this->assertTrue($m->commit($a));
 
@@ -1565,65 +1565,65 @@ class epTestManager extends epTestRuntime {
         $this->assertTrue($m->evictAll('eptAuthor'));
         $this->assertTrue($m->evictAll('eptBook'));
         $this->assertTrue($m->evictAll('eptBookstore'));
-        
+
         $this->assertTrue($a =& $m->get('eptAuthor', $a_oid));
 
         $this->assertTrue($s =& $m->get('eptBookstore', $s_oid));
 
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             // get book by oid
             $this->assertTrue($b = $m->get('eptBook', $bk_oids[$i]));
-            
+
             // check pages
             $this->assertTrue($b->pages == $bk_pages[$i]);
 
             // check bookstore
             $this->assertTrue($b->bookstore === $s);
-            
+
             $this->assertTrue($b->author = $a);
-            
+
             // add book into author
             if (!($books = $a->books)) {
                 $books = array();
             }
             $books[] = $b;
-            
+
             // assign books to author's books
             $this->assertTrue($a->books = $books);
             $this->assertTrue(count($a->books) == count($books));
 
             $this->assertTrue($b->epIsDirty());
-            
+
             // commit book
             $this->assertTrue($m->commit($b));
-            
+
             // make sure oid are valid
             $this->assertTrue(($oid = $b->epGetObjectId()));
-            
+
         }
 
         // now delete each book and check to see if both
         // the publisher's and author's book counts go down
         for($i = 0; $i < self::MAX_ITEMS; $i ++) {
-            
+
             // get book by oid
             $this->assertTrue($b =& $m->get('eptBook', $bk_oids[$i]));
-            
+
             // check pages
             $this->assertTrue($b->pages == $bk_pages[$i]);
 
             $m->delete($b);
 
             // we want to check that it is out of memory and database
-            // but this is impossible because the reference in store::books 
+            // but this is impossible because the reference in store::books
             // is different than the one that is being deleted
             // for some reason, though, it doesn't have this problem with
             // authors::books
             $this->assertTrue($m->evictAll('eptAuthor'));
             $this->assertTrue($m->evictAll('eptBook'));
             $this->assertTrue($m->evictAll('eptBookstore'));
-            
+
             $this->assertTrue($a =& $m->get('eptAuthor', $a_oid));
             $this->assertTrue($s =& $m->get('eptBookstore', $s_oid));
 
@@ -1646,35 +1646,72 @@ class epTestManager extends epTestRuntime {
             } else {
                 $this->assertTrue(count($s->books) == self::MAX_ITEMS - $i - 1);
             }
-            
+
         }
 
-        
+
         // -----------------------------------------------------
 
-        // clean up 
+        // clean up
         $m->deleteAll('eptAuthor');
         $m->deleteAll('eptBook');
     }
-    
+
+    /**
+     * test bug 234, all relationships deleted after
+     * creating and deleting in memory objects without commit it
+     */
+    function _testRelationsDeletes() {
+
+        $this->assertTrue($m = & $this->m);
+
+        // use manager to create one object
+        include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
+
+        // delete all books
+        $m->deleteAll('eptBook');
+        $m->setConfigOption('log_queries', true);
+
+        //
+        // new object | delete | check queries
+        //
+
+        // test object creation
+        $title = md5('eptBook');
+        $this->assertTrue($o = $m->create('eptBook', $title));
+        $this->assertTrue($o->title === $title);
+        $this->assertFalse($o->epIsDirty());
+        $this->assertFalse($o->epGetObjectId());
+
+        // del object
+        $o->delete();
+
+        $queries = $this->m->getQueries();
+        // no queries executed when objects are still in memory
+        $this->assertFalse( count($queries = array_shift( $queries )) );
+
+        // delete all books
+        $m->deleteAll('eptBook');
+    }
+
     /**
      * test {@link epManager}: deletion of composed_of fields
-     * {@link epManager::delete()} 
+     * {@link epManager::delete()}
      */
     function _testComposedOfDelete() {
-        
+
         // get the manager
         $this->assertTrue($m = & $this->m);
-        
+
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptAuthor.php');
-        
+
         // empty db: author and contact
         $m->deleteAll('eptAuthor');
         $m->deleteAll('eptContact');
-        
+
         // -----------------------------------------------------
-        
+
         // create an author
         $name = "author-test";
         $this->assertTrue($a = $m->create('eptAuthor', $name));
@@ -1697,15 +1734,15 @@ class epTestManager extends epTestRuntime {
         $this->assertTrue($a->epIsDirty());
         $this->assertTrue($m->commit($a));
         $this->assertTrue(($oid = $a->epGetObjectId()));
-        
+
         // get author oid to be used later
         $this->assertTrue($a_oid = $a->epGetObjectId());
-        
+
         // -----------------------------------------------------
-        
+
         // create a contact
         $this->assertTrue($c = $m->create('eptContact', $name));
-        
+
         // set phone
         $phone = '123-456-789';
         $this->assertTrue($c->phone = $phone);
@@ -1720,75 +1757,75 @@ class epTestManager extends epTestRuntime {
         $this->assertTrue($c->epIsDirty());
         $this->assertTrue($m->commit($c));
         $this->assertFalse($c->epIsDirty());
-        
+
         // get contact oid to be used later
         $this->assertTrue($c_oid = $c->epGetObjectId());
-        
+
         // -----------------------------------------------------
-        
+
         // assign contact to author and commit
         $this->assertTrue($a->contact = $c);
         $this->assertTrue($a->epIsDirty());
         $this->assertTrue($m->commit($a));
         $this->assertFalse($a->epIsDirty());
-        
+
         // -----------------------------------------------------
-        
+
         // remove author and contact from memory
         $this->assertTrue($m->evictAll('eptAuthor'));
         $this->assertTrue($m->evictAll('eptContact'));
-        
+
         // make sure author is gone
         $this->assertFalse($a);
         $this->assertFalse($c);
-        
+
         // read author back
         $this->assertTrue($a = & $m->get('eptAuthor', $a_oid));
-        
+
         // check its primitive fields
         $this->assertTrue($a->name === $name);
         $this->assertTrue($a->id === $id);
         $this->assertTrue($a->age === $age);
-        
-        // check fields in the contact 
-        $this->assertTrue($a->contact->phone === $phone);  
+
+        // check fields in the contact
+        $this->assertTrue($a->contact->phone === $phone);
         $this->assertTrue($a->contact->zipcode === $zipcode);
-        
+
         // -----------------------------------------------------
-        
+
         // test delete author
         //$c = & $a->getContact();
         $this->assertTrue($m->delete($a));
         $this->assertFalse($a);
         //$this->assertFalse($c);
-        
+
         // make sure we can't find author and contact any more
         $this->assertFalse($a = $m->get('eptAuthor', $a_oid));
         $this->assertFalse($a = $m->get('eptContact', $c_oid));
-        
+
         // -----------------------------------------------------
-        
-        // clean up 
+
+        // clean up
         $m->deleteAll('eptAuthor');
         $m->deleteAll('eptContact');
     }
 
     /**
-     * Test epObject::epStartTransaction() and epEndTransaction() 
+     * Test epObject::epStartTransaction() and epEndTransaction()
      */
     function _testTransactionObject() {
-        
+
         $this->assertTrue($m = & $this->m);
-        
+
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
-        
+
         // delete all books
         $m->deleteAll('eptBook');
 
         //
         // 1. create object (no rollback)
-        // 
+        //
 
         // test object creation
         $title = md5('eptBook');
@@ -1796,10 +1833,10 @@ class epTestManager extends epTestRuntime {
         $this->assertFalse($o->epIsDirty());
         $this->assertTrue($o->title === $title);
         $this->assertFalse($o->epIsDirty());
-        
-        // signal object the start of transaction 
+
+        // signal object the start of transaction
         $this->assertTrue($o->epStartTransaction());
-        
+
         // signal object the start of transaction (without rollback)
         $this->assertTrue($o->epEndTransaction());
 
@@ -1810,12 +1847,12 @@ class epTestManager extends epTestRuntime {
 
         //
         // 2. change object (with rollback)
-        // 
+        //
 
-        // signal object the start of transaction 
+        // signal object the start of transaction
         $this->assertTrue($o->epStartTransaction());
         $this->assertTrue($o->epInTransaction());
-        
+
         $title_0 = $title;
         $title = md5($title_0);
         $o->title = $title;
@@ -1830,12 +1867,12 @@ class epTestManager extends epTestRuntime {
 
         //
         // 3. change object (without rollback)
-        // 
+        //
 
-        // signal object the start of transaction 
+        // signal object the start of transaction
         $this->assertTrue($o->epStartTransaction());
         $this->assertTrue($o->epInTransaction());
-        
+
         $title_0 = $title;
         $title = md5($title_0);
         $o->title = $title;
@@ -1850,9 +1887,9 @@ class epTestManager extends epTestRuntime {
 
         //
         // 4. commit object (with rollback)
-        // 
-        
-        // signal object the start of transaction 
+        //
+
+        // signal object the start of transaction
         $this->assertTrue($o->epStartTransaction());
         $this->assertTrue($o->epInTransaction());
 
@@ -1875,16 +1912,16 @@ class epTestManager extends epTestRuntime {
      * Test transaction: start and commit
      */
     function _testTransactionStartCommit() {
-        
+
         $this->assertTrue($m = & $this->m);
-        
+
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
-        
+
         // delete all books
         $m->deleteAll('eptBook');
 
-        // start transaction 
+        // start transaction
         $this->assertTrue($m->start_t());
 
         // test object creation
@@ -1894,10 +1931,10 @@ class epTestManager extends epTestRuntime {
         $this->assertTrue($o->title === $title);
         $this->assertFalse($o->epIsDirty());
         $this->assertFalse(($oid = $o->epGetObjectId()));
-        
-        // commit transaction 
+
+        // commit transaction
         $this->assertTrue($m->commit_t());
-        
+
         // check object id
         $this->assertTrue(($oid = $o->epGetObjectId()));
 
@@ -1909,20 +1946,20 @@ class epTestManager extends epTestRuntime {
      * Transaction: start and rollback
      */
     function _testTransactionStartRollback() {
-        
+
         $this->assertTrue($m = & $this->m);
-        
+
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptBook.php');
-        
+
         // delete all books
         $m->deleteAll('eptBook');
 
-        // 
+        //
         // start | new object | change object | rollback
-        // 
+        //
 
-        // start transaction 
+        // start transaction
         $this->assertTrue($m->start_t());
 
         // test object creation
@@ -1931,27 +1968,27 @@ class epTestManager extends epTestRuntime {
         $this->assertTrue($o->title === $title);
         $this->assertFalse($o->epIsDirty());
         $this->assertFalse($o->epGetObjectId());
-        
-        // rollback transaction 
+
+        // rollback transaction
         $this->assertTrue($m->rollback_t());
-        
-        // check object 
+
+        // check object
         $this->assertFalse($o->epGetObjectId());
         $this->assertTrue($o->title == $title);
 
-        // 
+        //
         // 2. change object | rollback
-        // 
+        //
 
-        // start transaction 
+        // start transaction
         $this->assertTrue($m->start_t());
 
         $title_0 = $title;
         $title = md5($title_0);
         $o->title = $title;
 
-        // rollback transaction 
-        $this->assertTrue($m->rollback_t()); 
+        // rollback transaction
+        $this->assertTrue($m->rollback_t());
 
         // check object
         $this->assertTrue($o->title == $title_0);
@@ -1962,12 +1999,12 @@ class epTestManager extends epTestRuntime {
     }
 
     /**
-     * Run all tests 
+     * Run all tests
      * @param string $dbal (adodb, peardb)
      * @param string $dbtype (mysql, sqlite)
      */
     function _allTests($dbal, $dbtype) {
-        
+
         echo "tests for $dbal/$dbtype started.. " . epNewLine();
 
         echo "  setup..";
@@ -1989,7 +2026,7 @@ class epTestManager extends epTestRuntime {
         echo "  array to object..";
         $this->_testCreateFromArray();
         echo "done " . epNewLine();
-        
+
         echo "  data typess..";
         $this->_testDataTypes();
         echo "done " . epNewLine();
@@ -2014,6 +2051,10 @@ class epTestManager extends epTestRuntime {
         $this->_testObjectRelation();
         echo "done " . epNewLine();
 
+        echo "  object relationship deletion..";
+        $this->_testRelationsDeletes();
+        echo "done " . epNewLine();
+
         echo "  composed delete..";
         $this->_testComposedOfDelete();
         echo "done " . epNewLine();
@@ -2025,7 +2066,7 @@ class epTestManager extends epTestRuntime {
         echo "  transaction: commit..";
         $this->_testTransactionStartCommit();
         echo "done " . epNewLine();
-        
+
         echo "  transaction: rollback..";
         $this->_testTransactionStartRollback();
         echo "done " . epNewLine();
@@ -2037,7 +2078,7 @@ class epTestManager extends epTestRuntime {
      * Test adodb & mysql
      */
     function testAdodbMysql() {
-        
+
         // skip testing adodb + mysql if not allowed
         if (!$this->canTestAdodb() || !$this->canTestMysql()) {
             return;
@@ -2050,7 +2091,7 @@ class epTestManager extends epTestRuntime {
      * Test peardb & mysql
      */
     function testPearMysql() {
-        
+
         // skip testing peardb + mysql if not allowed
         if (!$this->canTestPeardb() || !$this->canTestMysql()) {
             return;
@@ -2063,7 +2104,7 @@ class epTestManager extends epTestRuntime {
      * Test pdo & mysql
      */
     function testPdoMysql() {
-        
+
         // skip testing pdo + mysql if not allowed
         if (!$this->canTestPdo('mysql') || !$this->canTestMysql()) {
             return;
@@ -2076,7 +2117,7 @@ class epTestManager extends epTestRuntime {
      * Test adodb & pgsql
      */
     function testAdodbPgsql() {
-        
+
         // skip testing adodb + pgsql if not allowed
         if (!$this->canTestAdodb() || !$this->canTestPgsql()) {
             return;
@@ -2089,7 +2130,7 @@ class epTestManager extends epTestRuntime {
      * Test peardb & pgsql
      */
     function testPearPgsql() {
-        
+
         // skip testing peardb + mysql if not allowed
         if (!$this->canTestPeardb() || !$this->canTestPgsql()) {
             return;
@@ -2102,7 +2143,7 @@ class epTestManager extends epTestRuntime {
      * Test pdo & pgsql
      */
     function testPdoPgsql() {
-        
+
         // skip testing pgsql if not allowed
         if (!$this->canTestPdo('pgsql') || !$this->canTestPgsql()) {
             return;
@@ -2128,7 +2169,7 @@ class epTestManager extends epTestRuntime {
      * Test peardb & mysql
      */
     function testPearSqlite() {
-        
+
         // skip testing sqlite if not allowed
         if (!$this->canTestPeardb() || !$this->canTestSqlite()) {
             return;
@@ -2142,7 +2183,7 @@ class epTestManager extends epTestRuntime {
      * Test pdo & sqlite
      */
     function testPdoSqlite() {
-        
+
         // skip testing sqlite if not allowed
         if (!$this->canTestPdo('sqlite') || !$this->canTestSqlite()) {
             return;
@@ -2153,18 +2194,18 @@ class epTestManager extends epTestRuntime {
 }
 
 if (!defined('EP_GROUP_TEST')) {
-    
+
     $tm = microtime(true);
-    
+
     $t = new epTestManager;
     if ( epIsWebRun() ) {
         $t->run(new HtmlReporter());
     } else {
         $t->run(new TextReporter());
     }
-    
+
     $elapsed = microtime(true) - $tm;
-    
+
     echo epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds';
 }
 
