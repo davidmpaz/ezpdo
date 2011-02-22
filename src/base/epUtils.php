@@ -2,9 +2,9 @@
 
 /**
  * $Id: epUtils.php 1028 2006-12-28 11:15:37Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1028 $ $Date: 2006-12-28 06:15:37 -0500 (Thu, 28 Dec 2006) $
  * @package ezpdo
@@ -39,7 +39,7 @@ function epIsCliRun() {
  * @return string
  */
 function epNewLine() {
-    return epIsWebRun() ? "<br/>" : "\n"; 
+    return epIsWebRun() ? "<br/>" : "\n";
 }
 
 /**
@@ -81,9 +81,9 @@ function epVarDump($var) {
 }
 
 /**
- * Remove excessive whitespaces: replace multiple ' 's with single ' ' 
- * @param string 
- * @return string 
+ * Remove excessive whitespaces: replace multiple ' 's with single ' '
+ * @param string
+ * @return string
  */
 function epRemoveWhiteSpaces($str) {
     $output_str = $str;
@@ -103,20 +103,20 @@ function epRemoveWhiteSpaces($str) {
  * @return string the resulting string
  */
 function epStrReplaceInMatched($pattern, $search, $replace, $long_string) {
-    
+
     if (empty($pattern) || empty($search)) {
         return false;
     }
-    
+
     $output = preg_replace_callback(
-        $pattern, 
+        $pattern,
         create_function(
             '$matches',
             'return str_replace(\''.$search.'\', \''.$replace.'\', $matches[0]);'
-            ), 
+            ),
         $long_string
         );
-    
+
     return $output;
 }
 
@@ -127,25 +127,25 @@ function epStrReplaceInMatched($pattern, $search, $replace, $long_string) {
  * <li>string "false", "no" => false</li>
  * <li>otherwise, same old value</li>
  * </ul>
- * @return mixed 
+ * @return mixed
  */
 function epStr2Bool($s) {
-    
+
     // for non-string, return original
     if (!is_string($s)) {
         return $s;
     }
-    
+
     $p = strtolower($s);
-    
+
     if ($p == 'true' || $p == 'yes' || $p == 'okay') {
         return true;
     } else if ($p == 'false' || $p == 'no') {
         return false;
-    } 
-    
+    }
+
     // no match, return original
-    return $s;  
+    return $s;
 }
 
 /**
@@ -154,16 +154,16 @@ function epStr2Bool($s) {
  * @return array
  */
 function epArrayStr2Bool($array) {
-    
+
     $array_b = $array;
-    
+
     foreach($array as $key => $value) {
-        
+
         if (!is_array($value)) {
             $array_b[$key] = epStr2Bool($value);
             continue;
-        } 
-        
+        }
+
         $array_b[$key] = epArrayStr2Bool($array[$key]);
     }
     return $array_b;
@@ -176,18 +176,18 @@ function epArrayStr2Bool($array) {
  * @return bool
  */
 function epIsDirEmpty($dir) {
-    
+
     // if dir does not exist or is not a dir, yes, it's empty
     if (!file_exists($dir) || !is_dir($dir)) {
         return true;
     }
-    
+
     // scan directory for files
     $files = scandir($dir);
     if (!is_array($files)) {
         return false;
     }
-    
+
     // besides '.' and '..', anything else?
     return count($files) <= 2;
 }
@@ -195,53 +195,53 @@ function epIsDirEmpty($dir) {
 /**
  * Get all files (w/ full path) under directory
  * @param string directcory
- * @param bool true for recursive get 
- * @param bool true for absolute path 
+ * @param bool true for recursive get
+ * @param bool true for absolute path
  * @return array
  */
 function epFilesInDir($dir = '.', $recursive = true, $absolute_path = true) {
-    
+
     $files_in_dir = array();
-    
+
     // done if dir does not exist or is not a dir
     if (!file_exists($dir) || !is_dir($dir)) {
         return $files_in_dir;
     }
-    
+
     // scan directory for files
     $entities = scandir($dir);
     if (!is_array($entities)) {
         return $files_in_dir;
     }
-    
+
     // go through each file/dir
     foreach($entities as $entity) {
-        
+
         // ignore . and ..
         if ($entity == '.' || $entity == '..') {
             continue;
         }
-        
+
         // get the path of the entity
         $path = $dir . '/' . $entity;
-        
+
         // check if path is a file
         if (is_file($path)) {
-            // rest is treated as a file 
+            // rest is treated as a file
             if ($absolute_path) {
-                $files_in_dir[] = realpath($path); 
+                $files_in_dir[] = realpath($path);
             } else {
                 $files_in_dir[] = $path;
             }
             continue;
         }
-        
+
         // check if path is a dir
         if (is_dir($path) && $recursive) {
             $files_in_dir = array_merge($files_in_dir, epFilesInDir($path, $recursive));
         }
     }
-    
+
     return $files_in_dir;
 }
 
@@ -252,12 +252,12 @@ function epFilesInDir($dir = '.', $recursive = true, $absolute_path = true) {
  * @return bool
  */
 function epMkDir($dir, $option = 0700) {
-    
+
     // does dir exist?
     if (file_exists($dir) || is_dir($dir)) {
         return true;
     }
-    
+
 	// PHP 5 mkdir breaks when recursively building a
 	// directory that has a '//' in the middle.
 	if (!epMkDir(dirname($dir), $option)) {
@@ -273,31 +273,31 @@ function epMkDir($dir, $option = 0700) {
  * @return bool
  */
 function epRmDir($dir) {
-    
+
     $status = true;
-    
+
     // glob all files under dir
     if ($objs = glob($dir . "/*")){
-        
+
         // go through each object
         foreach($objs as $obj) {
-            
-            // delete dir 
+
+            // delete dir
             if (is_dir($obj)) {
                 $status &= @rmdir($obj);
-            } 
-            
-            // delete file 
+            }
+
+            // delete file
             else {
                 $status &= @unlink($obj);
             }
         }
     }
-    
+
     $status &= @rmdir($dir);
 
     return $status;
-}   
+}
 
 /**
  * Convert a (binary or char) string into an Ascii hex string
@@ -309,7 +309,7 @@ function epRmDir($dir) {
 function epStr2Hex($s) {
     $len = strlen($s);
     $data = '';
-    for ($i = 0; $i < $len; $i ++) { 
+    for ($i = 0; $i < $len; $i ++) {
         $data .= sprintf("%02x",ord(substr($s,$i,1)));
     }
     return $data;
@@ -349,38 +349,38 @@ function epHex2Str($s) {
 }
 
 /**
- * Backup a directory by renaming it and creating a new dir with the old name 
+ * Backup a directory by renaming it and creating a new dir with the old name
  * @param string directory path
  * @param string the name of the backup directory
  * @return bool
  */
 function epDirBackup($dir, $dir_bk = '') {
-    
+
     // check if dir exists
     if (!file_exists($dir) || !is_dir($dir)) {
         return false;
     }
-    
+
     // if $dir_bk is give empty, figure out one with bkup date
     if (empty($dir_bk)) {
         $dir_bk = $dir . '-bk-' . date('ymdhis');
     }
-    
-    // rename the existing 
+
+    // rename the existing
     if (!rename($dir, $dir_bk)) {
         return false;
     }
-    
+
     // create the dir with the old name
     return mkdir($dir);
 }
 
 /**
- * Get value in a multi-dimensional associative array by 
- * namespace-like ('a.b.c.d') or xpath-like ('a/b/c/d') 
- * key. Paired with {@link epArraySet()}. 
- * 
- * For example, use epArrayGet($array, 'a.b.c.d') or 
+ * Get value in a multi-dimensional associative array by
+ * namespace-like ('a.b.c.d') or xpath-like ('a/b/c/d')
+ * key. Paired with {@link epArraySet()}.
+ *
+ * For example, use epArrayGet($array, 'a.b.c.d') or
  * epArrayGet($array, 'a/b/c/d') to get value 'x' from
  * <pre>
  * $array = array(
@@ -393,36 +393,36 @@ function epDirBackup($dir, $dir_bk = '') {
  *   )
  * )
  * </pre>
- * 
+ *
  * @param array|ArrayAccess $array
  * @param string $key namespace- or xpath-like key
  * @return mixed (array or scalar)
  */
 function epArrayGet($array, $key) {
-    
+
     $null = null;
 
     // sanity check
     if (!is_array($array) && !($array instanceof ArrayAccess)) {
         return $null;
     }
-    
+
     // break key into pieces
     $pieces = preg_split('/(\.|\/)/', $key, -1, PREG_SPLIT_NO_EMPTY);
     if (empty($pieces)) {
         // if no piece, return the whole array
         return $array;
     }
-    
-    // use refence walk through the array 
+
+    // use refence walk through the array
     $array_cur = $array;
     foreach($pieces as $piece) {
-        
+
         // if key ($piece) not found, end of search
         if (!isset($array_cur[$piece])) {
             return $null;
         }
-        
+
         // move to a deeper level
         $array_cur = $array_cur[$piece];
     }
@@ -431,77 +431,77 @@ function epArrayGet($array, $key) {
 }
 
 /**
- * Set value to a multi-dimensional associative array to a 
- * location specified by a namespace-like ('a.b.c.d') or 
- * xpath-like ('a/b/c/d') key. Paired with {@link epArrayGet()}. 
- * 
+ * Set value to a multi-dimensional associative array to a
+ * location specified by a namespace-like ('a.b.c.d') or
+ * xpath-like ('a/b/c/d') key. Paired with {@link epArrayGet()}.
+ *
  * @param array|ArrayAccess $array
  * @param string namespace- or xpath-like key
  * @param mixed value to be set
- * @return false|array 
+ * @return false|array
  */
 function epArraySet(&$array, $key, $value) {
-    
+
     $false = false;
 
     // sanity check
     if (!is_array($array) && !($array instanceof ArrayAccess)) {
         return $false;
     }
-    
+
     // break key into pieces
     $pieces = preg_split('/(\.|\/)/', $key, -1, PREG_SPLIT_NO_EMPTY);
     if (empty($pieces)) {
         return $false;
     }
-    
-    // use refence walk through the array 
+
+    // use refence walk through the array
     $array_cur = & $array;
     $i = 0;
     $n = count($pieces);
     foreach($pieces as $piece) {
-        
+
         //echo "$piece\n";
-        
+
         // reach the last one yet?
         if (++$i == $n) {
-            
+
             // assign value
             $array_cur[$piece] = $value;
-            
+
         } else {
-            
-            // not yet. if key ($piece) not found, expand array 
+
+            // not yet. if key ($piece) not found, expand array
             if (!isset($array_cur[$piece])) {
                 $array_cur[$piece] = array();
             } else if (!is_array($array_cur[$piece])) {
                 // if non-array, make it an array
                 $array_cur[$piece] = array($array_cur[$piece]);
             }
-            
+
             // move to a deeper level
             $array_cur = & $array_cur[$piece];
         }
-        
+
     }
-    
+
     return $array;
 }
 
 /**
- * Recursively merge two arrays. 
- * 
- * The non-array values of the first 
- * array are replaced with the values in the second array of the 
- * same keys. The difference between this method and the native 
- * PHP array_merge_recursive() is that instead of collecting all 
- * different values for the same key in both arrays, this method 
- * replaces the value with the value in the second array. This is 
- * useful, for example, for merging configuration options from 
- * different sources. 
- * 
- * Here is an example to show the difference. 
- * 
+ * Recursively merge two arrays.
+ *
+ * The non-array values of the first
+ * array are replaced with the values in the second array of the
+ * same keys. The difference between this method and the native
+ * PHP array_merge_recursive() is that instead of collecting all
+ * different values for the same key in both arrays, this method
+ * replaces the value with the value in the second array. This is
+ * useful, for example, for merging configuration options from
+ * different sources.
+ *
+ * Here is an example to show the difference.
+ *
  * <pre>
  * $array0 = array(
  *                "a" => array(
@@ -538,9 +538,9 @@ function epArraySet(&$array, $key, $value) {
  * $array_m2 = epArrayMergeRecursive($array0, $array1);
  * echo "array_m2:\n";
  * print_r($array_m2);
- * 
- * The output is 
- * 
+ *
+ * The output is
+ *
  * array0:
  * Array
  * (
@@ -557,7 +557,7 @@ function epArraySet(&$array, $key, $value) {
  *                 )
  *         )
  * )
- * 
+ *
  * array1:
  * Array
  * (
@@ -570,7 +570,7 @@ function epArraySet(&$array, $key, $value) {
  *                 )
  *         )
  * )
- * 
+ *
  * array_m1:
  * Array
  * (
@@ -594,7 +594,7 @@ function epArraySet(&$array, $key, $value) {
  *         )
  *
  * )
- * 
+ *
  * array_m2:
  * Array
  * (
@@ -623,16 +623,16 @@ function epArrayMergeRecursive($array1, $array2) {
         if (!is_array($value)) {
             if (!isset($array1[$key]) || $array2[$key] !== $array1[$key]) {
                 $merged[$key] = $value;
-            } 
+            }
             continue;
-        } 
+        }
         if (!isset($array1[$key])) {
             $array1[$key] = array();
         }
         $merged[$key] = epArrayMergeRecursive($array1[$key], $value);
     }
     return $merged;
-} 
+}
 
 /**
  * Convert an xml file or string into an array
@@ -640,10 +640,10 @@ function epArrayMergeRecursive($array1, $array2) {
  * @return false|array
  */
 function epXml2Array($xml) {
-    
+
     // trim input
     $xml = trim($xml);
-    
+
     // sanity check
     if (!$xml) {
         return false;
@@ -656,7 +656,7 @@ function epXml2Array($xml) {
         }
     }
     else {
-        // load an xml file 
+        // load an xml file
         if (($sxml = simplexml_load_file($xml)) === false) {
             return false;
         }
@@ -673,14 +673,14 @@ function epXml2Array($xml) {
  * @see http://www.php.net/manual/en/ref.simplexml.php
  */
 function epSimpleXmlElement2Array($e) {
-    
+
     $array = array();
-    
+
     foreach($e as $tag => $value) {
-        
+
         // parse children
         $child = epSimpleXmlElement2Array($value);
-        
+
         // if no children
         if (count($child) == 0) {
             // this is string value
@@ -689,7 +689,7 @@ function epSimpleXmlElement2Array($e) {
 
         $array[$tag] = $child;
     }
-    
+
     return $array;
 }
 
@@ -699,17 +699,17 @@ function epSimpleXmlElement2Array($e) {
  * @return string
  */
 function epValue2Xml($value, $root = 'document', $version='1.0') {
-    
+
     // convert value to xml body
     if (!($xml = epValue2XmlBody($value))) {
         return false;
     }
-    
+
     // wrap xml body into a root node
     if ($root) {
         $xml = "<$root>$xml</$root>";
     }
-    
+
     // add xml header (version)
     if ($version) {
         $xml = "<?xml version='$version'?>" . $xml;
@@ -724,7 +724,7 @@ function epValue2Xml($value, $root = 'document', $version='1.0') {
  * @return string
  */
 function epValue2XmlBody($value) {
-    
+
     // convert array into xml
     if (is_array($value) || is_object($value)) {
         $xml = '';
@@ -735,15 +735,15 @@ function epValue2XmlBody($value) {
         }
         return $xml;
     }
-    
+
     // a scalar value
     else if (is_scalar($value)) {
-        
+
         // convert boolean into "true"/"false"
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
-        
+
         // all the rest types of scalar value
         return $value;
     }
@@ -774,7 +774,7 @@ function &epNewObject($class, $args = array()) {
     $eval_str .= ";";
 
     eval($eval_str);
-    
+
     return $o;
 }
 
@@ -802,7 +802,7 @@ function epIsAbsPath($path) {
  * @see http://aidan.dotgeek.org/lib/?file=function.file_exists_incpath.php
  */
 function epFileExistsIncPath($file) {
-    
+
     $paths = explode(PATH_SEPARATOR, get_include_path());
     foreach ($paths as $path) {
         $fullpath = $path . DIRECTORY_SEPARATOR . $file;
@@ -820,7 +820,7 @@ function epFileExistsIncPath($file) {
  * @param string $method
  */
 function epIsMethodStatic($class, $method) {
-    
+
     // get class name if param is object
     if (is_object($class)) {
         $class = get_class($class);
@@ -857,5 +857,18 @@ function epFileExtension($fname) {
     }
     return substr($fname, $pos + 1);
 }
+
+/**
+ * Return wether the object was already commited.
+ *
+ * In transaction context this is if oid !== false
+ *
+ * @param $obj epObject
+ * @return bool
+ */
+function epFilterCommited($obj) {
+    return $obj->epGetObjectId() !== false;
+}
+
 
 ?>

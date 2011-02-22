@@ -97,37 +97,37 @@ class epManagerBase extends epConfigurableWithLog {
         'onEvictAll',
         'onPostEvictAll',
         );
-    
+
     /**
      * Array to cache the database connections for classes
      * @var array (of epDbObject keyed by class names)
      */
     protected $dbs = array();
-    
+
     /**
      * Cached class compiler
      * @var epClassCompiler
      */
     protected $cc;
-    
+
     /**
      * Cached EZOQL parser
      * @var epQuery
      */
     protected $q;
-    
+
     /**
      * Cached class map factory
      * @var epClassMapFactory
      */
     protected $cmf;
-    
+
     /**
      * Cached database factory
      * epDbFactory
      */
     protected $dbf;
-    
+
     /**
      * Array to cache commited object instances
      * <pre>
@@ -147,19 +147,19 @@ class epManagerBase extends epConfigurableWithLog {
      * @var array
      */
     protected $objects_c = array();
-    
+
     /**
      * Array to keep uncommited instances (newly created)
      * @var array (keyed by uid)
      */
     protected $objects_uc = array();
-    
+
     /**
      * Array to keep global event listeners
      * @var array (of objects (listeners))
      */
     protected $listeners_g = array();
-    
+
     /**
      * Array to keep local listeners
      * @var array (keyed by persistent class names)
@@ -171,7 +171,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @var false|epTransition
      */
     protected $t = false;
-    
+
     /**
      * Constructor
      * @param epConfig|array
@@ -180,7 +180,7 @@ class epManagerBase extends epConfigurableWithLog {
     public function __construct($config = null) {
         parent::__construct($config);
     }
-    
+
     /**
      * Implement abstract method {@link epConfigurable::defConfig()}
      * @access public
@@ -213,7 +213,7 @@ class epManagerBase extends epConfigurableWithLog {
     public function version() {
         return '1.1.6';
     }
-    
+
     /**
      * Initialization
      * @param bool $force whether to force initialization
@@ -221,7 +221,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @throws epExceptionManagerBase
      */
     protected function initialize($force = false) {
-        
+
         // done if not forced, and class map and db factories are set
         if (!$force && $this->cmf && $this->dbf) {
             return true;
@@ -231,20 +231,20 @@ class epManagerBase extends epConfigurableWithLog {
         if (!$this->_loadCompiled()) {
             return false;
         }
-        
+
         // get the db factory
         include_once(EP_SRC_DB.'/epDbObject.php');
         if (!($this->dbf = & epDbFactory::instance())) {
             throw new epExceptionManagerBase('Cannot get db factory instance');
             return false;
         }
-        
+
         // remove all connections
         $this->dbf->removeAll();
-        
+
         // set the db lib to use
         $this->dbf->setDbLib($this->getConfigOption('db_lib'));
-        
+
         // set up class autoloading if 'autoload' is set to true
         if ($this->getConfigOption('autoload')) {
             if (function_exists('epSetupAutoload')) {
@@ -256,7 +256,7 @@ class epManagerBase extends epConfigurableWithLog {
         if ($this->getConfigOption('auto_flush')) {
             register_shutdown_function(array($this, 'flushAll'));
         }
-        
+
         return true;
     }
 
@@ -269,12 +269,12 @@ class epManagerBase extends epConfigurableWithLog {
      * @return bool
      */
     public function autoload($class) {
-        
+
         // check if class has been compiled
         if (!($cm = & $this->_getMap($class))) {
             return false;
         }
-        
+
         // include the class file
         include_once($cm->getClassFile());
         return true;
@@ -296,16 +296,16 @@ class epManagerBase extends epConfigurableWithLog {
         if (!($cm = & $this->_getMap($class))) {
             return false;
         }
-        
+
         // get db for the class
         if (!($db = & $this->_getDb($cm))) {
             return false;
         }
-        
+
         // return the total number of object in class
         return $db->count($cm);
     }
-    
+
     /**
      * Get all stored objects of a class
      * @param string class name
@@ -314,23 +314,23 @@ class epManagerBase extends epConfigurableWithLog {
      * @return false|null|array (false if failure; null if none found)
      */
     public function getAll($class, $option = EP_GET_FROM_BOTH, $oids = null) {
-        
+
         // get class map for class
         if (!($cm = & $this->_getMap($class))) {
             return false;
         }
-        
+
         // get instances from cache only
         if ($option == EP_GET_FROM_CACHE) {
-            
+
             // return all cached for the class if any
             if (isset($this->objects_c[$class])) {
-                
+
                 // return all if no oids specified
                 if (!$oids) {
                     return array_values($this->objects_c[$class]);
                 }
-                
+
                 // otherwise only objects with oids specified
                 else {
                     $ros = array();
@@ -342,10 +342,10 @@ class epManagerBase extends epConfigurableWithLog {
                     return $ros;
                 }
             }
-            
+
             return null;
         }
-        
+
         // event: onPreLoad
         $this->_dispatchEvent(array('onPreLoad'), $class, array('operation' => 'getAll'));
 
@@ -361,7 +361,7 @@ class epManagerBase extends epConfigurableWithLog {
                 $ex = array_keys($this->objects_c[$class]);
             }
         }
-        
+
         // fetch and cache them all
         if ($os = $db->fetch($cm, null, $ex, $oids)) {
             foreach($os as &$o) {
@@ -370,12 +370,12 @@ class epManagerBase extends epConfigurableWithLog {
                 $this->_dispatchEvent(array('onLoad', 'onPostLoad'), $o);
             }
         }
-        
+
         // done if get from DB only
         if ($option == EP_GET_FROM_DB) {
             return $os;
         }
-        
+
         /**
          * if it reaches this point, we are getting instances
          * from both db and cache, so return all that have been
@@ -399,11 +399,11 @@ class epManagerBase extends epConfigurableWithLog {
                 return $ros;
             }
         }
-        
+
         // return null if nothing found
         return null;
     }
-    
+
     /**
      * Get an instance for a class by object id
      *
@@ -426,7 +426,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @access public
      */
     public function &get($class, $oid = false, $option = EP_GET_FROM_BOTH) {
-        
+
         // trim class name
         $class = trim($class);
 
@@ -436,24 +436,24 @@ class epManagerBase extends epConfigurableWithLog {
 				"Only false or valid object id (positive integer) is allowed for argument \$oid"
 				);
         }
-		
+
         // if oid is not unspecified
 		if (!$oid) {
 			// get all object of the class
 			$os = $this->getAll($class, $option);
 			return $os;
 		}
-        
+
         // event: onPreLoad
         $this->_dispatchEvent(array('onPreLoad'), $class, array('operation' => 'getOne', 'params' => $oid));
 
         // check the cache
         if (isset($this->objects_c[$class][$oid])) {
-            
+
             // refresh object if get from db
             $o = & $this->objects_c[$class][$oid];
             if ($option == EP_GET_FROM_DB) {
-                
+
                 // false: no event dispatching
                 if (!$this->_refresh($o, false)) {
                     return self::$false;
@@ -462,34 +462,34 @@ class epManagerBase extends epConfigurableWithLog {
                 // event: onLoad, onPostLoad
                 $this->_dispatchEvent(array('onLoad', 'onPostLoad'), $class, $oid);
             }
-            
+
             return $o;
         }
-        
+
         // are we getting from cache only?
         if ($option == EP_GET_FROM_CACHE) {
             return self::$false;
         }
-        
+
         // create the object (false: no caching, false: no event dispatching)
         if (!($o = $this->_create($class, false, false))) {
             return self::$false;
         }
-        
+
         // set object id
         $o->epSetObjectId($oid);
-        
+
         // refresh object with oid (false: no event dispatching)
         if (!$this->_refresh($o, false)) {
             return self::$false;
         }
-        
+
         // event: onLoad and onPostLoad
         $this->_dispatchEvent(array('onLoad', 'onPostLoad'), $o);
 
         return $o;
     }
-    
+
     /**
      * Conduct object query with EZOQL (see more in {@link epQuery})
      * @param string $oql
@@ -498,7 +498,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @throws epExceptionQuery, epExceptionManagerBase
      */
     public function &query($oql) {
-        
+
         if (!$oql) {
             return self::$false;
         }
@@ -507,7 +507,7 @@ class epManagerBase extends epConfigurableWithLog {
         $args = func_get_args();
         // remove the first argument (the query string)
         array_shift($args);
-        
+
         // get the new query object
         if (!$this->q) {
             include_once(EP_SRC_RUNTIME . '/epQuery.php');
@@ -526,10 +526,10 @@ class epManagerBase extends epConfigurableWithLog {
         if (!($cms = $this->q->getClassMaps())) {
             return self::$false;
         }
-        
+
         // use the first class map
         $db = & $this->_getDb($cms[0]);
-        
+
         // before query, commit objects of the involved classes if
         // option 'flush_before_find' is set. (see explanation in
         // class epQuery)
@@ -549,13 +549,13 @@ class epManagerBase extends epConfigurableWithLog {
         // get query parts for later uses
         $limit = $this->q->getLimit();
         $orderby = $this->q->getOrderBy();
-        
+
         // aggregation function in query?
         if ($aggr_func = $this->q->getAggregateFunction()) {
             // delegate aggreation function query to database layer
             return $db->query($cms, $sql_stmts, $orderby, $limit, $aggr_func);
         }
-        
+
         // delegate query to database layer (epDbObject)
         if ($os = $db->query($cms, $sql_stmts, $orderby, $limit)) {
             // cache them all
@@ -565,7 +565,7 @@ class epManagerBase extends epConfigurableWithLog {
                 $this->_dispatchEvent(array('onLoad', 'onPostLoad'), $o);
             }
         }
-        
+
         return $os;
     }
 
@@ -585,7 +585,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @return null|object|array
      */
     public function &find($o, $option = EP_GET_FROM_BOTH, $cache = true, $objs = true) {
-        
+
         // check if the first parameter is string
         if (is_string($o)) {
 			// if so, call query for EZOQL query
@@ -598,7 +598,7 @@ class epManagerBase extends epConfigurableWithLog {
         if (!($class = $this->_getClass($o))) {
             return self::$false;
         }
-        
+
         // get class map for class
         if (!($cm = & $this->_getMap($class))) {
             return self::$false;
@@ -626,7 +626,7 @@ class epManagerBase extends epConfigurableWithLog {
         // if EP_GET_FROM_DB, no search in cache
         $os_cache = array();
         if ($option != EP_GET_FROM_DB) {
-            
+
             // find in cache first
             $os_cache = $this->_findInCache($o);
 
@@ -644,7 +644,7 @@ class epManagerBase extends epConfigurableWithLog {
                 $ex = array_keys($this->objects_c[$class]);
             }
         }
-        
+
         // get db for the class
         if (!($db = & $this->_getDb($cm))) {
             return self::$false;
@@ -660,18 +660,18 @@ class epManagerBase extends epConfigurableWithLog {
                 }
             }
         }
-        
+
         // done if get from DB only
         if ($option == EP_GET_FROM_DB) {
             return $os;
         }
-        
+
         // merge objects found in db and cache
         $os = array_merge($os ? $os : array(), $os_cache ? $os_cache : array());
-        
+
         return $os;
     }
-    
+
     /**
      * Create a new instance of a class
      * @param string|object $class_or_obj class name or an object
@@ -679,16 +679,16 @@ class epManagerBase extends epConfigurableWithLog {
      * @access public
      */
     public function &create($class_or_obj) {
-        
+
         // get the argument for the object constructor
         $args = func_get_args();
 
         // remove the first argument
         array_shift($args);
-        
+
         // call the lower _create()
         $o = & $this->_create($class_or_obj, true, true, $args);
-        
+
         // add this newly create object into transaction
         $this->addObject_t($o);
 
@@ -711,7 +711,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @throws epExceptionManagerBase
      */
     public function &_create($class_or_obj, $caching = true, $dispatch_event = true, $args = array()) {
-        
+
         // check if the argument is a string (class name)
         $class = '';
         $o = false;
@@ -727,10 +727,10 @@ class epManagerBase extends epConfigurableWithLog {
 
         // check if class has been compiled
         if (!($cm = & $this->_getMap($class))) {
-            
+
             // if not, check if auto_compile is enabled
             if (!$this->getConfigOption('auto_compile')) {
-                
+
                 // if not (auto_compile off), throw
                 throw new epExceptionManagerBase(
                     'Class ' . $class . ' has not been compiled. '
@@ -738,14 +738,14 @@ class epManagerBase extends epConfigurableWithLog {
                     . 'auto_compile or compile manually');
                 return self::$null;
             }
-            
+
             // otherwise (auto compile enabled)
             if (!($cm = & $this->_compileClass($class))) {
                 // return false if auto-compile fails
                 return self::$null;
             }
         }
-        
+
         // event: onPreCreate
         if ($dispatch_event) {
             $this->_dispatchEvent(array('onPreCreate'), $class, $args);
@@ -760,7 +760,7 @@ class epManagerBase extends epConfigurableWithLog {
                 return self::$null;
             }
         }
-        
+
         // wrap object if it doesn't have epObject ifc
         if (!($o instanceof epObject)) {
             if (!($o = new epObject($o, $cm))) {
@@ -768,12 +768,12 @@ class epManagerBase extends epConfigurableWithLog {
                 return self::$null;
             }
         }
-        
+
         // cache it in the array of uncommited objects (only when auto_flush is on)
         if ($caching /** && $this->getConfigOption("auto_flush")**/ ) {
             $this->objects_uc[$o->epGetUId()] = & $o;
         }
-        
+
         // event: onCreate, onPostCreate
         if ($dispatch_event) {
             $this->_dispatchEvent(array('onCreate', 'onPostCreate'), $o);
@@ -798,7 +798,7 @@ class epManagerBase extends epConfigurableWithLog {
         if (!($o = & $this->_create($class, true, $dispatch_event))) {
             return self::$null;
         }
-        
+
         // do we need a clean object?
         if ($clean) {
             // reset every var to null
@@ -809,11 +809,11 @@ class epManagerBase extends epConfigurableWithLog {
                 }
             }
         }
-        
+
         // create object from array
         return $this->_fromArray($o, $array, $dispatch_event, $clean);
     }
-    
+
     /**
      * Use an array to update an epObject
      *
@@ -826,7 +826,7 @@ class epManagerBase extends epConfigurableWithLog {
     public function &updateFromArray(epObject &$o, $array, $dispatch_event = true) {
         return $this->_fromArray($o, $array, $dispatch_event);
     }
-   
+
     /**
      * Combines the same functionality that {@link createFromArray()} and
      * {@link updateFromArray} have.
@@ -839,47 +839,47 @@ class epManagerBase extends epConfigurableWithLog {
      * @throws epExceptionManagerBase
      */
     protected function &_fromArray(&$o, $array, $dispatch_event, $clean = true) {
-        
+
         // get class from object
         $class = $o->epGetClass();
-        
+
         // copy array values to object
         foreach($array as $var => $val) {
-            
+
             // skip oid
             if ($var == 'oid') {
                 $o->epSetObjectId($val);
                 continue;
             }
-            
+
             // check if var exists in class
             if (!$o->epIsVar($var)) {
                 // unrecognized var
                 throw new epExceptionManagerBase('Variable ['.$var.'] does not exist in class ['.$class.']');
                 return self::$null;
             }
-            
+
             //
             // a primitive var?
             //
             if ($o->epIsPrimitive($var)) {
-                
+
                 // primitive must be a scalar
                 if (!is_scalar($val)) {
                     throw new epExceptionManagerBase('Value is not scalar for primitive var ['.$class.'::'.$var.']');
                     return self::$null;
                 }
-                
+
                 // assign value to var in object
                 $o[$var] = $val;
-                
+
                 continue;
             }
-            
+
             //
             // a relationship var
             //
-            
+
             // get class of var
             $class = $o->epGetClassOfVar($var);
 
@@ -894,7 +894,7 @@ class epManagerBase extends epConfigurableWithLog {
                     $o->epSet($var, $this->createFromArray($class, $val, $dispatch_event, $clean));
                     continue;
                 }
-                
+
                 // if value is int, it might be an oid of an existing object
                 if (is_integer($val) || ctype_digit($val)) {
                     // get the corresponding object
@@ -910,7 +910,7 @@ class epManagerBase extends epConfigurableWithLog {
                     $o->epSet($var, $val);
                     continue;
                 }
-                
+
                 throw new epExceptionManagerBase('Value is not array or object id for relationship var ['.$class.'::'.$var.']');
                 continue;
             }
@@ -943,13 +943,13 @@ class epManagerBase extends epConfigurableWithLog {
                         continue;
                     }
                 }
-                
+
                 // if it is an object, it might be an existing object
                 if ($val instanceof epObject) {
                     $os[] = & $val;
                     continue;
                 }
-                
+
                 throw new epExceptionManagerBase('Value is not array or object id for relationship var ['.$class.'::'.$var.']');
                 continue;
             }
@@ -959,7 +959,7 @@ class epManagerBase extends epConfigurableWithLog {
 
         return $o;
     }
-    
+
     /**
      * Explicitly cache an object instance
      * @param epObject $o object
@@ -969,12 +969,12 @@ class epManagerBase extends epConfigurableWithLog {
      * @static
      */
     public function cache(&$o, $force_replace = false) {
-        
+
         // cannot cache object without id
         if (!($oid = $o->epGetObjectId())) {
             return false;
         }
-        
+
         // get the class name
         if (!($class = $this->_getClass($o))) {
             return false;
@@ -984,11 +984,11 @@ class epManagerBase extends epConfigurableWithLog {
         if (!$force_replace && isset($this->objects_c[$class][$oid])) {
             return true;
         }
-        
+
         // insert instance into cache (important to have & so
         // we can delete object explicitly)
         $this->objects_c[$class][$oid] = & $o;
-        
+
         return true;
     }
 
@@ -1010,27 +1010,27 @@ class epManagerBase extends epConfigurableWithLog {
      * @access protected
      */
     protected function _refresh(&$o, $dispatch_event = true) {
-        
+
         // only refresh object with valid oid
         if (!($oid = $o->epGetObjectId())) {
             return false;
         }
-        
+
         // get class name
         if (!($class = $this->_getClass($o))) {
             return false;
         }
-        
+
         // get class map for class
         if (!($cm = & $this->_getMap($class))) {
             return false;
         }
-        
+
         // get db for the class
         if (!($db = & $this->_getDb($cm))) {
             return false;
         }
-        
+
         // event: onPreRefresh
         if ($dispatch_event) {
             $this->_dispatchEvent(array('onPreRefresh'), $o);
@@ -1041,7 +1041,7 @@ class epManagerBase extends epConfigurableWithLog {
         if (count($os) != 1) {
             return false;
         }
-        
+
         // replace object with the refreshed one
         $o->epCopyVars($os[0]);
         $o->epSetDirty(false);
@@ -1059,7 +1059,7 @@ class epManagerBase extends epConfigurableWithLog {
 
         return true;
     }
-    
+
     /**
      * Called by {@link commit()} and {@link flush()}
      *
@@ -1078,22 +1078,22 @@ class epManagerBase extends epConfigurableWithLog {
         if (!($cm = & $o->epGetClassMap())) {
             return false;
         }
-        
+
         // get class name
         if (!($class = $cm->getName())) {
             return false;
         }
-        
+
         // get db for the class
         if (!($db = & $this->_getDb($cm))) {
             return false;
         }
 
         $modified_rvars = $o->epGetModifiedVars(epObject::VAR_RELATIONSHIP);
-        
+
         // insert if no id assigned
         if (!$o->epGetObjectId()) {
-            
+
             // event: onPreInsert
             $this->_dispatchEvent(array('onPreInsert'), $o);
 
@@ -1101,31 +1101,31 @@ class epManagerBase extends epConfigurableWithLog {
             if (!$db->insert($cm, $o)) {
                 return false;
             }
-            
+
             // set object id
             $o->epSetObjectId($db->lastInsertId($cm->getOidColumn()));
-            
+
             // reset dirty flag
             $o->epSetDirty(false);
             if ($simple) {
                 $o->epSetModifiedVars($modified_rvars);
             }
-            
+
             // remove it from uncommited cache
             unset($this->objects_uc[$o->epGetUid()]);
-            
+
             // cache it
             $this->cache($o);
-            
+
             // now set object committable
             $o->epSetCommittable(true);
-            
+
             // event: onInsert onPostInsert
             $this->_dispatchEvent(array('onInsert', 'onPostInsert'), $o);
 
             return true;
         }
-        
+
         // event: onPreUpdate
         $this->_dispatchEvent(array('onPreUpdate'), $o);
 
@@ -1133,22 +1133,22 @@ class epManagerBase extends epConfigurableWithLog {
         if (!$db->update($cm, $o)) {
             return false;
         }
-        
+
         // reset dirty flag after successful update
         $o->epSetDirty(false);
         if ($simple) {
             $o->epSetModifiedVars($modified_rvars);
         }
-        
+
         // also set object committable
         $o->epSetCommittable(true);
-        
+
         // event: onUpdate and onPostUpdate
         $this->_dispatchEvent(array('onUpdate', 'onPostUpdate'), $o);
 
         return true;
     }
-    
+
     /**
      * Delete all stored objects for a class.
      *
@@ -1161,19 +1161,19 @@ class epManagerBase extends epConfigurableWithLog {
      * @access public
      */
     public function deleteAll($class) {
-        
+
         // get class map for class
         $cm = & $this->_getMap($class);
         if (!$cm) {
             return false;
         }
-        
+
         // get db for the class
         $db = & $this->_getDb($cm);
         if (!$db) {
             return false;
         }
-        
+
         // event: onPreDeleteAll
         $this->_dispatchEvent(array('onPreDeleteAll'), $class);
 
@@ -1181,7 +1181,7 @@ class epManagerBase extends epConfigurableWithLog {
         if (!$db->truncate($cm)) {
             return false;
         }
-        
+
         // delete objects from cache
         if (isset($this->objects_c[$class])) {
             unset($this->objects_c[$class]);
@@ -1189,7 +1189,7 @@ class epManagerBase extends epConfigurableWithLog {
 
         // also delete cached uncommited objects
         foreach($this->objects_uc as $uid => &$o) {
-            
+
             if ($o && $class == $this->_getClass($o)) {
 
                 // set that object is deleted
@@ -1206,7 +1206,7 @@ class epManagerBase extends epConfigurableWithLog {
 
         return true;
     }
-    
+
     /**
      * Delete an object and its datastore copy
      * @param object
@@ -1214,14 +1214,14 @@ class epManagerBase extends epConfigurableWithLog {
      * @access public
      */
     public function delete(&$o = null) {
-        
+
         if (!$o) {
             return false;
         }
-        
+
         // no need to delete db row for unknown oid
         if (!($oid = $o->epGetObjectId()) ) {
-            
+
             // event: onPreDelete
             $this->_dispatchEvent(array('onPreDelete'), $o);
 
@@ -1231,7 +1231,7 @@ class epManagerBase extends epConfigurableWithLog {
                 $this->objects_uc[$uid] = null;
                 unset($this->objects_uc[$uid]);
             }
-            
+
             // fix bug 97: set that object is deleted
             $o->epSetDeleted(true);
 
@@ -1240,22 +1240,22 @@ class epManagerBase extends epConfigurableWithLog {
 
             return true;
         }
-        
+
         // get class name
         if (!($class = $this->_getClass($o))) {
             return false;
         }
-        
+
         // get class map for class
         if (!($cm = & $this->_getMap($class))) {
             return false;
         }
-        
+
         // get db for the class
         if (!($db = & $this->_getDb($cm))) {
             return false;
         }
-        
+
         // event: onPreDelete
         $this->_dispatchEvent(array('onPreDelete'), $o);
 
@@ -1276,10 +1276,10 @@ class epManagerBase extends epConfigurableWithLog {
             $this->objects_c[$class][$oid] = null;
             unset($this->objects_c[$class][$oid]);
         }
-        
+
         return true;
     }
-    
+
     /**
      * Evict all instances of a class
      * @param string $class class name
@@ -1298,17 +1298,17 @@ class epManagerBase extends epConfigurableWithLog {
      * @access public
      */
     protected function _evictAll($class = false, $dispatch_event = true) {
-        
+
         // class name cannot be empty
         if (!$class) {
             return false;
         }
-        
+
         // any object cached for class?
         if ($class && !isset($this->objects_c[$class])) {
             return true;
         }
-        
+
         // event: onPreEvictAll
         if ($dispatch_event) {
             $this->_dispatchEvent(array('onPreEvictAll'), $class);
@@ -1333,7 +1333,7 @@ class epManagerBase extends epConfigurableWithLog {
             // unset cache for class
             unset($this->objects_c[$class]);
         }
-        
+
         // event: onEvictAll, onPostEvictAll
         if ($dispatch_event) {
             $this->_dispatchEvent(array('onEvictAll', 'onPostEvictAll'), $class);
@@ -1341,7 +1341,7 @@ class epManagerBase extends epConfigurableWithLog {
 
         return true;
     }
-    
+
     /**
      * Evicts an instance from the cache. Eviction forces the object
      * be retrieved (same as {@link refresh()}  from datastore the
@@ -1352,7 +1352,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @access public
      */
     public function evict(&$o = null) {
-        
+
         // if no object, evict all
         if (!$o) {
             $status = true;
@@ -1361,37 +1361,37 @@ class epManagerBase extends epConfigurableWithLog {
             }
             return $status;
         }
-        
+
         // no need to evict object with unknown oid
         if (!($oid = $o->epGetObjectId())) {
             return true;
         }
-        
+
         // get class name
         if (!($class = $this->_getClass($o))) {
             return false;
         }
-        
+
         // check if instance is cached
         if (!isset($this->objects_c[$class][$oid])) {
             return false;
         }
-        
+
         // event: onPreEvict
         $this->_dispatchEvent(array('onPreEvict'), $o);
 
         // evict the instance from cache (needed to explicitly delete object)
         $this->objects_c[$class][$oid] = null;
-        
+
         // unset this oid
         unset($this->objects_c[$class][$oid]);
-        
+
         // event: onEvict and onPostEvict
         $this->_dispatchEvent(array('onEvict', 'onPostEvict'), $o);
 
         return true;
     }
-    
+
     /**
      * Flush all objects into db (same as {@link flush()} with no parameters)
      * @return void
@@ -1399,7 +1399,7 @@ class epManagerBase extends epConfigurableWithLog {
     public function flushAll() {
         $this->flush();
     }
-    
+
     /**
      * Flushes all dirty or new instances to the datastore
      * @param string $class
@@ -1408,9 +1408,9 @@ class epManagerBase extends epConfigurableWithLog {
      * @access public
      */
     public function flush($class = false, $commit_all = true) {
-        
+
         $status = true;
-        
+
         if ($commit_all) {
 
             // flush uncommited objects
@@ -1422,16 +1422,16 @@ class epManagerBase extends epConfigurableWithLog {
                 }
             }
         }
-        
+
         // flush cached objects (commited)
         foreach($this->objects_c as $class_ => &$objects) {
-            
+
             // flush only a class?
             if ($class && $class != $class_) {
                 // skip if not required to commit
                 continue;
             }
-            
+
             // flush
             foreach($objects as $oid => &$o) {
                 if ($o) {
@@ -1442,7 +1442,7 @@ class epManagerBase extends epConfigurableWithLog {
 
         return $status;
     }
-    
+
     /**
      * The public version of {@ink _getMap())
      * @param string $class the class name of the object
@@ -1458,21 +1458,21 @@ class epManagerBase extends epConfigurableWithLog {
      * @return false|array
      */
     protected function _findInCache($o) {
-        
+
         if (!$o) {
             return false;
         }
-        
+
         // get class name
         if (!($class = $this->_getClass($o))) {
             return false;
         }
-        
+
         // check if any cached object for the class
         if (!isset($this->objects_c[$class])) {
             return false;
         }
-        
+
         // check each cached object
         $matched = array();
         foreach($this->objects_c[$class] as $oid => &$cached_o) {
@@ -1482,7 +1482,7 @@ class epManagerBase extends epConfigurableWithLog {
                 }
             }
         }
-        
+
         return $matched;
     }
 
@@ -1496,7 +1496,7 @@ class epManagerBase extends epConfigurableWithLog {
     public function getClass($o) {
         return $this->_getClass($o);
     }
-    
+
     /**
      * Get the class map of a class
      * @param object|string $class class name
@@ -1504,12 +1504,12 @@ class epManagerBase extends epConfigurableWithLog {
      * @access public
      */
     public function &getClassMap($class) {
-        
+
         // get class name if argument is an object
         if (is_object($class)) {
             $class = $this->_getClass($class);
         }
-        
+
         return $this->_getMap($class);
     }
 
@@ -1521,21 +1521,21 @@ class epManagerBase extends epConfigurableWithLog {
      * @access protected
      */
     protected function _getClass($o) {
-        
+
         // sanity check
         if (!$o || !is_object($o)) {
             return false;
         }
-        
+
         // get class name
         $class = get_class($o);
         if ($o instanceof epObject) {
             $class = get_class($o->getForeignObject());
         }
-        
+
         return $class;
     }
-    
+
     /**
      * Gets class map for a class
      * @param string $class the class name of the object
@@ -1543,12 +1543,12 @@ class epManagerBase extends epConfigurableWithLog {
      * @return epClassMap
      */
     protected function &_getMap($class) {
-        
+
         // have we initialized class map factory yet?
         if (!$this->cmf) {
             $this->initialize(true);
         }
-        
+
         // get class map for class
         return $this->cmf->track($class);
     }
@@ -1562,7 +1562,7 @@ class epManagerBase extends epConfigurableWithLog {
     public function &getDb($cm) {
         return $this->_getDb($cm);
     }
-    
+
     /**
      * (Low level) Get the db connection for a class
      * @param string $class the class name
@@ -1570,7 +1570,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @return false|epDb
      */
     protected function &_getDb($cm) {
-        
+
         // get class name
         $class = $cm->getName();
 
@@ -1578,29 +1578,29 @@ class epManagerBase extends epConfigurableWithLog {
         if (isset($this->dbs[$class])) {
             return $this->dbs[$class];
         }
-        
+
         // get dsn from class map
         $dsn = $cm->getDsn();
         if (!$dsn) {
             throw new epExceptionManagerBase('Cannot find DSN for class [' . $class . ']');
             return self::$false;
         }
-        
+
         // have we initialized db factory yet?
         if (!$this->dbf) {
             $this->initialize(true);
         }
-        
+
         // get the db connection from db factory
         $db = $this->dbf->make($dsn);
         if (!$db) {
             throw new epExceptionManagerBase('Cannot establish database connection for class [' . $class . ']');
             return self::$false;
         }
-        
+
         // set check_table_exists options to db
         $db->setCheckTableExists($this->getConfigOption('check_table_exists'));
-        
+
         // check if in transition. if so add db to watch
         if ($this->t) {
             $this->t->addDb($db);
@@ -1614,11 +1614,11 @@ class epManagerBase extends epConfigurableWithLog {
             throw new epExceptionManagerBase('Cannot create table for class [' . $class . ']');
             return self::$false;
         }
-        
+
         // cache db for class
         return $this->dbs[$class] = & $db;
     }
-    
+
     /**
      * Loads compiled info into manager
      *
@@ -1635,14 +1635,14 @@ class epManagerBase extends epConfigurableWithLog {
             throw new epExceptionManagerBase('Compiled file not specified');
             return false;
         }
-        
+
         // get the dir that holds the class map file
         if ($compiled_dir = $this->getConfigOption('compiled_dir')) {
             // if compiled dir is a relative path, make is absolute
             $compiled_dir = $this->getAbsolutePath($compiled_dir);
             $rcmf =  $compiled_dir . '/' . $rcmf;
         }
-        
+
         // check if force_compile is set
         if ($this->getConfigOption('force_compile')) {
             // if so, delete the compiled file to force compile
@@ -1650,7 +1650,7 @@ class epManagerBase extends epConfigurableWithLog {
                 @unlink($rcmf);
             }
         }
-        
+
         // get the contetns of the runtime config map file
         $compiled_info = false;
         if (file_exists($rcmf)) {
@@ -1680,14 +1680,14 @@ class epManagerBase extends epConfigurableWithLog {
         }
         // if no compiled class map file found
         else {
-            
+
             // simply get the class map factory instance
             $this->cmf = & epClassMapFactory::instance();
 
             // remove all classes now
             $this->cmf->removeAll();
         }
-        
+
         // check if auto_compile is enabled
         if ($this->getConfigOption('auto_compile')) {
             $this->_compileAll();
@@ -1695,14 +1695,14 @@ class epManagerBase extends epConfigurableWithLog {
 
         return true;
     }
-    
+
     /**
      * Get the compiler
      * @return bool
      * @throws epExceptionManagerBase
      */
     protected function _getCompiler() {
-        
+
         // check if class compiler is instantiated
         if (!$this->cc) {
             include_once(EP_SRC_COMPILER.'/epCompiler.php');
@@ -1711,7 +1711,7 @@ class epManagerBase extends epConfigurableWithLog {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -1722,7 +1722,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @throws epExceptionManagerBase
      */
     protected function &_compileClass($class) {
-        
+
         // sanity check
         if (!$class) {
             return self::$false;
@@ -1732,13 +1732,13 @@ class epManagerBase extends epConfigurableWithLog {
         if (!$this->_getCompiler()) {
             return self::$false;
         }
-        
+
         // call class compiler to compile the class
         if (!$this->cc->compile($class)) {
             throw new epExceptionManagerBase('Failed in compiling class ' . $class);
             return self::$false;
         }
-        
+
         // if so, get the class map after compiling the class
         return $this->_getMap($class);
     }
@@ -1749,18 +1749,18 @@ class epManagerBase extends epConfigurableWithLog {
      * @throws epExceptionManagerBase
      */
     protected function _compileAll() {
-        
+
         // check if class compiler is instantiated
         if (!$this->_getCompiler()) {
             return false;
         }
-        
+
         // call class compiler to compile the class
         if (!$this->cc->compile()) {
             throw new epExceptionManagerBase('Failed in compiling classes in configured directory');
             return false;
         }
-        
+
         return true;
     }
 
@@ -1777,7 +1777,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @return false|epTransaction
      */
     public function start_t() {
-        
+
         // are we in transition already?
         if ($this->t) {
             return false;
@@ -1799,15 +1799,22 @@ class epManagerBase extends epConfigurableWithLog {
      * @return bool
      */
     public function commit_t($rollback = true) {
-        
+
         // check if in transition
         if (!$this->t) {
             throw new epExceptionManagerBase('Transaction not started');
             return false;
         }
 
-        // commit all changed objects since the start of transaction
-        if (!$this->t->commitObjects()) {
+        try {
+            // commit all changed objects since the start of transaction
+            $commited = $this->t->commitObjects();
+        } catch (epExceptionDb $e) {
+            // fails to commit
+            $commited = false;
+        }
+
+        if (!$commited) {
 
             // rollback if asked for
             if ($rollback) {
@@ -1827,7 +1834,7 @@ class epManagerBase extends epConfigurableWithLog {
 
         // commit sql statements in all dbs
         if (!$this->t->commitDbs()) {
-            
+
             // rollback if asked for
             if ($rollback) {
                 $this->rollback_t();
@@ -1855,7 +1862,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @return bool
      */
     public function rollback_t() {
-        
+
         if (!$this->t) {
             throw new epExceptionManagerBase('Transaction not started');
             return false;
@@ -1864,46 +1871,60 @@ class epManagerBase extends epConfigurableWithLog {
         // rollback all dbs
         $status = $this->t->rollbackDbs();
 
+        // bug #217 non transactional mysql need to delete objects by hand
+        if(! $status){
+            // if not rolled back in db, get already commited objects
+            $commited = &$this->t->getCommitedOjects();
+            /*
+             *  last chance to rollback, at least delete commited objects
+             *  TODO optimize this operation, maybe deleteAll needs support
+             *  for delete collections, delete all object collection at once
+             */
+            foreach ($commited as $co) {
+                $co->delete();
+            }
+        }
+
         // restore object states
         $status = $this->t->rollbackObjects();
-            
+
         // reset transaction
         $this->t = false;
 
         return $status;
     }
-    
+
     /**
      * Add object for the current transition to watch
      * @param epObject
      * @return bool
      */
     protected function addObject_t(epObject  &$o) {
-        
+
         // are we in transition?
         if (!$this->t) {
             // quit now if not
             return false;
         }
-        
+
         // get class name
         if (!($class = $this->_getClass($o))) {
             return false;
         }
-        
+
         // get class map for class
         if (!($cm = & $this->_getMap($class))) {
             return false;
         }
-        
+
         // get db for the class
         if (!($db = & $this->_getDb($cm))) {
             return false;
         }
-        
+
         // add object to watch
         $this->t->addObject($o, $db);
-        
+
         return true;
     }
 
@@ -1913,13 +1934,13 @@ class epManagerBase extends epConfigurableWithLog {
      * @access public
      */
     public function getClassMapFactory() {
-        
+
         // if class map factory does not exist yet
         if (!$this->cmf) {
             // initialize
             $this->initialize(true);
         }
-        
+
         return $this->cmf;
     }
 
@@ -1928,12 +1949,12 @@ class epManagerBase extends epConfigurableWithLog {
      * @return false|array
      */
     public function getQueries() {
-        
+
         // check if db factory is init'ed
         if (!$this->dbf) {
             return false;
         }
-        
+
         // get dbs
         if (!($dbs = $this->dbf->allMade())) {
             return false;
@@ -1960,7 +1981,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @throws epExceptionManagerBase
      */
     public function register($l) {
-        
+
         // sanity check
         if (!$l) {
             throw new epExceptionManagerBase('Listener cannot be null.');
@@ -1972,7 +1993,7 @@ class epManagerBase extends epConfigurableWithLog {
 
             // and it is -not- a class compiled (to be persisted)
             if (!$this->_getMap($l)) {
-                
+
                 // does listener class exist?
                 if (!class_exists($l)) {
                     throw new epExceptionManagerBase('Listener class [' . $l . '] does not exist.');
@@ -1985,7 +2006,7 @@ class epManagerBase extends epConfigurableWithLog {
                     return false;
                 }
             }
-            
+
             // otherwise its a local listener
             else {
 
@@ -1993,7 +2014,7 @@ class epManagerBase extends epConfigurableWithLog {
                 if (!isset($this->listeners_l[$l]) || !$this->listeners_l[$l]) {
                     $this->listeners_l[$l] = true;
                 }
-                
+
                 // done
                 return true;
             }
@@ -2030,7 +2051,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @return false|integer (number of listener unregistered)
      */
     public function unregister($l) {
-        
+
         // sanity check
         if (!$l || (!is_string($l) && !is_object($l))) {
             return false;
@@ -2045,7 +2066,7 @@ class epManagerBase extends epConfigurableWithLog {
         // go through all listeners
         $unregistered = 0;
         foreach($this->listeners_g as $k => $listener) {
-            
+
             $is_listener = false;
 
             // $l is listener class
@@ -2054,7 +2075,7 @@ class epManagerBase extends epConfigurableWithLog {
                     $is_listener = true;
                 }
             }
-            
+
             // $l is listener object
             else {
                 if ($listener === $l) {
@@ -2081,12 +2102,12 @@ class epManagerBase extends epConfigurableWithLog {
      * @return void
      */
     protected function _dispatchEvent($events, $obj_or_class, $params = array()) {
-        
+
         // check if it is configured to dispatch events
         if (!$this->getConfigOption('dispatch_events')) {
             return;
         }
-        
+
         // make event array
         if (is_string($events)) {
             $events = array($events);
@@ -2094,10 +2115,10 @@ class epManagerBase extends epConfigurableWithLog {
 
         // dispatch events one by one to local and global listeners
         foreach($events as $event) {
-            
+
             // dispatch event to local listener
             $this->_dispatchEvent_l($event, $obj_or_class, $params);
-            
+
             // dispatch event to global listener
             $this->_dispatchEvent_g($event, $obj_or_class, $params);
         }
@@ -2111,7 +2132,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @return void
      */
     protected function _dispatchEvent_l($event, $obj_or_class, $params = array()) {
-        
+
         // must be either epObject or a string
         if (!$obj_or_class ||
             (!is_string($obj_or_class) && !($obj_or_class instanceof epObject))) {
@@ -2167,10 +2188,10 @@ class epManagerBase extends epConfigurableWithLog {
 
         // go through all global event listeners
         foreach($this->listeners_g as $listener) {
-            
+
             // check if listener can process event
             if (method_exists($listener, $event)) {
-                
+
                 // call the listen to process event
                 $listener->$event($obj_or_class, $params);
             }
@@ -2186,7 +2207,7 @@ class epManagerBase extends epConfigurableWithLog {
      * @return false|array (of string (callback methods))
      */
     protected function _inspectListenser($l) {
-        
+
         // sanity check
         if (!$l || !is_object($l) || !($class = get_class($l))) {
             return false;
@@ -2204,7 +2225,7 @@ class epManagerBase extends epConfigurableWithLog {
 
         return $callbacks;
     }
-            
+
     /**
      * Notify object changes
      *
@@ -2218,19 +2239,19 @@ class epManagerBase extends epConfigurableWithLog {
      * @return bool
      */
     public function notifyChange(&$o, $event, $vars) {
-        
+
         switch ($event) {
-            
+
             case 'onPreChange':
-                
+
                 // add this object into transaction
                 $this->addObject_t($o);
 
                 // dispatch event: onPreChange
                 $this->_dispatchEvent(array('onPreChange'), $o, $vars);
-                
+
                 break;
-            
+
             case 'onChange':
             case 'onPostChange':
 
@@ -2238,11 +2259,11 @@ class epManagerBase extends epConfigurableWithLog {
                 $this->_dispatchEvent(array('onChange', 'onPostChange'), $o, $vars);
 
                 break;
-        
+
             default:
                 throw new epExceptionManagerBase('Unrecognized event');
         }
-        
+
         return true;
     }
 
@@ -2276,7 +2297,7 @@ class epExceptionManager extends epExceptionManagerBase {
  * @subpackage ezpdo.runtime
  */
 class epManager extends epManagerBase implements epSingleton {
-    
+
     /**
      * The cached example object for epObjectRelation
      * @var epObjectRelation
@@ -2309,7 +2330,7 @@ class epManager extends epManagerBase implements epSingleton {
     public function __construct($config = null) {
         parent::__construct($config);
     }
-    
+
     /**
      * Overrides {@link epManagerBase::initialize()}
      * @param bool $force whether to force initialization
@@ -2317,10 +2338,10 @@ class epManager extends epManagerBase implements epSingleton {
      * @throws epExceptionManager
      */
     protected function initialize($force = false) {
-        
+
         // call parent epManagerBase to initialize
         $status = parent::initialize($force);
-        
+
         // check if init'ed before
         if (!$force && $this->cm_obj_rel) {
             return true;
@@ -2334,7 +2355,7 @@ class epManager extends epManagerBase implements epSingleton {
                 return false;
             }
         }
-        
+
         // append overall table prefix
         $this->rel_tbl_prefix = $this->getConfigOption('relation_table');
         if ($prefix = $this->getConfigOption('table_prefix')) {
@@ -2346,13 +2367,13 @@ class epManager extends epManagerBase implements epSingleton {
 
         // set default dsn to relation table
         $this->cm_obj_rel->setDsn($this->getConfigOption('default_dsn'));
-        
+
         // cache relation table splitting flag
         $this->rel_tbl_split = $this->getConfigOption('split_relation_table');
-        
+
         return $status;
     }
-    
+
     /**
      * Commits an object
      * @param object $o
@@ -2360,7 +2381,7 @@ class epManager extends epManagerBase implements epSingleton {
      * @access public
      */
     public function commit(&$o, $force = false) {
-        
+
         // make sure we are dealing with an epObject
         if (!($o instanceof epObject)) {
             return false;
@@ -2370,17 +2391,17 @@ class epManager extends epManagerBase implements epSingleton {
         if (!$force && !$o->epNeedsCommit()) {
             return true;
         }
-        
+
         // get class map for class
         if (!($cm = & $o->epGetClassMap())) {
             return false;
         }
-        
+
         // get class name
         if (!($class = $cm->getName())) {
             return false;
         }
-        
+
         // check if class has any non-primitive fields
         if (!($npfs = $cm->getNonPrimitive())) {
             return $this->_commit_o($o);
@@ -2394,7 +2415,7 @@ class epManager extends epManagerBase implements epSingleton {
 
         // array to keep track of 1-to-many relations
         $relations = array();
-        
+
         // go through each non-primitive field
         $status = true;
         foreach($npfs as $name => $fm) {
@@ -2409,10 +2430,10 @@ class epManager extends epManagerBase implements epSingleton {
             if (!($v = & $o->epGet($name))) {
                 continue;
             }
-            
+
             // check if value is array
             if (is_array($v) || $v instanceof epArray) {
-                
+
                 // check if it is a "many" field
                 if (!$fm->isMany()) {
                     throw new epExceptionManager('Value (array) of variable [' . $cm->getName() . "::" . $fm->getName() . '] and its field map mismatch');
@@ -2424,36 +2445,36 @@ class epManager extends epManagerBase implements epSingleton {
                     $convert_oid_0 = $v->getConvertOid();
                     $v->setConvertOid(false);
                 }
-                
+
                 // go through each value in $v
                 $oids = array();
                 foreach($v as &$w) {
-                    
+
                     if (is_string($w)) {
-                        
+
                         $oids[] = $w;
-                        
+
                     } else if (is_object($w) && ($w instanceof epObject)) {
 
                         // ignore deleted object
                         if ($w->epIsDeleted()) {
                             continue;
                         }
-                        
+
                         // commit the value (object)
                         if ($w->epIsCommitting()) {
-                            
+
                             if (!$w->epGetObjectId()) {
                                 // if the object is to be commited, do a simple commit to get the oid
                                 $status &= $this->_commit_o($w, true); // true: simple commit
                             }
-                            
+
                         } else {
 
                             // for not in to-be-committed queue
                             $status &= $this->commit($w);
                         }
-                        
+
                         if ($w->epIsCommittable()) {
                             // collect oid
                             $oids[] = $this->encodeUoid($w);
@@ -2466,7 +2487,7 @@ class epManager extends epManagerBase implements epSingleton {
                 if ($v instanceof epArray) {
                     $v->setConvertOid($convert_oid_0);
                 }
-                
+
                 // put oids into the relation array
                 if (isset($modified_rvars[$name])) {
                     $new = $oids;
@@ -2548,15 +2569,15 @@ class epManager extends epManagerBase implements epSingleton {
                     $relations[$name][$fm->getBase_b()]['new'] = $new;
                     $relations[$name][$fm->getBase_b()]['old'] = $old;
                 }
-                
+
             } else {
-                
+
                 $oid = false;
-                
+
                 if (is_string($v)) {
-                    
+
                     $oid = $v;
-                    
+
                 } else if (is_object($v) && ($v instanceof epObject)) {
 
                     // check if it is a "One" field map
@@ -2564,7 +2585,7 @@ class epManager extends epManagerBase implements epSingleton {
                         throw new epExceptionManager('Variable value (array) and field map (One) mismatch');
                         continue;
                     }
-                    
+
                     // ignore deleted object
                     if ($v->epIsDeleted()) {
                         continue;
@@ -2572,25 +2593,25 @@ class epManager extends epManagerBase implements epSingleton {
 
                     // commit the value (object)
                     if ($v->epIsCommitting()) {
-                        
+
                         if (!$v->epGetObjectId()) {
                             // if the object is to be commited, do simple commit to get the oid
                             $status &= $this->_commit_o($v, true); // true: simple commit
                         }
-                        
+
                     } else {
-                        
+
                         // object not in to-be-committed queue. force commit
                         $status &= $this->commit($v);
 
                     }
-                    
+
                     if ($v->epIsCommittable()) {
                         // collect oid
                         $oid = $this->encodeUoid($v);
                     }
                 }
-                
+
                 // put oid into the relation array
                 if ($oid !== false) {
                     if (isset($modified_rvars[$name])) {
@@ -2606,7 +2627,7 @@ class epManager extends epManagerBase implements epSingleton {
         if ($o->epNeedsCommit()) {
             $status &= $this->_commit_o($o);
         }
-        
+
         // update object relation for has_many or composed_of_many fields
         foreach($relations as $var_a => $relation) {
             $base_a = $cm->getField($var_a)->getBase_a();
@@ -2614,10 +2635,10 @@ class epManager extends epManagerBase implements epSingleton {
                 $status &= $this->_updateRelations($base_a, $class, $o->epGetObjectId(), $var_a, $base_b, $b_oids['new'], $b_oids['old']);
             }
         }
-        
+
         return $status;
     }
-    
+
     /**
      * Overrides {@link epManagerBase::delete()} to deal with object relationships
      * Delete all objects in a class and all its subclasses
@@ -2626,7 +2647,7 @@ class epManager extends epManagerBase implements epSingleton {
      * @access public
      */
     public function deleteAll($class) {
-        
+
         // get class map for class
         if (!($cm = & $this->_getMap($class))) {
             return false;
@@ -2655,7 +2676,7 @@ class epManager extends epManagerBase implements epSingleton {
      * @access protected
      */
     protected function _deleteAll(epClassMap $cm) {
-        
+
         // get class name
         $class = $cm->getName();
 
@@ -2664,35 +2685,35 @@ class epManager extends epManagerBase implements epSingleton {
             // if not, simply call parent to delete all
             return parent::deleteAll($class);
         }
-        
+
         // check if class has any composed_of fields
         if (!($cofs = $cm->getComposedOf())) {
-            
+
             // call parent to delete all
             $status = parent::deleteAll($class);
-            
+
             // remove relations from and to the class
             $status &= $this->_deleteRelations($class);
             return $status;
         }
-        
+
         // otherwise, we need to go through each object and delete the composed_of fields
         // this is an expensive operation. should be optimized.
-        
+
         // get all objects of the class
         if (!($os = $this->getAll($class))) {
             return true;
         }
-        
+
         // delete every object
         $status = true;
         foreach($os as $o) {
             $status &= $this->delete($o);
         }
-        
+
         return $status;
     }
-    
+
     /**
      * Overrides {@link epManagerBase::delete()} to deal with object relationships
      * @param object
@@ -2700,12 +2721,12 @@ class epManager extends epManagerBase implements epSingleton {
      * @access public
      */
     public function delete(&$o = null) {
-        
+
         // get class name
         if (!($class = $this->_getClass($o))) {
             return false;
         }
-        
+
         // get class map for class
         if (!($cm = & $this->_getMap($class))) {
             return false;
@@ -2719,25 +2740,25 @@ class epManager extends epManagerBase implements epSingleton {
 
         // check if class has any composed_of fields
         if (!($cofs = $cm->getComposedOf())) {
-            
+
             // if not, delete all relations from and to the object
             $status = parent::delete($o);
-            
+
             // remove relations from and to the class
             $status &= $this->_deleteRelations($class, $oid);
-            
+
             return $status;
         }
-        
+
         // otherwise, go through composed_of fields and delete each object composed of
         $status  = true;
         foreach($cofs as $cof) {
-            
+
             // get the value for the composed_of field
             if (!($val = $o->epGet($cof->getName()))) {
                 continue;
             }
-            
+
             // is the field value an array? if so, delete recursively
             if (!is_array($val) && !($val instanceof epArray) ) {
                 $status &= $this->delete($val);
@@ -2747,13 +2768,13 @@ class epManager extends epManagerBase implements epSingleton {
                 }
             }
         }
-        
+
         $status &= parent::delete($o);
         $status &= $this->_deleteRelations($class, $oid);
-        
+
         return $status;
     }
-    
+
     /**
      * Returns the relation ids for the variable specified of the object
      * @param epObject $o the object
@@ -2762,17 +2783,17 @@ class epManager extends epManagerBase implements epSingleton {
      * @return false|string|array
      */
     public function getRelationIds(&$o, $fm, $cm) {
-        
+
         // make sure we are dealing with valid object and non-primitive field
         if (!$o || !$fm  || !$cm) {
             return false;
         }
-        
+
         // object needs to have a valid id and has to be non-primitive
         if (!($oid_a = $o->epGetObjectId()) /* || $fm->isPrimitive() */) {
             return false;
         }
-        
+
         // get class_a, var_a, and the related class
         $base_a = $fm->getBase_a();
         $class_a = $cm->getName();
@@ -2790,37 +2811,37 @@ class epManager extends epManagerBase implements epSingleton {
         if (!($eo = & $this->_relationExample($class_a, $oid_a, $var_a, $base_b))) {
             return false;
         }
-        
+
         // find all relation objects using the example object
         // (find from db only, false: no cache, false: don't convert to objects)
         $rs = & parent::find($eo, EP_GET_FROM_DB, false, false);
-        
+
         // convert result into oids
         $oids_b = null;
         if ($fm->isSingle()) {
-            
+
             if (is_array($rs) && count($rs) > 1) {
                 throw new epExceptionManager('Field ' . $fm->getName() . ' mapped as composed_of_/has_one but is associated with > 1 objects');
                 return false;
             }
-            
+
             if ($rs) {
                 $oids_b = $rs[0];
             }
-            
+
         } else if ($fm->isMany()) {
-            
+
             $oids_b = array();
             if ($rs) {
                 $oids_b = $rs;
             }
-            
+
         }
-        
+
         // always return unique oids
 		return is_array($oids_b) ? array_unique($oids_b) : $oids_b;
     }
-    
+
     /**
      * Delete one-to-many relations between class_a and class_b.
      * @param string $class name of class
@@ -2828,7 +2849,7 @@ class epManager extends epManagerBase implements epSingleton {
      * @return bool
      */
     protected function _deleteRelations($class, $oid = null) {
-        
+
         // split relation table?
         if (!$this->rel_tbl_split) {
             // delete with no split
@@ -2838,7 +2859,7 @@ class epManager extends epManagerBase implements epSingleton {
         // delete relation with split
         return $this->_deleteRelationsSplit($class, $oid);
     }
-    
+
     /**
      * Delete one-to-many relations between class_a and class_b
      * under split_relation_table mode
@@ -2847,11 +2868,11 @@ class epManager extends epManagerBase implements epSingleton {
      * @return bool
      */
     protected function _deleteRelationsSplit($class, $oid = null) {
-        
+
         $status = true;
 
         foreach($this->_getRelationPairs($class) as $base_a_b) {
-            
+
             // split base a and b
             list($base_a, $base_b) = explode(' ', $base_a_b);
 
@@ -2873,7 +2894,7 @@ class epManager extends epManagerBase implements epSingleton {
      * @return bool
      */
     protected function _deleteRelationsNoSplit($class, $oid = null) {
-        
+
         // get db for object relationship
         if (!($db = & $this->_getDb($this->cm_obj_rel))) {
             return false;
@@ -2899,7 +2920,7 @@ class epManager extends epManagerBase implements epSingleton {
      * @return bool
      */
     protected function _updateRelations($base_a, $class_a, $oid_a, $var_a, $base_b, $oids_b_new = array(), $oids_b_old = null) {
-        
+
         // need to have a non-empty name
         if (!$base_a || !$class_a || !$oid_a || !$var_a|| !$base_b) {
             throw new epExceptionManager('Incorrect parameters to update relations');
@@ -2950,10 +2971,10 @@ class epManager extends epManagerBase implements epSingleton {
      * @return false|epObjectRelation
      */
     protected function &_relationExample($class_a = null, $oid_a = null, $var_a = null, $base_b = null, $class_b = null, $oid_b = null) {
-        
+
         // check if the example object has been created
         if ($this->eo_obj_rel) {
-            
+
             // set values to vars
             $this->eo_obj_rel->class_a = $class_a;
             $this->eo_obj_rel->oid_a   = $oid_a;
@@ -2984,7 +3005,7 @@ class epManager extends epManagerBase implements epSingleton {
      * @return array
      */
     protected function _getRelationPairs($class) {
-        
+
         // return value (array)
         $pairs = array();
 
@@ -2996,11 +3017,11 @@ class epManager extends epManagerBase implements epSingleton {
         // go through one by one
         $pairs = array();
         foreach($fms as $fm) {
-            
+
             // get base_a and base_b
             $base_a = $fm->getBase_a();
             $base_b = $fm->getBase_b();
-            
+
             // swap base_a and base_b if a > b
             if ($base_a > $base_b) {
                 $t = $base_a;
@@ -3008,12 +3029,12 @@ class epManager extends epManagerBase implements epSingleton {
                 $base_b = $t;
             }
             $base_a_b = $base_a . ' ' . $base_b;
-            
+
             // check if pair has been seen
             if (in_array($base_a_b, $pairs)) {
                 continue;
             }
-            
+
             $pairs[] = $base_a_b;
         }
 
@@ -3028,7 +3049,7 @@ class epManager extends epManagerBase implements epSingleton {
      * @return string
      */
     public function getRelationTable($base_a, $base_b) {
-        
+
         // are we in split mode?
         if (!$this->rel_tbl_split) {
             // return the single relation table name
@@ -3041,7 +3062,7 @@ class epManager extends epManagerBase implements epSingleton {
         } else {
             $postfix = strtolower($base_b . '_' .  $base_a);
         }
-        
+
         // append postfix
         $table = $this->rel_tbl_prefix;
         if ($table[strlen($table) - 1] != '_') {
@@ -3081,7 +3102,7 @@ class epManager extends epManagerBase implements epSingleton {
      * @return void
      */
     protected function _setRelationTable($table_or_base_a, $base_b = false) {
-        
+
         // get relation table name (w/o prefix)
         $table = $table_or_base_a;
         if ($base_b) {
@@ -3090,10 +3111,10 @@ class epManager extends epManagerBase implements epSingleton {
 
         // fix bug 175: make DSN always the same as class_a or class_b
         if ($base_b) {
-            
+
             // set dsn to relation table
             $this->cm_obj_rel->setDsn($this->_getRelationDsn($table_or_base_a, $base_b));
-            
+
             // remove cached db for relation table
             if (isset($this->dbs[$this->cm_obj_rel->getName()])) {
                 unset($this->dbs[$this->cm_obj_rel->getName()]);
@@ -3151,17 +3172,17 @@ class epManager extends epManagerBase implements epSingleton {
      * @return false|epObject
      */
     public function &getByUoid($uoid) {
-        
+
         // string: encoded objected id
         if (!is_string($uoid)) {
             return false;
         }
-        
+
         // ask manager to decode uoid
         if (!$this->decodeUoid($uoid, $class, $oid)) {
             return false;
         }
-        
+
         // let manager find object with class and oid
         return $this->get($class, $oid);
     }
@@ -3172,7 +3193,7 @@ class epManager extends epManagerBase implements epSingleton {
      * @return false|array of epObject (with same index as $uoids)
      */
     public function getByUoids($uoids) {
-        
+
         // string: encoded objected id
         if (!is_array($uoids)) {
             return false;
@@ -3193,10 +3214,10 @@ class epManager extends epManagerBase implements epSingleton {
         foreach ($oids_class as $class => $oids) {
             $objects = array_merge($objects, $this->getAll($class, EP_GET_FROM_BOTH, $oids));
         }
-        
+
         return $objects;
     }
-    
+
     /**
      * Generate a string that can be used to uniquely identify an object.
      * False is returned if invalid object or object does not have oid yet.
@@ -3210,7 +3231,7 @@ class epManager extends epManagerBase implements epSingleton {
         // put class name and id into simple format: "<class>:<id>"
         return $this->_encodeUoid($o->epGetClass(), $oid);
     }
-    
+
     /**
      * Lower level method called by epManager::encodeUoid()
      * @param string $class
@@ -3220,7 +3241,7 @@ class epManager extends epManagerBase implements epSingleton {
     protected function _encodeUoid($class, $oid) {
         return $class . ':' . $oid;
     }
-    
+
     /**
      * The reverse of epManager::encodeUoid()
      * @param string $s (the encoded object id)
@@ -3229,19 +3250,19 @@ class epManager extends epManagerBase implements epSingleton {
      * @return boolean
      */
     public function decodeUoid($s, &$class, &$oid) {
-        
+
         if (!$s || strpos($s,':') <= 0) {
             return false;
         }
-        
+
         // split by ':'
         list($class, $oid) = explode(':', $s);
         $oid = (integer)$oid;
-        
+
         // class and oid should not be null
         return ($class && $oid);
     }
-    
+
     /**
      * Changes DSN for classes at runtime.
      *
@@ -3260,7 +3281,7 @@ class epManager extends epManagerBase implements epSingleton {
      * @todo Needs to check if class hiearchies and relations is in one db.
      */
     public function setDsn($dsn) {
-        
+
         // DSN should not be empty
         if (!$dsn) {
             return false;
@@ -3293,13 +3314,13 @@ class epManager extends epManagerBase implements epSingleton {
      * @access public
      */
     public function createTables() {
-        
+
         // if class map factory does not exist yet
         if (!$this->cmf || !$this->cm_obj_rel) {
             // initialize
             $this->initialize(true);
         }
-        
+
         // done if no class at all
         if (!($cms = $this->cmf->allMade())) {
             return array();
@@ -3310,10 +3331,10 @@ class epManager extends epManagerBase implements epSingleton {
 
         // reset dbs cache so they will be created
         $this->dbs = array();
-        
+
         // go through all classes mapped
         foreach($cms as $cm) {
-            
+
             // get class name
             $class = $cm->getName();
 
@@ -3347,7 +3368,7 @@ class epManager extends epManagerBase implements epSingleton {
                 }
             }
         }
-        
+
         return $classes_done;
     }
 
@@ -3360,13 +3381,13 @@ class epManager extends epManagerBase implements epSingleton {
      * @access public
      */
     public function dropTables() {
-        
+
         // if class map factory does not exist yet
         if (!$this->cmf || !$this->cm_obj_rel) {
             // initialize
             $this->initialize(true);
         }
-        
+
         // done if no class at all
         if (!($cms = $this->cmf->allMade())) {
             return array();
@@ -3374,10 +3395,10 @@ class epManager extends epManagerBase implements epSingleton {
 
         // array to hold classes/relation tables done
         $classes_done = array();
-        
+
         // go through all classes mapped
         foreach($cms as $cm) {
-            
+
             // get class name
             $class = $cm->getName();
 
@@ -3411,7 +3432,7 @@ class epManager extends epManagerBase implements epSingleton {
                 }
             }
         }
-        
+
         return $classes_done;
     }
 
@@ -3435,7 +3456,7 @@ class epManager extends epManagerBase implements epSingleton {
         if (!($cms = $this->cmf->allMade())) {
             return array();
         }
-        
+
         // array to hold classes/tables with indexes created
         $classes_done = array();
 
@@ -3496,7 +3517,7 @@ class epManager extends epManagerBase implements epSingleton {
         }
         return self::$instance;
     }
-    
+
     /**
      * Implement {@link epSingleton} interface
      * Forcefully destroy old instance (only used for tests).

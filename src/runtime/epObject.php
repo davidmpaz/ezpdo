@@ -72,20 +72,20 @@ class epExceptionArray extends epException {
  * @subpackage ezpdo.runtime
  */
 class epArray implements IteratorAggregate, ArrayAccess, Countable {
-    
+
     /**
      * The internal array
      * @var false|array (false if array is not loaded)
      */
     protected $array = false;
-    
+
     /**
      * Copy of internal array at first load
      * Used to decide what relations should get saved or deleted
      * @var array
      */
     protected $origArray = array();
-    
+
     /**
      * The epObject this array is associated to
      * @var epObject
@@ -169,7 +169,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
             $this->loaded = true;
             return true;
         }
-        
+
         // initialize array with an empty array
         $this->array = array();
 
@@ -184,7 +184,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
             $this->array = $array;
             $this->origArray = $array;
         }
-        
+
         return ($this->loaded = true);
     }
 
@@ -214,7 +214,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
     public function &getObject() {
         return $this->o;
     }
-    
+
     /**
      * Returns the base class name of the object contained in the array
      * @return string
@@ -223,7 +223,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
     public function getClass() {
         return $this->fm->getClass();
     }
-    
+
     /**
      * Returns the field map
      * @return epFieldMap
@@ -232,7 +232,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
     public function getFieldMap() {
         return $this->fm;
     }
-    
+
     /**
      * Returns whehter to flag object dirty
      * @return bool
@@ -241,7 +241,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
     public function getClean() {
         return $this->clean;
     }
-    
+
     /**
      * Sets whether to flag the associated object dirty
      * @param bool $clean
@@ -251,7 +251,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
     public function setClean($clean = true) {
         $this->clean = $clean;
     }
-    
+
     /**
      * Returns whether it is converting oids or not
      * @return bool
@@ -260,7 +260,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
     public function getConvertOid() {
         return $this->convert_oid;
     }
-    
+
     /**
      * Set whether to convert oids
      * @param bool $convert_oid
@@ -283,25 +283,25 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
      * @access public
      */
     public function copy($from, $clean = true) {
-        
+
         // backup clean flag
         $clean0 = $this->getClean();
-        
+
         // set clean flag
         $this->setClean($clean);
-        
+
         // remove all items before copying array
         $this->removeAll(false);
-        
+
         // if so, add items one by one
         foreach($from as $v) {
             $this->offsetSet(null, $v);
         }
-        
+
         // restore clean flag
         $this->setClean($clean0);
     }
-    
+
     /**
      * Implements Countable::count().
      * Returns the number of vars in the object
@@ -320,23 +320,23 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
         if (!$this->array) {
             return 0;
         }
-        
+
         return count($this->array);
     }
-     
+
     /**
      * Implements IteratorAggregate::getIterator()
      * Returns the iterator which is an ArrayIterator object connected to the array
      * @return ArrayIterator
      */
     public function getIterator() {
-        
+
         // load UOIDs to array if not already
         $this->_load();
 
         // clean up deleted objects
         $this->_cleanUp();
-        
+
         // convert uoid into objects before "foreach" is called
         if ($this->convert_oid) {
             // change all the UOIDs to objects
@@ -346,54 +346,54 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
         // return the array iterator
         return new ArrayIterator($this->array);
     }
-     
+
     /**
      * Implements ArrayAccess::offsetExists()
      * @return bool
      */
     public function offsetExists($index) {
-        
+
         // load UOIDs to array if not already
         $this->_load();
 
         // clean up deleted objects
         $this->_cleanUp();
-        
+
         return isset($this->array[$index]);
     }
-    
+
     /**
      * Implements ArrayAccess::offsetGet()
      * @return mixed
      */
     public function offsetGet($index) {
-        
+
         // load UOIDs to array if not already
         $this->_load();
 
         // clean up deleted objects
         $this->_cleanUp();
-        
+
         // check if value of index is set
         if (!isset($this->array[$index])) {
             return null;
         }
-        
+
         // convert uoid (if string) into object
         if ($this->convert_oid && is_string($this->array[$index])) {
             $this->array[$index] = $this->_uoid2Obj($this->array[$index]);
         }
-        
+
         // return the object
         return $this->array[$index];
     }
-     
+
     /**
      * Implements ArrayAccess::offsetSet()
      * @return void
      */
     public function offsetSet($index, $newval) {
-        
+
         // load UOIDs to array if not already
         $this->_load();
 
@@ -411,7 +411,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
             $this->_updateInverse($newval, epObject::INVERSE_ADD);
         }
         else {
-            
+
             // existing index
             if (count($this->array) > $index) {
                 // remove from inverse
@@ -439,15 +439,15 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
      * @return mixed
      */
     public function offsetUnset($index) {
-        
+
         // load UOIDs to array if not already
         $this->_load();
-        
+
         // clean up deleted objects
         $this->_cleanUp();
-        
+
         if (isset($this->array[$index])) {
-            
+
             // notify on pre change
             if ($this->o && !$this->clean) {
                 $this->_notifyChange('onPreChange');
@@ -458,21 +458,21 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
 
             // unset the index
             unset($this->array[$index]);
-            
+
             // notify the associated object that array has changed
             if ($this->o && !$this->clean) {
                 $this->_notifyChange('onPostChange');
             }
         }
     }
-    
+
     /**
      * Removes an object (using UId as identifier)
      * @return void
      * @access protected
      */
     public function remove($o) {
-        
+
         // load UOIDs to array if not already
         $this->_load();
 
@@ -480,21 +480,21 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
         if (!$this->array) {
             return false;
         }
-        
+
         // get all objects before looping through
         $this->_uoids2Objs();
 
         // go through each object
         foreach($this as $k => $v) {
-            
+
             // check if value is an epObject
             if (!($v instanceof epObject)) {
                 continue;
             }
-            
+
             // check if this is the object to be deleted
             if (/*$o->epGetUId() == $v->epGetUId()*/ $o->epGetObjectId() == $v->epGetObjectId()) {
-                
+
                 // notify on pre change
                 if ($this->o && !$this->clean) {
                     $this->_notifyChange('onPreChange');
@@ -508,7 +508,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
                 if ($this->o && !$this->clean) {
                     $this->_notifyChange('onPostChange');
                 }
-                
+
                 return true;
             }
         }
@@ -528,9 +528,9 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
         if ($load) {
             $this->_load();
         }
-        
+
         if ($this->array) {
-            
+
             // notify on pre change
             if ($this->o && !$this->clean) {
                 $this->_notifyChange('onPreChange');
@@ -560,18 +560,18 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
      * @access public
      */
     public function inArray($val, $strict = true) {
-        
+
         // load uoids to array
         $this->_load();
 
         // clean up deleted objects
         $this->_cleanUp();
-        
+
         // for non-object, do the usual matching
         if (!is_object($val)) {
             return in_array($val, $this->array);
         }
-        
+
         // if value is an epObject
         if ($val instanceof epObject) {
 
@@ -583,15 +583,15 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
                         return true;
                     }
                 }
-                
+
                 // $v is an object
                 else if ($v instanceof epObject) {
-                    
+
                     // check if UID matches
                     if ($v->epGetUId() == $val->epGetUId()) {
                         return true;
                     }
-                    
+
                     // if non-strict, then OID matching also counts
                     if (!$strict) {
                         if ($v->epGetObjectId() == $val->epGetObjectId()) {
@@ -604,33 +604,33 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
 
         return false;
     }
-    
+
     /**
      * Converts the uoid
      * @param string $uoid (encoded object id)
      * @return epObject
      */
     protected function &_uoid2Obj($uoid) {
-        
+
         // is this array associated with an object
         if (!$this->o) {
             return $uoid;
         }
-        
+
         // get manager
         if (!($m = $this->o->epGetManager())) {
             return $uoid;
         }
-        
+
         // call manager to get object by encoded id
         if ($o = $m->getByUoid($uoid)) {
             return $o;
         }
-        
+
         // return encode oid if can't get object
         return $uoid;
     }
-    
+
     /**
      * Converts all UOIDs in $this->array to objects.
      * @return bool
@@ -641,7 +641,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
         if (!$this->o) {
             return false;
         }
-        
+
         // get manager
         if (!($m = $this->o->epGetManager())) {
             return false;
@@ -674,22 +674,22 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
                 unset($uoids[$index]);
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Cleans up all deleted objects
      * @return void
      * @access protected
      */
     protected function _cleanUp() {
-        
+
         // done if no items
         if (!$this->array) {
             return;
         }
-        
+
         // go through each object
         foreach($this->array as $k => $v) {
             if (($v instanceof epObject) && $v->epIsDeleted()) {
@@ -697,7 +697,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
             }
         }
     }
-    
+
     /**
      * Updates the value of the inverse var (always a one-way action)
      * @param epObject $o The opposite object
@@ -705,7 +705,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
      * @return bool
      */
     protected function _updateInverse(&$o, $action = epObject::INVERSE_ADD) {
-        
+
         // check if object is epObject
         if (!$o || !$this->fm || !($o instanceof epObject)) {
             return false;
@@ -748,7 +748,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
                     break;
             }
         }
-        
+
         // reset inverse updating flag
         $o->epSetUpdating(false, $action);
         $this->o->epSetUpdating(false, $action);
@@ -762,13 +762,13 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
      * @return bool
      */
     protected function _notifyChange($event) {
-        
+
         // get var name
         $var = '';
         if ($this->fm) {
             $var = $this->fm->getName();
         }
-        
+
         // call object to notify the manager this change
         return $this->o->epNotifyChange($event, array($var => ''));
     }
@@ -792,15 +792,15 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
      * @return bool
      */
     public function sortBy() {
-        
+
         $this->_load();
-        
+
         // get arguments
         if (!($args = func_get_args())) {
             throw new epExceptionArray('No sortBy() arguments');
             return false;
         }
-        
+
         // convert UOIDs to objects
         $this->_uoids2Objs();
 
@@ -808,11 +808,11 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
         $this->orderbys = array();
         $orderby = array();
         $is_path = true;
-        
+
         foreach($args as $arg) {
-            
+
             if ($is_path) {
-                
+
                 // make sure arg is string
                 if (!is_string($arg)) {
                     throw new epExceptionArray('Only string key is allowed');
@@ -838,7 +838,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
                 $is_path = true;
             }
         }
-        
+
         return usort($this->array, array($this, '__sort'));
     }
 
@@ -849,23 +849,23 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
      * @throws epExceptionDbObject
      */
     private function __sort($a, $b) {
-        
+
         // tie if no orderbys
         if (!$this->orderbys) {
             return 0;
         }
-        
+
         // go through each orderby
         foreach($this->orderbys as $orderby) {
-            
+
             // sign by direction
             $sign = $orderby['dir'] == SORT_DESC ? -1 : + 1;
-            
+
             // get values from a and b
             $path = $orderby['path'];
             $va = epArrayGet($a, $path);
             $vb = epArrayGet($b, $path);
-            
+
             // numeric
             if (is_numeric($va)) {
                 // a < b
@@ -877,7 +877,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
                 }
                 continue;
             }
-            
+
             // string
             if (is_string($va)) {
                 if (($r = strcmp($va, $vb)) < 0) {
@@ -888,11 +888,11 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
                 }
                 continue;
             }
-            
+
             // invalid orderby value
             throw new epExceptionArray('Invalid sorting parameters');
         }
-        
+
         // tie
         return 0;
     }
@@ -997,7 +997,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
     const VAR_PRIMITIVE = 1;
     const VAR_RELATIONSHIP = 2;
     /**#@-*/
-    
+
     /**#@+
      * Actions for updating inverse (binary exclusive)
      */
@@ -1010,7 +1010,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * Constant: not a getter or setter
      */
     const NOT_AN_ACCESSOR = "NOT_AN_ACCESSOR";
-    
+
     /**#@+
      * Used for return value to avoid reference notice in 5.0.x and up
      * @var bool
@@ -1031,19 +1031,19 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @var object
      */
     protected $ep_object = false;
-    
+
     /**
      * The object's uid (used to id objects in memory)
      * @var string
      */
     protected $ep_uid = false;
-    
+
     /**
      * The object id
      * @var false|integer
      */
     protected $ep_object_id = false;
-    
+
     /**
      * The deleted flag
      * @var bool
@@ -1055,13 +1055,13 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @var bool
      */
     protected $ep_is_dirty = false;
-    
+
     /**
      * The committable flag (true by default)
      * @var bool
      */
     protected $ep_is_committable = true;
-    
+
     /**
      * The inverse updating add flag
      * @var bool
@@ -1073,13 +1073,13 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @var bool
      */
     protected $ep_updating_remove = false;
-    
+
     /**
      * The searching flag
      * @var bool
      */
     protected $ep_is_searching = false;
-    
+
     /**
      * The matching flag
      * @var bool
@@ -1097,19 +1097,19 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @var array (keyed by var names)
      */
     protected $ep_vars_before = false;
-    
+
     /**
      * Cached persistence manager
      * @var epManager
      */
     protected $ep_m = false;
-    
+
     /**
      * Cached class map for this object
      * @var epClassMap
      */
     protected $ep_cm = false;
-    
+
     /**
      * Cached field maps for the variables
      * @var array (of epFieldMap)
@@ -1121,7 +1121,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @var array
      */
     protected $ep_cached_vars = array();
-    
+
     /**
      * The cached method names
      * @var array
@@ -1147,26 +1147,26 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @see epOverload
      */
     public function __construct($o, $cm = null) {
-        
+
         if (!is_object($o)) {
             throw new epExceptionObject("Cannot wrap a non-object");
         }
-        
+
 		// set up manager and class map (back reference)
         $this->ep_m = epManager::instance();
         $this->ep_cm = & $cm;
 
 		// wrap the object
         $this->_wrapObject($o);
-        
+
 		// collect methods from object. must be called before
 		// _collectVars(), which depends on the cached methods
 		$this->_collectMethods();
-        
+
 		// collect vars (after _collectMethods)
 		$this->_collectVars();
     }
-    
+
     /**
      * Gets the persistence manager
      * @return epManager
@@ -1175,7 +1175,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
     public function epGetManager() {
         return $this->ep_m;
     }
-    
+
     /**
      * Gets the class (name) of the object
      * @return string
@@ -1183,7 +1183,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
     public function epGetClass() {
         return $this->ep_cm ? $this->ep_cm->getName() : get_class($this->ep_object);
     }
-    
+
     /**
      * Gets class map for this object
      * @return epClassMap
@@ -1192,7 +1192,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
     public function &epGetClassMap() {
         return $this->ep_cm;
     }
-    
+
     /**
      * Gets object uid
      * @return integer
@@ -1200,7 +1200,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
     public function epGetUId() {
         return $this->ep_uid;
     }
-    
+
     /**
      * Gets object id
      * @return integer
@@ -1208,7 +1208,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
     public function epGetObjectId() {
         return $this->ep_object_id;
     }
-    
+
     /**
      * Sets object id. Should only be called by {@link epManager}
      * Note that object id can be set only once (when it is persisted for the first time).
@@ -1222,7 +1222,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
             throw new epExceptionObject("Cannot alter object id");
         }
     }
-    
+
     /**
      * Collects and caches all methods for the object
      * @return void
@@ -1265,7 +1265,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
     	// otherwise error
     	throw new epExceptionObject('Variable [' . $this->_varName($var_name) . '] is not public nor does it have public getter');
-		
+
 		return self::$false;
     }
 
@@ -1301,7 +1301,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
     	// otherwise error
     	throw new epExceptionObject('Variable [' . $this->_varName($var_name) . '] is not public nor does it have public setter');
-    	
+
 		// other cases : error
 		return self::$false;
     }
@@ -1312,13 +1312,13 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @access public
      */
     public function epGetVars() {
-        
+
         // get vars from the wrapped object
         $vars = get_object_vars($this->ep_object);
-        
+
         // append oid to array
         $vars['oid'] = $this->ep_object_id;
-        
+
         // also collect protected/private members (accessible via public g/setters)
 		if ($this->ep_cm) {
 			foreach ($this->ep_cm->getAllFields() as $name => $field) {
@@ -1329,10 +1329,10 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 				}
 			}
 		}
-		
+
 		return $vars;
     }
-    
+
     /**
      * Checks if the object has the variable
      * @param string $var_name variable name
@@ -1351,7 +1351,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @access public
      */
     public function epIsPrimitive($var_name) {
-        
+
         // get field map of the variable
         if (!($fm = & $this->_getFieldMap($var_name))) {
             // always a primitve if a var doesn't have a field map
@@ -1369,7 +1369,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @access public
      */
     public function epIsSingle($var_name) {
-        
+
         // get field map of the variable
         if (!($fm = & $this->_getFieldMap($var_name))) {
             return false;
@@ -1383,7 +1383,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
         // return whether var is a single valued field
         return $fm->isSingle();
     }
-    
+
     /**
      * Checks if a variable is many-valued relationship field
      * @param string $var_name variable name
@@ -1391,12 +1391,12 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @access public
      */
     public function epIsMany($var_name) {
-        
+
         // get field map of the variable
         if (!($fm = & $this->_getFieldMap($var_name))) {
             return false;
         }
-        
+
         // cannot be single if pritimive
         if ($fm->isPrimitive()) {
             return false;
@@ -1413,12 +1413,12 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @access public
      */
     public function epGetClassOfVar($var_name) {
-        
+
         // get field map of the variable
         if (!($fm = & $this->_getFieldMap($var_name))) {
             return false;
         }
-        
+
         // return the related class
         return $fm->getClass();
     }
@@ -1430,23 +1430,23 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @access public
      */
     public function &epGet($var_name) {
-        
+
         // is var oid?
         if ($var_name == 'oid') {
             return $this->ep_object_id;
         }
-        
+
         // get the best-matched var name
         if (!in_array($var_name, $this->ep_cached_vars)) {
             throw new epExceptionObject('Variable [' . $this->_varName($var_name) . '] does not exist or is not accessible');
             return self::$false;
         }
-        
+
         // intermediate variable to prevent notice about reference returns
         $var =& $this->epObjectGetVar($var_name);
         return $var;
     }
-    
+
     /**
      * Sets the value to a variable
      * @param string $var_name variable name
@@ -1455,16 +1455,16 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @return bool
      */
     public function epSet($var_name, $value, $clean = false) {
-        
+
         // find the best-matched var name
         if (!in_array($var_name, $this->ep_cached_vars)) {
             throw new epExceptionObject('Variable [' . $var_name . '] does not exist or is not accessible');
             return false;
         }
-        
+
         // only when old and new value differ
         if ($this->epObjectGetVar($var_name) !== $value) {
-            
+
             // notify change
             if (!$clean) {
                 $this->epNotifyChange('onPreChange', array($var_name => ''));
@@ -1472,16 +1472,16 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
             // change var value
             $this->epObjectSetVar($var_name, $value);
-            
+
             // flag object dirty if it's not a clean 'set'
             if (!$clean) {
                 $this->epNotifyChange('onPostChange', array($var_name => $value));
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Checks if object has been deleted
      * @return bool
@@ -1508,7 +1508,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
     public function epIsDirty() {
         return $this->ep_is_dirty;
     }
-    
+
     /**
      * Explicitly sets dirty flag
      * @param false|true $is_dirty
@@ -1516,10 +1516,10 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @access public
      */
     public function epSetDirty($is_dirty = true) {
-        
+
         // set the dirty flag
         $this->ep_is_dirty = $is_dirty;
-        
+
         // clear modified vars if not dirty
         if (!$this->ep_is_dirty) {
             $this->ep_modified_pvars = array();
@@ -1578,7 +1578,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
         }
 
         // otherwise, set children committable (recursion)
-        
+
         // to avoid loop, use 'searching' flag
         $this->epSetSearching(true);
 
@@ -1620,7 +1620,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
         $this->epSetSearching(false);
     }
-    
+
     /**
      * Checks if object is all inverse update actions specified are taking place
      * @param integer $actions Inverse update actions INVERSE_ADD/REMOVE/BOTH
@@ -1707,7 +1707,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
     public function epIsCommitting() {
         return $this->ep_is_committing;
     }
-    
+
     /**
      * Set the object is being committed
      *
@@ -1728,7 +1728,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @param integer $type The type of vars: VAR_PRIMITIVE, VAR_RELATIONSHIP or both (|)
      */
     public function epGetModifiedVars($type = null) {
-        
+
         // if type is not specified, get both types of vars
         if (!$type) {
             $type = self::VAR_PRIMITIVE | self::VAR_RELATIONSHIP;
@@ -1749,17 +1749,17 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
         return $modified_vars;
     }
-    
+
     /**
      * Sets the modified vars (only used by EZPDO internally)
      * @param array $modified_vars
      * @access public
      */
     public function epSetModifiedVars($vars) {
-        
+
         // flag to indicate if any var modified
         $dirty = false;
-        
+
         // categorize vars into pvars and rvars
         foreach($vars as $var => $value) {
 
@@ -1788,7 +1788,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
         return $dirty;
     }
-    
+
     /**
      * Copy the values of the vars from another object. Note this is
      * a low-level copy that alters the vars of the wrapped object
@@ -1797,18 +1797,18 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @return bool
      */
     public function epCopyVars($from) {
-        
+
         // the argument must be either an array or an epObject
         if (!is_array($from) && !($from instanceof epObject)) {
             return false;
         }
-        
+
         // array-ize if epObject
         $var_values = $from;
         if ($from instanceof epObject) {
             $var_values = $from->epGetVars();
         }
-        
+
         // copy over values from input
         foreach($var_values as $var => $value) {
             //  to vars that exist in this object
@@ -1816,10 +1816,10 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
                 $this->epObjectSetVar($var, $value);
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Checks if the variables of this object matches all the
      * non-null variables in another object
@@ -1835,17 +1835,17 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @return bool
      */
     public function epMatches($o, $deep = false) {
-        
+
         // make sure param is epObject
         if (!($o instanceof epObject)) {
             return false;
         }
-        
+
         // same object if same object uid
         if ($this->ep_uid == $o->epGetUId()) {
             return true;
         }
-        
+
         // matches if the example object does not have any non-null variable
         if (!($vars_o = $o->epGetVars())) {
             return true;
@@ -1853,11 +1853,11 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
         // get vars of this object
         $vars = $this->epGetVars();
-        
+
         // set 'matching' flag to avoid endless loop
         $this->epSetMatching(true);
         $o->epSetMatching(true);
-        
+
         // go through each var from the example object
         foreach($vars_o as $var => $value) {
 
@@ -1865,12 +1865,12 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
             if ($var == 'oid') {
                 continue;
             }
-            
+
             // ignore null values (including empty string)
             if (is_null($value) || (is_string($value) && !$value)) {
                 continue;
             }
-            
+
             // for primitive var, mismatch if var is not in object or two vars unequal
             if ($this->epIsPrimitive($var)) {
                 if (!isset($vars[$var]) || $vars[$var] != $value) {
@@ -1890,25 +1890,25 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
             // many-valued relationship var
             if ($value instanceof epArray) {
-                
+
                 // the epArray can have different order between the
                 // two objects, so we have to do an n^2 loop to see
                 // if they are the same (ugly)
                 // oak: shall we match array count? strict mode? //
                 foreach ($value as $obj) {
-                    
+
                     if (!$obj) {
                         continue;
                     }
-                    
+
                     // skip object already under matching
                     if ($obj->epIsMatching()) {
                         continue;
                     }
-                    
+
                     // flag indicates object being matched
                     $matched = false;
-                    
+
                     // go through each var in array
                     foreach ($vars[$var] as $tmp) {
                         if (!$tmp->epIsMatching() && !$obj->epIsMatching()) {
@@ -1918,7 +1918,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
                             }
                         }
                     }
-                    
+
                     // no match to $obj. done.
                     if (!$matched) {
                         $this->epSetMatching(false);
@@ -1930,12 +1930,12 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
             // one-valued relationship field
             else if (($value instanceof epObject) && !$value->epIsMatching()) {
-                
+
                 // we need to check this
                 if (!isset($vars[$var])) {
                     $vars[$var] = $this->epGet($var);
                 }
-                
+
                 // match only when vars are not flagged 'matching'
                 if (!$value->epIsMatching() && !$vars[$var]->epIsMatching()) {
                     if (!$vars[$var]->epMatches($value, true)) {
@@ -1952,13 +1952,13 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
                     return false;
                 }
             }
-            
+
         }
 
         // reset matching flags
         $this->epSetMatching(false);
         $o->epSetMatching(false);
-        
+
         return true;
     }
 
@@ -1968,12 +1968,12 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @return bool
      */
     public function epMethodExists($method) {
-        
+
         // sanity check: method name should not be empty
         if (!$method || !$this->ep_object) {
             return false;
         }
-        
+
         // call the cached object to check if method exists
         return method_exists($this->ep_object, $method);
     }
@@ -2022,14 +2022,14 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
         }
         return $this->ep_m->delete($this);
     }
-    
+
     /**
      * Implements magic method __sleep()
      * Sets cached class map, field maps, and manager to null or empty
      * to prevent them from being serialized
      */
     public function __sleep() {
-        
+
         // set cached class map to null so it's not serialized
         $this->ep_cm = NULL;
 
@@ -2048,10 +2048,10 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * Recovers cached manager and class map
      */
     public function __wakeup() {
-        
+
         // recover manager when waking up
         $this->ep_m = epManager::instance();
-        
+
         // recover class map
         $this->ep_cm = $this->ep_m->getMap(get_class($this->ep_object));
 
@@ -2083,7 +2083,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
     final public function &__get($var_name) {
         return $this->epGet($var_name);
     }
-    
+
     /**
      * Implements magic method __set().
      * This method calls {@link epSet()}.
@@ -2092,7 +2092,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
     final public function __set($var_name, $value) {
         $this->epSet($var_name, $value);
     }
-    
+
     /**
      * Intercepts getter/setters to manage persience state.
      * @param string $method method name
@@ -2101,7 +2101,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @see epObject::__call()
      */
     final public function __call($method, $args) {
-        
+
         try {
             // try getters/setters first
             $ret = $this->_intercept($method, $args);
@@ -2111,34 +2111,34 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
         } catch (epExceptionObject $e) {
             // exception: var cannot found in setter and getter
         }
-        
+
         //
         // after getters and setters, call epOverload::__call()
         //
-        
+
         // preprocess before __call()
         if ($method != 'onPreChange') {
             $this->_pre_call();
         }
-        
+
         // get old argument conversion flag
         $ca = $this->getConvertArguments();
-        
+
         // force -no- argument conversion (fix bug 69)
         $this->setConvertArguments(false);
-        
+
         // actually call method in original class
         $ret =  parent::__call($method, $args);
-        
+
         // recover old argument conversion flag
         $this->setConvertArguments($ca);
-        
+
         // post process after __call()
         $this->_post_call();
-        
+
         return $ret;
     }
-    
+
     /**
      * Preprocess before __call()
      * @return void
@@ -2148,25 +2148,25 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
         // !!! since we don't know which vars exactly will be changed, report none !!!
         $this->epNotifyChange('onPreChange', array());
     }
-    
+
     /**
      * Post process after __call()
      * @return void
      */
     protected function _post_call() {
-        
+
         // get vars after _call()
         $vars_after = get_object_vars($this->ep_object);
-        
+
         // collect modified vars
         $changed_vars = array();
         foreach($vars_after as $var => $value) {
-            
+
             // skip relationship field
             if ($this->epIsMany($var)) {
                 continue;
             }
-            
+
             // skip unspotted var before method call
 			if (!isset($this->ep_vars_before[$var])) {
 				continue;
@@ -2182,11 +2182,11 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
         if ($changed_vars) {
             $this->epNotifyChange('onPostChange', $changed_vars);
         }
-        
+
         // release old values
         $this->ep_vars_before = false;
     }
-    
+
     /**
      * Intercept getters/setters
      * @param string $method method name
@@ -2195,7 +2195,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @return mixed
      */
     protected function _intercept($method, $args) {
-        
+
         // intercept getter
         if (substr($method, 0, 4) == 'get_') {
             $vn = substr($method, 4);
@@ -2205,7 +2205,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
             $vn = strtolower(substr($method, 3, 1)) . substr($method, 4);
             return $this->epGet($vn);
         }
-        
+
         // intercept setter
         if (substr($method, 0, 4) == 'set_') {
             $vn = substr($method, 4);
@@ -2215,7 +2215,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
             $vn = strtolower(substr($method, 3, 1)) . substr($method, 4);
             return $this->epSet($vn, isset($args[0]) ? $args[0] : null);
         }
-        
+
         return self::NOT_AN_ACCESSOR;
     }
 
@@ -2228,60 +2228,60 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @throws epExceptionObject
      */
     protected function _wrapObject($o) {
-        
+
         // no need to wrap an epObject instance
         if ($o instanceof epObject) {
             throw new epExceptionObject('No wrapper for epObject instance');
             return false;
         }
-        
+
         // set the wrapped object (the foreign object)
         $this->setForeignObject($o);
-        
+
         // cache the object for quick access
         $this->ep_object = $o;
-        
+
         // create the uid for this object
         $this->ep_uid = self::$uniqid_counter++;
-        
+
         return true;
     }
-    
+
     /**
      * Collect and cache all vars for the object
      * @return void
      * @access protected
      */
     protected function _collectVars() {
-        
+
 		// collect vars in objects
 		$this->ep_cached_vars = array_keys(get_object_vars($this->ep_object));
-		
+
         // add private/protected vars in case missed out
 		if ($this->ep_cm) {
-			
+
 			// has __get() or __set() in class?
 			$has__get = in_array('__get', $this->ep_cached_methods);
 			$has__set = in_array('__set', $this->ep_cached_methods);
-			
+
 			// get all vars from class map
 			$vars = array_keys($this->ep_cm->getAllFields());
-			
+
 			// go through all vars and collect accessible non-public vars
 			// 'accessible' means a var has both public getter and setter
 			foreach ($vars as $var) {
-				
+
 				// skip if already collected
 				if (in_array($var, $this->ep_cached_vars)) {
 					continue;
                 }
-				
+
 				// does it have public g/setter?
 				$hasGetter = $has__get ||
 					in_array('get' . ucfirst($var), $this->ep_cached_methods);
 				$hasSetter = $has__set ||
 					in_array('set' . ucfirst($var), $this->ep_cached_methods);
-				
+
 				// collect it if publically accessible
 				if ($hasGetter && $hasSetter) {
 					$this->ep_cached_vars[] = $var;
@@ -2289,7 +2289,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
             }
         }
     }
-    
+
     /**
      * Checks persistence manager
      * @return bool
@@ -2310,12 +2310,12 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
      * @return false|epFieldMap
      */
     protected function &_getFieldMap($var_name) {
-        
+
         // check if we have class map
         if (!$this->ep_cm || !$var_name) {
             return self::$false;
         }
-        
+
         // check if field map is cached
         if (isset($this->ep_fms[$var_name])) {
             return $this->ep_fms[$var_name];
@@ -2323,14 +2323,14 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
         // get field map
         $fm = $this->ep_cm->getField($var_name);
-        
+
         // cache it
         $this->ep_fms[$var_name] = $fm;
-        
+
         // return the field map for the var
         return $fm;
     }
-    
+
     /**
      * Implements Countable::count().
      * Returns the number of vars in the object
@@ -2339,30 +2339,30 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
     public function count() {
         return count($this->epGetVars()); // oid included
     }
-     
+
      /**
      * Implements IteratorAggregate::getIterator()
      * Returns the iterator which is an ArrayIterator object connected to the vars
      * @return ArrayIterator
      */
     public function getIterator () {
-        
+
         // get all vars of the object
         $vars = array();
         foreach($this->epGetVars() as $k => $v) {
             $vars[$k] = $this->epGet($k);
         }
-        
+
         // return the array iterator
         return new ArrayIterator($vars);
     }
-     
+
     /**
      * Implements ArrayAccess::offsetExists()
      * @return bool
      */
     public function offsetExists($index) {
-        
+
         // is the index oid?
         if ($index == 'oid') {
             return true;
@@ -2370,7 +2370,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
         return in_array($index, $this->ep_cached_vars);
     }
-    
+
     /**
      * Implements ArrayAccess::offsetGet()
      * @return mixed
@@ -2378,7 +2378,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
     public function offsetGet($index) {
         return $this->epGet($index);
     }
-     
+
     /**
      * Implements ArrayAccess::offsetSet()
      * @return mixed
@@ -2401,7 +2401,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
         }
         $this->o->epSet($index, null);
      }
-     
+
      /**
       * Implement magic method __toString()
       *
@@ -2411,7 +2411,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
       * @return string
       */
      public function __toString() {
-         
+
          // indentation
          $indent = '  ';
 
@@ -2420,7 +2420,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
          // class for the object
          $s .= 'object (' . $this->epGetClassMap()->getName() . ')' . "\n";
-         
+
          // object id
          $s .= $indent . 'oid : ' . $this->epGetObjectId() . "\n";
 
@@ -2461,7 +2461,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
          $s .= $indent . 'vars' . "\n";
          $indent .= $indent;
          foreach($vars as $var => $value) {
-             
+
              // skip oid
              if ($var == 'oid') {
                  continue;
@@ -2469,10 +2469,10 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
 
              // output var name
              $s .= $indent . '[' . $var . ']: ';
-             
+
              // re-get value so objects are loaded
              $value = $this->epGet($var);
-             
+
              if ($value instanceof epObject) {
                  $s .= $this->ep_m->encodeUoid($value);
              }
@@ -2482,7 +2482,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
              else {
                  $s .= print_r($value, true);
              }
-             
+
              $s .= "\n";
          }
 
@@ -2519,13 +2519,13 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
  * @subpackage ezpdo.runtime
  */
 class epObject extends epObjectBase {
-    
+
     /**
      * Array to hold the names of the fetched relational variables
      * @var array
      */
     protected $ep_rvars_fetched = array();
-    
+
     /**
      * The array to keep the original state of the object when a
      * transaction starts. It is also used as the indicator of
@@ -2557,7 +2557,7 @@ class epObject extends epObjectBase {
         $this->ep_rvars_fetched = array();
         return true;
     }
-    
+
     /**
      * Overrides {@link epObjectBase::epGet()}
      *
@@ -2572,15 +2572,15 @@ class epObject extends epObjectBase {
      * @throws epExceptionManager, epExceptionObject
      */
     public function &epGet($var_name) {
-        
+
         // do the usual stuff
         $val = & parent::epGet($var_name);
-        
+
         // done if either manger, class map or field map not found
         if (!$this->ep_m || !$this->ep_cm || !($fm = $this->_getFieldMap($var_name))) {
             return $val;
         }
-        
+
         // return now if primitive field
         if ($fm->isPrimitive()) {
             return $val;
@@ -2606,12 +2606,12 @@ class epObject extends epObjectBase {
      * @throws epExceptionManager, epExceptionObject
      */
     public function epSet($var_name, $value, $clean = false) {
-        
+
         // do the usual stuff if manger or class map or field map not found
         if (!$this->ep_m || !$this->ep_cm || !($fm = & $this->_getFieldMap($var_name))) {
             return parent::epSet($var_name, $value, $clean);
         }
-        
+
         // return now if not a relatiionship field
         if ($fm->isPrimitive()) {
             // do the usual stuff
@@ -2639,7 +2639,7 @@ class epObject extends epObjectBase {
     public function epInTransaction() {
         return $this->ep_trans_backup !== false;
     }
-    
+
     /**
      * Signals the object to prepare for a transaction
      *
@@ -2650,7 +2650,7 @@ class epObject extends epObjectBase {
      * @return bool
      */
     public function epStartTransaction() {
-        
+
         // array to hold wrapper vars and object vars
         $this->ep_trans_backup = array();
 
@@ -2673,23 +2673,23 @@ class epObject extends epObjectBase {
      * @return bool
      */
     public function epEndTransaction($rollback = false) {
-        
+
         // need to roll back?
         if ($rollback) {
-            
+
             // restore (unserialize) wrapper vars
             $this->_restoreWrapperVars($this->ep_trans_backup['wrapper_vars']);
-            
+
             // restore (unserialize) object vars
             $this->_restoreObjectVars($this->ep_trans_backup['object_vars']);
         }
-        
+
         // reset backup to false (not in transaction)
         $this->ep_trans_backup = false;
-        
+
         return true;
     }
-    
+
     /**
      * Updates all the object's inverses
      * @param $action INVERSE_ADD or INVERSE_REMOVE
@@ -2738,13 +2738,13 @@ class epObject extends epObjectBase {
 
         return $status;
     }
-    
+
     /**
      * Backup the wrapper vars
      * @return array
      */
     protected function _backupWrapperVars() {
-        
+
         // vars in this wrapper to be backed up
         static $wrapper_vars = array(
             'ep_uid',
@@ -2753,7 +2753,7 @@ class epObject extends epObjectBase {
             'ep_modified_pvars',
             'ep_modified_rvars',
             );
-        
+
         // put wrapper vars into an array
         $backup = array();
         foreach($wrapper_vars as $var) {
@@ -2769,7 +2769,12 @@ class epObject extends epObjectBase {
      * @return void
      */
     protected function _restoreWrapperVars($backup) {
-        
+
+        // nothing to restore?
+        if(!$backup){
+            return;
+        }
+
         // set vars back to wrapper
         foreach($backup as $var => $value) {
             $this->$var = $value;
@@ -2802,6 +2807,11 @@ class epObject extends epObjectBase {
      * @return void
      */
     protected function _restoreObjectVars($backup) {
+        // nothing to restore ?
+        if(!$backup){
+            return;
+        }
+
         // set vars back to wrapped object
         foreach($backup as $var => $value) {
             $this->epObjectSetVar($var, $value);
@@ -2825,13 +2835,13 @@ class epObject extends epObjectBase {
      * @return string|array (of string)
      */
     protected function _reduceRelationshipVar($var_name) {
-        
+
         // get the var
         $var = $this->epObjectGetVar($var_name);
-        
+
         // many-valued vars
         if (is_array($var) || $var instanceof epArray) {
-            
+
             // (optimization) turn off oid conversion
             if ($var instanceof epArray) {
                 $convert_oid_0 = $var->getConvertOid();
@@ -2855,7 +2865,7 @@ class epObject extends epObjectBase {
             }
 
         }
-        
+
         // one-valued var
         else {
             if ($var instanceof epObject) {
@@ -2865,7 +2875,7 @@ class epObject extends epObjectBase {
                 $rvar = $var;
             }
         }
-        
+
         return $rvar;
     }
 
@@ -2876,15 +2886,15 @@ class epObject extends epObjectBase {
      * @return void
      */
     protected function _pre_call() {
-        
+
         // call parent::_pre_call() first
         parent::_pre_call();
-        
+
         // done if manager and class map cannot be found
         if (!$this->ep_m || !$this->ep_cm) {
             return;
         }
-        
+
 		// get vars so relation oids are converted to objects
         if ($npfs = $this->ep_cm->getNonPrimitive()) {
 			foreach($npfs as $var_name => $fm) {
@@ -2895,7 +2905,7 @@ class epObject extends epObjectBase {
         // keep track of old values
         $this->ep_vars_before = get_object_vars($this->ep_object);
     }
-    
+
     /**
      * Installs the value for a one-valued relatinship var
      * @param string $var_name The name of the variable
@@ -2918,7 +2928,7 @@ class epObject extends epObjectBase {
 
         // get object by uoid (string)
         $val = & $this->ep_m->getByUoid($uoid);
-        
+
         // (clean) set var
         parent::epSet($var_name, $val, true); // true: clean
 
@@ -2934,12 +2944,12 @@ class epObject extends epObjectBase {
      * @return mixed
      */
     protected function &_getOneValuedUOid($var_name, $fm, $val) {
-        
+
         // done if non-empty value
         if ($val) {
             return $val;
         }
-        
+
         // has this object been persisted?
         if (!$this->epGetObjectId()) {
             return $val;
@@ -3031,7 +3041,7 @@ class epObject extends epObjectBase {
         // if value is false, null, or neither an array nor an epObject
         if ($value === false || is_null($value)
             || !is_array($value) && !($value instanceof epObject)) {
-            
+
             $status = true;
 
             // udpate inverse remove
@@ -3043,13 +3053,13 @@ class epObject extends epObjectBase {
                 }
                 $value0->setConvertOid($convert_oid_0);
             }
-            
+
             // do the usual stuff
             $status &= parent::epSet($var_name, $value, $clean);
 
             return $status;
         }
-        
+
         // make sure epArray allocated
         $var = & $this->_installManyValued($var_name, $fm, parent::epGet($var_name));
 
@@ -3072,42 +3082,42 @@ class epObject extends epObjectBase {
      * @return bool
      */
     protected function _typeMatches($value, $fm) {
-        
+
         // no check if no manager
         if (!$this->ep_m) {
             return true;
         }
-        
+
         // no checking on primitve, ignore false|null|empty, and non-epObject
         if ($fm->isPrimitive() || !$value) {
             // always true
             return true;
         }
-        
+
         // epObject
         if ($value instanceof epObject) {
             return $this->_isClassOf($this->ep_m->getClass($value), $fm->getClass());
         }
-        
+
         // array
         else if (is_array($value) || $value instanceof epArray) {
-            
+
             foreach($value as $k => $v) {
-                
+
                 if (!($v instanceof epObject)) {
                     continue;
                 }
-                
+
                 if (!$this->_isClassOf($this->ep_m->getClass($v), $fm->getClass())) {
                     return false;
                 }
             }
             return true;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Checks whether a class is or is rooted from a base class
      * @param string $class
@@ -3130,7 +3140,7 @@ class epObject extends epObjectBase {
      * @return bool
      */
     protected function _updateInverse($fm, &$o, $action = epObject::INVERSE_ADD, $one_way = true) {
-        
+
         // check if object is epObject
         if (!$o || !($o instanceof epObject)) {
             return false;
@@ -3178,7 +3188,7 @@ class epObject extends epObjectBase {
                     break;
             }
         }
-        
+
         // reset inverse updating flag
         $o->epSetUpdating(false, $action);
         if ($one_way) {

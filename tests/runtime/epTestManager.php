@@ -1999,6 +1999,79 @@ class epTestManager extends epTestRuntime {
     }
 
     /**
+     * Transaction: end and rollback
+     * tests bug #217 after rollback some objects remain in db
+     */
+    function _testTransactionEndRollback() {
+
+        $this->assertTrue($m = & $this->m);
+
+        // use manager to create one object
+        include_once(EP_TESTS.'/classes/bookstore/src/eptAuthor.php');
+
+        // delete all authors and its contacts
+        $m->deleteAll('eptAuthor');
+
+        //
+        // start | new object | change object | commit (1)
+        //
+        try{
+            // start transaction
+            $this->assertTrue($m->start_t());
+
+            // test object creation
+            $this->assertTrue($c = $m->create('eptContact'));
+            $this->assertFalse($c->epIsDirty());
+            $this->assertFalse($c->epGetObjectId());
+
+            // test object creation
+            $name = 'eptAuthor';
+            $this->assertTrue($o = $m->create('eptAuthor', $name));
+            $this->assertTrue($o->name === $name);
+            $this->assertFalse($o->epIsDirty());
+            $this->assertFalse($o->epGetObjectId());
+
+            $o->contact = $c;
+
+            // commit transaction first time
+            $this->assertTrue($m->commit_t());
+
+            //
+            // start | new object | change object | commit (2)
+            //
+
+            // start transaction
+            $this->assertTrue($m->start_t());
+
+            // test object creation
+            $this->assertTrue($c1 = $m->create('eptContact'));
+            $this->assertFalse($c1->epIsDirty());
+            $this->assertFalse($c1->epGetObjectId());
+
+            // test object creation
+            $name = 'eptAuthor'; //fails to insert duplicated author
+            $this->assertTrue($o1 = $m->create('eptAuthor', $name));
+            $this->assertTrue($o1->name === $name);
+            $this->assertFalse($o1->epIsDirty());
+            $this->assertFalse($o1->epGetObjectId());
+
+            $o1->contact = $c1;
+
+            // commit transaction with auto rollback
+            // this will fail and one spare contact is in db due to bug #217
+
+            $m->commit_t();
+        }catch (Exception $e){
+            $cs = $m->get('eptContact');
+            //no more than one contact must exist
+            $this->assertTrue(count($cs) == 0);
+        }
+
+        // delete all authors
+        $m->deleteAll('eptAuthor');
+    }
+
+    /**
      * Run all tests
      * @param string $dbal (adodb, peardb)
      * @param string $dbtype (mysql, sqlite)
@@ -2069,6 +2142,10 @@ class epTestManager extends epTestRuntime {
 
         echo "  transaction: rollback..";
         $this->_testTransactionStartRollback();
+        echo "done " . epNewLine();
+
+        echo "  transaction: rollback surplus..";
+        $this->_testTransactionEndRollback();
         echo "done " . epNewLine();
 
         echo "  complete!" . epNewLine();
