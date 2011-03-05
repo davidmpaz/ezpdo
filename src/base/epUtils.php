@@ -870,5 +870,80 @@ function epFilterCommited($obj) {
     return $obj->epGetObjectId() !== false;
 }
 
+/**
+ * Return file unserialized content of the latest backup file
+ *
+ * @param string $path dir\file to find backups files
+ * @return false|epClassMapFactory unserialized class map from backup
+ */
+function epGetBackup($path = '.'){
+    // if file is provided load it and unserialize
+    if(is_file($path)){
+        return ($content = file_get_contents($path)) ? unserialize($content) : false;
+    }
+    // compiled dir was provided search last backup and load it
+    $mtime = 0; $file = false;
+    $files = epFilesInDir($path);
+    foreach ($files as $f) {
+        if( (strpos($f, '.backup.') !== false) && ($t = filemtime($f)) >= $mtime){
+            $mtime = $t;
+            $file = $f;
+        }
+    }
+    if($file){
+        return ($content = file_get_contents($file)) ? unserialize($content) : false;
+    }
+    return false;
+}
+
+/**
+ * Deletes last backup made of the compiled file
+ * @param strin $path
+ */
+function epRmBackup($path = null){
+    // no path or file name
+    if(! is_dir($path)){
+        return false;
+    }
+
+    // compiled dir was provided search last backup and load it
+    $mtime = 0; $file = false;
+    $files = epFilesInDir($path);
+    foreach ($files as $f) {
+        if( (strpos($f, '.backup.') !== false) && ($t = filemtime($f)) >= $mtime){
+            $mtime = $t;
+            $file = $f;
+        }
+    }
+
+    // found file, delete it!
+    if($file){
+        unlink($file);
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Write into file the array passed, one line per array element
+ * @param string $path
+ * @param array $content
+ * @return bool
+ */
+function epWriteToFile($path, $content){
+    // if not file do nothing
+    if(is_dir($path)){
+        return false;
+    }
+
+    // write to file
+    if(is_array($content) && file_put_contents($path, implode("\n", $content))){
+        return true;
+    }
+
+    throw new epExceptionConfig('Cannot write into file or not exist at [' . $path . ']');
+    return false;
+}
 
 ?>
