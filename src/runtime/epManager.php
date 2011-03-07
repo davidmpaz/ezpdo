@@ -1655,6 +1655,13 @@ class epManagerBase extends epConfigurableWithLog {
             if (file_exists($rcmf)) {
                 @unlink($rcmf);
             }
+
+            // recompiled?... check if we want to auto update schemas
+            if ($this->getConfigOption('auto_update')){
+                // touch updater to fire its execution later
+                include_once (EP_SRC_DB.'/epDbUpdate.php');
+                $this->su = epDbUpdate::instance();
+            }
         }
 
         // get the contetns of the runtime config map file
@@ -1697,6 +1704,13 @@ class epManagerBase extends epConfigurableWithLog {
         // check if auto_compile is enabled
         if ($this->getConfigOption('auto_compile')) {
             $this->_compileAll();
+
+            // recompiled?... check if we want to auto update schemas
+            if ($this->getConfigOption('auto_update')){
+                // touch updater to fire its execution later
+                include_once (EP_SRC_DB.'/epDbUpdate.php');
+                $this->su = epDbUpdate::instance();
+            }
         }
 
         return true;
@@ -2385,6 +2399,19 @@ class epManager extends epManagerBase implements epSingleton {
 
         // cache relation table splitting flag
         $this->rel_tbl_split = $this->getConfigOption('split_relation_table');
+
+        // auto update schema?
+        if ($this->getConfigOption('auto_update')){
+            if ($this->su && ($strat = $this->su->getStrategy())) {
+                if ($strat == 'drop'){
+                    // drop all tables
+                    $this->dropTables();
+                }else{
+                    // if it is set strategy and is not drop, it is alter|sim
+                    $this->alterTables();
+                }
+            }
+        }
 
         return $status;
     }
