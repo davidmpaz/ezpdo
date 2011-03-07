@@ -2101,7 +2101,11 @@ class epTestManager extends epTestRuntime {
 
         // sqlite updater not implemented yet
         if ($dbtype == 'sqlite'){
-            return true;
+            try{
+                $result = $m->alterTables();
+            }catch (epExceptionDbObject $dboe){
+                $this->m->log($dboe->getMessage() . ' at ' . $dboe->getLine());
+            }
         }elseif($dbtype == 'mysql'){
             // call manger to update as standalone tool
             // here updater is init'ed with all config options
@@ -2155,12 +2159,68 @@ class epTestManager extends epTestRuntime {
                 }
             }
         }else{
-            // postgresql not yet test it
-            return true;
+            // call manger to update as standalone tool
+            // here updater is init'ed with all config options
+            $result = $m->alterTables();
+
+            $this->assertTrue(is_array($result) && !empty($result));
+
+            foreach ($result as $q) {
+                $this->assertTrue($q['sucess']);
+                // check changes for eptAuthor
+                if($q['class'] == 'eptAuthor'){
+                    $this->assertTrue(count($q['executed']) == 3);
+                    $expected = 'ALTER TABLE "eptAuthor" ALTER COLUMN "first_name" TYPE varchar(64)';
+                    $this->assertEqual($expected, $q['executed'][0]);
+
+                    $expected = 'ALTER TABLE "eptAuthor" RENAME COLUMN "first_name" TO "name"';
+                    $this->assertEqual($expected, $q['executed'][1]);
+
+                    $expected = 'CREATE UNIQUE INDEX "idx_eptAuthor_name" ON "eptAuthor" ("name");';
+                    $this->assertEqual($expected, $q['executed'][2]);
+
+                    $this->assertTrue(count($q['ignored']) == 1);
+                    $expected = 'ALTER TABLE "eptAuthor" DROP COLUMN "sex"';
+                    $this->assertEqual($expected, $q['ignored'][0]);
+                }elseif($q['class'] == 'eptBook'){
+                    $this->assertTrue(count($q['executed']) == 6);
+                    $this->assertFalse($q['ignored']);
+
+                    $expected = 'ALTER TABLE "eptBook" ADD COLUMN "price" numeric(5,2)';
+                    $this->assertTrue(in_array($expected, $q['executed']));
+
+                    $expected = 'ALTER TABLE "eptBook" ADD COLUMN "coverimg" bytea';
+                    $this->assertTrue(in_array($expected, $q['executed']));
+
+                    $expected = 'ALTER TABLE "eptBook" ALTER COLUMN "recommend" TYPE numeric(1)';
+                    $this->assertTrue(in_array($expected, $q['executed']));
+                    $expected = 'ALTER TABLE "eptBook" RENAME COLUMN "recommend" TO "recommended"';
+                    $this->assertTrue(in_array($expected, $q['executed']));
+
+                    $expected = 'ALTER TABLE "eptBook" ALTER COLUMN "pubdates" TYPE numeric(16)';
+                    $this->assertTrue(in_array($expected, $q['executed']));
+                    $expected = 'ALTER TABLE "eptBook" RENAME COLUMN "pubdates" TO "pubdate"';
+                    $this->assertTrue(in_array($expected, $q['executed']));
+                }elseif($q['class'] == 'eptBookstore'){
+                    $this->assertTrue(count($q['ignored']) == 1);
+                    $this->assertFalse($q['executed']);
+                    $expected = 'ALTER TABLE "eptBookstore" DROP COLUMN "address"';
+                    $this->assertEqual($expected, $q['ignored'][0]);
+                }
+                elseif($q['class'] == 'eptContact'){
+                    $this->assertTrue(count($q['ignored']) == 1);
+                    $this->assertFalse($q['executed']);
+                    $expected = 'ALTER TABLE "eptContact" DROP COLUMN "home_address"';
+                    $this->assertEqual($expected, $q['ignored'][0]);
+                }else{
+                    // fail since we have no more class changed
+                    $this->fail("Trying to update unmodified class.");
+                }
+            }
         }
     }
 
-/**
+    /**
      * Test the sql schema evolution feature.
      * Only tests the bookstore classes. This
      * test the add/alter/drop fields feature, add table
@@ -2188,16 +2248,20 @@ class epTestManager extends epTestRuntime {
         // set up the compiled file to use
         $m->setConfigOption('update_from', EP_TESTS . '/runtime/input/compiled.ezpdo.test.' . $dbtype);
 
-        // call manger to update as standalone tool
-        // here updater is init'ed with all config options
-        $result = $m->alterTables();
-
-        $this->assertTrue(is_array($result) && !empty($result));
-
         // sqlite updater not implemented yet
         if ($dbtype == 'sqlite'){
-            return true;
+            try{
+                $result = $m->alterTables();
+            }catch (epExceptionDbObject $dboe){
+                $this->m->log($dboe->getMessage() . ' at ' . $dboe->getLine());
+            }
         }elseif($dbtype == 'mysql'){
+            // call manger to update as standalone tool
+            // here updater is init'ed with all config options
+            $result = $m->alterTables();
+
+            $this->assertTrue(is_array($result) && !empty($result));
+
             foreach ($result as $q) {
                 $this->assertTrue($q['sucess']);
                 // check changes for eptAuthor
@@ -2242,8 +2306,55 @@ class epTestManager extends epTestRuntime {
                 }
             }
         }else{
+            // call manger to update as standalone tool
+            // here updater is init'ed with all config options
+            $result = $m->alterTables();
+
+            $this->assertTrue(is_array($result) && !empty($result));
+
             // postgresql not yet test it
-            return true;
+            foreach ($result as $q) {
+                $this->assertTrue($q['sucess']);
+                // check changes for eptAuthor
+                if($q['class'] == 'eptAuthor'){
+                    $this->assertTrue(count($q['executed']) == 1);
+                    $expected = 'ALTER TABLE "eptAuthor" CHANGE COLUMN "first_name" "name" varchar(64)';
+                    $this->assertEqual($expected, $q['executed'][0]);
+
+                    $this->assertTrue(count($q['ignored']) == 1);
+                    $expected = 'ALTER TABLE "eptAuthor" DROP COLUMN "sex"';
+                    $this->assertEqual($expected, $q['ignored'][0]);
+                }elseif($q['class'] == 'eptBook'){
+                    $this->assertTrue(count($q['executed']) == 4);
+                    $this->assertFalse($q['ignored']);
+
+                    $expected = 'ALTER TABLE "eptBook" ADD COLUMN "price" decimal(5,2)';
+                    $this->assertTrue(in_array($expected, $q['executed']));
+
+                    $expected = 'ALTER TABLE "eptBook" ADD COLUMN "coverimg" blob';
+                    $this->assertTrue(in_array($expected, $q['executed']));
+
+                    $expected = 'ALTER TABLE "eptBook" CHANGE COLUMN "recommend" "recommended" boolean';
+                    $this->assertTrue(in_array($expected, $q['executed']));
+
+                    $expected = 'ALTER TABLE "eptBook" CHANGE COLUMN "pubdates" "pubdate" int(16)';
+                    $this->assertTrue(in_array($expected, $q['executed']));
+                }elseif($q['class'] == 'eptBookstore'){
+                    $this->assertTrue(count($q['ignored']) == 1);
+                    $this->assertFalse($q['executed']);
+                    $expected = 'ALTER TABLE "eptBookstore" DROP COLUMN "address"';
+                    $this->assertEqual($expected, $q['ignored'][0]);
+                }
+                elseif($q['class'] == 'eptContact'){
+                    $this->assertTrue(count($q['ignored']) == 1);
+                    $this->assertFalse($q['executed']);
+                    $expected = 'ALTER TABLE "eptContact" DROP COLUMN "home_address"';
+                    $this->assertEqual($expected, $q['ignored'][0]);
+                }else{
+                    // fail since we have no more class changed
+                    $this->fail("Trying to update unmodified class.");
+                }
+            }
         }
     }
 

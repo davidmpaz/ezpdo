@@ -2,9 +2,9 @@
 
 /**
  * $Id: epDbPortSqlite.php 1030 2007-01-19 10:38:55Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1030 $
  * @package ezpdo
@@ -13,8 +13,9 @@
 
 /**
  * Class to handle database portability for Sqlite
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
+ * @author David Moises Paz <davidmpaz@gmail.com>
  * @version $Revision: 1030 $
  * @package ezpdo
  * @subpackage ezpdo.db
@@ -23,19 +24,19 @@ class epDbPortSqlite extends epDbPortable {
 
     /**
      * Override {@link epDbPort::createTable()}
-     * 
+     *
      * Generate SQL code to create table
-     * 
+     *
      * @param epClassMap $cm
      * @param string $indent
      * @param epDb $db
      * @return string|array (of strings)
      */
     public function createTable($cm, $db, $indent = '  ') {
-        
+
         // start create table
         $sql = "CREATE TABLE " . $db->quoteId($cm->getTable()) . " (\n";
-        
+
         // the oid field
         $fstr = $this->_defineField($db->quoteId($cm->getOidColumn()), 'INTEGER', '12', false, true);
         $sql .= $indent . $fstr . ",\n";
@@ -54,17 +55,37 @@ class epDbPortSqlite extends epDbPortable {
                 $sql .= $indent . $fstr . ",\n";
             }
         }
-        
+
         // write unique keys
         //$sql .= $this->_uniqueKeys($cm, $db, $indent);
-        
+
         // remove the last ','
         $sql = substr($sql, 0, strlen($sql) - 2);
 
         // end of table creation
         $sql .= ");\n";
-        
+
         return $sql;
+    }
+
+    /**
+     * SQL to alter table.
+     *
+     * Sql is returned in array keyed by operations (drop,change,add).
+     * Override {@link epDbPortable::alterTable()}
+     *
+     * @param epClassMap $ncm New class map
+     * @param epDb $db
+     * @param $force
+     * @return array('drop', 'alter', 'add', 'ignore', 'table')
+     * @author David Moises Paz <davidmpaz@gmail.com>
+     * @version 1.1.6
+     */
+    public function alterTable($ncm, $db, $force = false) {
+
+        // Ahaha !! sqlite version in adodb doesnt allow to do this
+        // for time being not implemented yet, use drop strategy instead
+        throw new epExceptionDbObject('Unsuported operation [ALTER] for this database type');
     }
 
     /**
@@ -109,7 +130,7 @@ class epDbPortSqlite extends epDbPortable {
 
         // go through each index
         foreach ($indexes as $index) {
-            
+
             $sql = 'PRAGMA index_info('.$db->quoteId($index).')';
             if (!$db->execute($sql)) {
                 return false;
@@ -117,7 +138,7 @@ class epDbPortSqlite extends epDbPortable {
 
             // go through reach record
             $okay = $db->rsRestart();
-            
+
             while ($okay) {
                 // get index name
                 $column = $db->rsGetCol('name');
@@ -143,7 +164,7 @@ class epDbPortSqlite extends epDbPortable {
 
     /**
      * Override {@link epDbPort::dropTable()}
-     * SQL to drop table 
+     * SQL to drop table
      * @param string $table
      * @param epDb $db
      * @return string
@@ -153,7 +174,7 @@ class epDbPortSqlite extends epDbPortable {
     }
 
     /**
-     * SQL to truncate (empty) table 
+     * SQL to truncate (empty) table
      * @param string $table
      * @param epDb $db
      * @return string
@@ -161,7 +182,7 @@ class epDbPortSqlite extends epDbPortable {
     public function truncateTable($table, $db) {
         return 'DELETE FROM  ' . $db->quoteId($table) . " WHERE 1;\n";
     }
-    
+
     /**
      * Returns the random function name
      * @return string
@@ -172,19 +193,19 @@ class epDbPortSqlite extends epDbPortable {
 
     /**
      * Overrides {@link epDbPort::insertValues()}
-     * Returns the insert SQL statement. 
-     * 
+     * Returns the insert SQL statement.
+     *
      * Sqlite does not allow to insert multiple rows in one INSERT
      * statement. So we need to create multiple INSERT statements.
-     * 
+     *
      * @param string $table
      * @param epDb $db
-     * @param array $cols The names of the columns to be inserted 
+     * @param array $cols The names of the columns to be inserted
      * @param array $rows The rows of values to be inserted
      * @return string|array
      */
     public function insertValues($table, $db, $cols, $rows) {
-        
+
         // make insert sql stmt
         $sql_header = 'INSERT INTO ' . $db->quoteId($table) . ' (';
 
@@ -200,7 +221,7 @@ class epDbPortSqlite extends epDbPortable {
 
         // collect all sql statements
         foreach($rows as $row) {
-            
+
             // collect all values
             $row_q = array();
             foreach($row as $col_value) {
@@ -216,49 +237,49 @@ class epDbPortSqlite extends epDbPortable {
 
     /**
      * Override {@link epDbPortable::_defineField}
-     * 
-     * Return column/field definition in CREATE TABLE (called by 
+     *
+     * Return column/field definition in CREATE TABLE (called by
      * {@link createTable()})
-     * 
-     * @param string $fname 
+     *
+     * @param string $fname
      * @param string $type
      * @param string $params
      * @param string $default
      * @param bool $autoinc
-     * @return false|string 
+     * @return false|string
      */
     protected function _defineField($fname, $type, $params = false, $default = false, $autoinc = false, $notnull = false) {
-        
+
         // is it an auto-incremental?
         if ($autoinc) {
             //return $fname . ' INTEGER AUTOINCREMENT';
             return $fname . ' INTEGER PRIMARY KEY';
         }
-        
+
         // get field name and type(params)
         $sql = $fname . ' ' . $this->_fieldType($type, $params);
-        
+
         // does the field have default value?
         if ($default) {
             $sql .= ' DEFAULT ' . $default;
         }
-        
+
         return $sql;
     }
-    
+
     /**
-     * Overrides epDbPortable::_indexName(). 
+     * Overrides epDbPortable::_indexName().
      * Returns the index name for CREATE INDEX statement
-     * 
+     *
      * Note that SQLITE keeps all indices in a master table so the
      * table name to be indexed must be appended.
-     * 
+     *
      * @param string $table The table name
-     * @param string 
-     * @return string 
+     * @param string
+     * @return string
      */
     protected function _indexName($index_name, $table = false) {
-        $_t = ($table[0] == '_') ? '' : '_'; 
+        $_t = ($table[0] == '_') ? '' : '_';
         $_i = ($index_name[0] == '_') ? '' : '_';
         return 'idx' . $_t . $table . $_i . $index_name;
     }
@@ -266,7 +287,7 @@ class epDbPortSqlite extends epDbPortable {
     /**
      * SQL to genreate one unique key (called by epDbPortable::_uniqueKeys())
      * @param string $name The name of the key (already quoted)
-     * @param array $keys The columns for the key (already quoted) 
+     * @param array $keys The columns for the key (already quoted)
      * @return string
      */
     protected function _uniqueKey($name, $keys) {

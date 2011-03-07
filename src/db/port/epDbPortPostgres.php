@@ -2,10 +2,11 @@
 
 /**
  * $Id: epDbPortPostgres.php 1051 2007-06-20 00:02:31Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
+ * @author David Moises Paz <davidmpaz@gmail.com>
  * @version $Revision: 1051 $
  * @package ezpdo
  * @subpackage ezpdo.db
@@ -13,14 +14,14 @@
 
 /**
  * Class to handle database portability for Postgres
- * 
- * Initially contributed by sbogdan (http://www.ezpdo.net/forum/profile.php?id=34). 
- * Improved by rashid (Robert Janeczek) (http://www.ezpdo.net/forum/profile.php?id=27). 
- * 
+ *
+ * Initially contributed by sbogdan (http://www.ezpdo.net/forum/profile.php?id=34).
+ * Improved by rashid (Robert Janeczek) (http://www.ezpdo.net/forum/profile.php?id=27).
+ *
  * @author Robert Janeczek <rashid@ds.pg.gda.pl>
  * @author sbogdan <http://www.ezpdo.net/forum/profile.php?id=34>
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
- * 
+ *
  * @version $Revision: 1051 $
  * @package ezpdo
  * @subpackage ezpdo.db
@@ -38,10 +39,10 @@ class epDbPortPostgres extends epDbPortable {
      * @return string|array (of strings)
      */
     public function createTable($cm, $db, $indent = '  ') {
-       
+
         // start create table
         $sql = "CREATE TABLE \"" . $cm->getTable() . "\" (";
-       
+
         // the oid field
         $fstr = $this->_defineField($cm->getOidColumn(), 'Integer', '', false, true);
         $sql .= $indent . $fstr . ",";
@@ -63,14 +64,14 @@ class epDbPortPostgres extends epDbPortable {
 
         // write unique keys
         //$sql .= $this->_uniqueKeys($cm, $db, $indent);
-        
+
         // write primary key
         $sql .= $indent . "CONSTRAINT ". $cm->getTable() . "_" .$cm->getOidColumn() . " PRIMARY KEY (" .$cm->getOidColumn() .")\n";
-       
-        // end of table creation 
+
+        // end of table creation
         // WITH OIDS - see http://www.ezpdo.net/forum/viewtopic.php?pid=750#p750
         $sql .= ") WITH OIDS;\n";
-       
+
         return $sql;
     }
 
@@ -86,10 +87,10 @@ class epDbPortPostgres extends epDbPortable {
         $ret = array(array(), array());
 
         // get all columns in the pg_attribute and pg_class table
-        $sql = 'SELECT a.attname, a.attnum ' . 
-            ' FROM pg_attribute a, pg_class c ' . 
-            ' WHERE c.relname = ' . $db->quote($cm->getTable()) . 
-            ' AND a.attrelid = c.oid AND a.attnum > 0' . 
+        $sql = 'SELECT a.attname, a.attnum ' .
+            ' FROM pg_attribute a, pg_class c ' .
+            ' WHERE c.relname = ' . $db->quote($cm->getTable()) .
+            ' AND a.attrelid = c.oid AND a.attnum > 0' .
             ' ORDER BY a.attnum';
 
         // execute the query
@@ -99,7 +100,7 @@ class epDbPortPostgres extends epDbPortable {
 
         // array to collect all columns
         $columns = array();
-        
+
         // go through reach record
         $okay = $db->rsRestart();
         while ($okay) {
@@ -111,8 +112,8 @@ class epDbPortPostgres extends epDbPortable {
 
         // get all the indexes in the table (indkey has a list, space separated)
         $sql = 'SELECT c2.relname AS indexname, i.indisprimary, i.indisunique, i.indkey AS indkey' .
-            ' FROM pg_class c, pg_class c2, pg_index i' . 
-            ' WHERE c.relname = '.$db->quote($cm->getTable()) . 
+            ' FROM pg_class c, pg_class c2, pg_index i' .
+            ' WHERE c.relname = '.$db->quote($cm->getTable()) .
             ' AND c.oid = i.indrelid AND i.indexrelid = c2.oid';
 
         // execute above query
@@ -123,7 +124,7 @@ class epDbPortPostgres extends epDbPortable {
         // go through reach record
         $okay = $db->rsRestart();
         while ($okay) {
-            
+
             // skip the primary index
             if ($db->rsGetCol('indisprimary') == 't') {
                 // next row
@@ -134,7 +135,7 @@ class epDbPortPostgres extends epDbPortable {
             // get index name
             $name = $db->rsGetCol('indexname');
             $unique = $db->rsGetCol('indisunique');
-            
+
             // $unique is t if unique
             // $unique is f if index
             $unique = ($unique == 't')? 0 : 1;
@@ -142,11 +143,11 @@ class epDbPortPostgres extends epDbPortable {
             foreach ($indexes as $index) {
                 $ret[$unique][$name][] = $columns[$index];
             }
-            
+
             // next row
             $okay = $db->rsNext();
         }
-        
+
         return $ret;
     }
 
@@ -182,7 +183,7 @@ class epDbPortPostgres extends epDbPortable {
         //return 'DELETE FROM ' . $table . " WHERE 1=1;\n";
         return 'TRUNCATE TABLE  ' . $db->quoteId($table) . ";\n";
     }
-   
+
     /**
      * Returns the random function name
      * @return string
@@ -194,18 +195,18 @@ class epDbPortPostgres extends epDbPortable {
     /**
      * Overrides {@link epDbPort::insertValues()}
      * Returns the insert SQL statement
-     * 
+     *
      * Pgsql does not allow to insert multiple rows in one INSERT
      * statement. So we need to create multiple INSERT statements.
-     * 
+     *
      * @param string $table
      * @param epDb $db
-     * @param array $cols The names of the columns to be inserted 
+     * @param array $cols The names of the columns to be inserted
      * @param array $rows The rows of values to be inserted
      * @return string|array
      */
     public function insertValues($table, $db, $cols, $rows) {
-        
+
         // make insert sql stmt
         $sql_header = 'INSERT INTO ' . $db->quoteId($table) . ' (';
 
@@ -221,7 +222,7 @@ class epDbPortPostgres extends epDbPortable {
 
         // collect all sql statements
         foreach($rows as $row) {
-            
+
             // collect all values
             $row_q = array();
             foreach($row as $col_value) {
@@ -249,7 +250,7 @@ class epDbPortPostgres extends epDbPortable {
      * @return false|string
      */
     protected function _defineField($fname, $type, $params = false, $default = false, $autoinc = false, $notnull = false) {
-       
+
         // is it an auto-incremental?
         if ($autoinc) {
             //return $fname . ' INTEGER AUTOINCREMENT';
@@ -257,12 +258,57 @@ class epDbPortPostgres extends epDbPortable {
         }
         // get field name and type(params)
         $sql = $fname . ' ' . $this->_fieldType($type, $params);
-       
+
         // does the field have default value?
         if ($default) {
             $sql .= ' DEFAULT ' . $default;
         }
-       
+
+        return $sql;
+    }
+
+    /**
+     * Override {@link epDbPortable::_alterField}
+     *
+     * Return column/field alter sql in ALTER TABLE (called by
+     * {@link alterTable()})
+     *
+     * @param string $ofname Old name
+     * @param string $fname New name
+     * @param string $type
+     * @param string $op Whether to ADD|CHANGE|DROP the field
+     * @param string $params
+     * @return false|string
+     * @author David Moises Paz <davidmpaz@gmail.com>
+     * @version 1.1.6
+     */
+    protected function _alterField($ofname, $fname, $type, $op, $params = false, $default = false) {
+
+        //get operation
+        switch (strtolower($op)) {
+            case ("add"):
+                $sql = "ADD ";
+                // get field name and type(params)
+                $sql .= "COLUMN " . $ofname . " " . $this->_fieldType($type, $params);
+                // does the field have default value?
+                if ($default) {
+                    $sql .= ' DEFAULT ' . $default;
+                }
+                break;
+            case ("alter"):
+                $sql[] = "ALTER COLUMN " . $ofname . " TYPE " .
+                    $this->_fieldType($type, $params);
+                $sql[] = "RENAME COLUMN " . $ofname . " TO " . $fname;
+                break;
+            case ("drop"):
+                $sql = "DROP COLUMN " . $ofname;
+                break;
+
+            default:
+                return false;
+            break;
+        }
+
         return $sql;
     }
 
@@ -303,7 +349,7 @@ class epDbPortPostgres extends epDbPortable {
                     $params = "10,5";
                 }
                 break;
-            
+
             case epFieldMap::DT_CLOB:
             case epFieldMap::DT_TEXT:
                 // http://www.postgresql.org/docs/8.0/interactive/datatype-character.html
@@ -330,16 +376,16 @@ class epDbPortPostgres extends epDbPortable {
 
         return $ftype;
     }
-   
+
     /**
-     * Overrides epDbPortable::_indexName(). 
+     * Overrides epDbPortable::_indexName().
      * Returns the index name for CREATE INDEX statement
      * @param string $table The table name
-     * @param string 
-     * @return string 
+     * @param string
+     * @return string
      */
     protected function _indexName($index_name, $table = false) {
-        $_t = ($table[0] == '_') ? '' : '_'; 
+        $_t = ($table[0] == '_') ? '' : '_';
         $_i = ($index_name[0] == '_') ? '' : '_';
         return 'idx' . $_t . $table . $_i . $index_name;
     }
@@ -347,7 +393,7 @@ class epDbPortPostgres extends epDbPortable {
     /**
      * SQL to genreate one unique key (called by epDbPortable::_uniqueKeys())
      * @param string $name The name of the key (already quoted)
-     * @param array $keys The columns for the key (already quoted) 
+     * @param array $keys The columns for the key (already quoted)
      * @return string
      */
     protected function _uniqueKey($name, $keys) {
