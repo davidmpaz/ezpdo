@@ -878,8 +878,8 @@ function epFilterCommited($obj) {
  */
 function epGetBackup($path = '.'){
     // if file is provided load it and unserialize
-    if(is_file($path)){
-        return ($content = file_get_contents($path)) ? unserialize($content) : false;
+    if(is_file($path) && ($content = file_get_contents($path))){
+        return ($content) ? unserialize($content) : false;
     }
     // compiled dir was provided search last backup and load it
     $mtime = 0; $file = false;
@@ -890,8 +890,8 @@ function epGetBackup($path = '.'){
             $file = $f;
         }
     }
-    if($file){
-        return ($content = file_get_contents($file)) ? unserialize($content) : false;
+    if($file && ($content = file_get_contents($file))){
+        return ($content) ? unserialize($content) : false;
     }
     return false;
 }

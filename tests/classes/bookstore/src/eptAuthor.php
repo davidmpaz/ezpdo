@@ -28,6 +28,7 @@ include_once(realpath(dirname(__FILE__)).'/eptContact.php');
  *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 118 $ $Date: 2005-03-20 13:14:20 -0500 (Sun, 20 Mar 2005) $
+ * @uuid 001
  * @package ezpdo_t
  * @subpackage ezpdo_t.bookstore
  */
@@ -37,6 +38,7 @@ class eptAuthor extends eptBase {
      * Id of the author
      * @var integer
      * @orm integer(64)
+     * @uuid 0011
      */
     public $id;
 
@@ -44,6 +46,7 @@ class eptAuthor extends eptBase {
      * Name of the author
      * @var string
      * @orm char(64) unique(name)
+     * @uuid 0012
      */
     public $name;
 
@@ -51,6 +54,7 @@ class eptAuthor extends eptBase {
      * Age of the author
      * @var integer
      * @orm integer(3)
+     * @uuid 0013
      */
     public $age;
 
@@ -58,6 +62,7 @@ class eptAuthor extends eptBase {
      * Is the author an elite writer?
      * @var boolean
      * @orm boolean
+     * @uuid 0014
      */
     public $is_elite;
 
@@ -65,6 +70,7 @@ class eptAuthor extends eptBase {
      * Books written by the author
      * @var array of eptBook
      * @orm has many eptBook
+     * @uuid 0015
      */
     public $books;
 
@@ -72,6 +78,7 @@ class eptAuthor extends eptBase {
      * Contact info of the author
      * @var eptContact
      * @orm composed_of one eptContact
+     * @uuid 0016
      */
     public $contact;
 

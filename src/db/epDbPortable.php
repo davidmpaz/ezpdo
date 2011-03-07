@@ -2,10 +2,11 @@
 
 /**
  * $Id: epDbPortable.php 992 2006-06-01 11:04:15Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
+ * @author David Moises Paz <davidmpaz@gmail.com>
  * @version $Revision: 992 $
  * @package ezpdo
  * @subpackage ezpdo.db
@@ -18,24 +19,24 @@ include_once(EP_SRC_ORM . '/epClassMap.php');
 
 /**
  * Class to handle database portability
- * 
- * This class takes care of the database portability issues. 
- * Databases of different vendors are notoriously known 
- * not to follow the standard ANSI SQL. This class provides 
- * methods to resolve differences among different SQLs. 
- * 
+ *
+ * This class takes care of the database portability issues.
+ * Databases of different vendors are notoriously known
+ * not to follow the standard ANSI SQL. This class provides
+ * methods to resolve differences among different SQLs.
+ *
  * This class is by no means a panacea to all the portability
- * issues, but only those concern EZPDO. And the class is 
- * designed to be "static" and interaction with the database 
- * is limited to, for example, meta info retrievals. All 'actual' 
- * database interactions (queries) are done through {@link epDb}. 
- * 
- * Most ideas are from ADODb author John Lim's blog 
- * ({@link http://phplens.com/phpeverywhere/?q=node/view/177}) 
- * and the slides from PEAR:DB's author Daniel Convissor 
- * ({@link http://www.analysisandsolutions.com/presentations/portability/slides/toc.htm}). 
- * Credits are due to the two development teams. 
- * 
+ * issues, but only those concern EZPDO. And the class is
+ * designed to be "static" and interaction with the database
+ * is limited to, for example, meta info retrievals. All 'actual'
+ * database interactions (queries) are done through {@link epDb}.
+ *
+ * Most ideas are from ADODb author John Lim's blog
+ * ({@link http://phplens.com/phpeverywhere/?q=node/view/177})
+ * and the slides from PEAR:DB's author Daniel Convissor
+ * ({@link http://www.analysisandsolutions.com/presentations/portability/slides/toc.htm}).
+ * Credits are due to the two development teams.
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 992 $
  * @package ezpdo
@@ -45,27 +46,27 @@ class epDbPortable {
 
     /**
      * Generate SQL code to create table
-     * 
-     * Sometimes extra procedure may be needed for some fields to work. 
-     * For example, some database does not have a direct auto-incremental 
-     * keyword and, to make it work, you need extra procedure after 
-     * creating the table. Here is an example, for a table column in 
-     * an Oracle database to be auto-incremental, we need to insert 
-     * a sequence and a trigger (See this link for more info 
-     * {@link http://webxadmin.free.fr/article.php?i=134}). If this is 
+     *
+     * Sometimes extra procedure may be needed for some fields to work.
+     * For example, some database does not have a direct auto-incremental
+     * keyword and, to make it work, you need extra procedure after
+     * creating the table. Here is an example, for a table column in
+     * an Oracle database to be auto-incremental, we need to insert
+     * a sequence and a trigger (See this link for more info
+     * {@link http://webxadmin.free.fr/article.php?i=134}). If this is
      * the case the subclass should override this method and return both
      * "create table" statement and the extra.
-     * 
+     *
      * @param epClassMap $cm
      * @param epDb $db
      * @param string $indent
      * @return string|array (of strings)
      */
     public function createTable($cm, $db, $indent = '  ') {
-        
+
         // start create table
         $sql = "CREATE TABLE " . $db->quoteId($cm->getTable()) . " (\n";
-        
+
         // the oid field
         $fstr = $this->_defineField($db->quoteId($cm->getOidColumn()), 'integer', '12', false, true);
         $sql .= $indent . $fstr . ",\n";
@@ -85,16 +86,16 @@ class epDbPortable {
                 $sql .= $indent . $fstr . ",\n";
             }
         }
-        
+
         // write unique keys
         //$sql .= $this->_uniqueKeys($cm, $db, $indent);
-        
+
         // write primary key
         $sql .= $indent . "PRIMARY KEY (" . $db->quoteId($cm->getOidColumn()) . ")\n";
-        
+
         // end of table creation
         $sql .= ");\n";
-        
+
         return $sql;
     }
 
@@ -114,7 +115,7 @@ class epDbPortable {
 
         // reset return array
         $ret = array(array(), array());
-        
+
         // go through reach record
         $okay = $db->rsRestart();
         while ($okay) {
@@ -153,7 +154,7 @@ class epDbPortable {
      * @return string
      */
     public function createIndex($cm, $db, $curIndex = array()) {
-        
+
         // reset return array (sql stmts to drop and create indexes)
         $sqls = array('drop' => array(), 'create' => array());
 
@@ -164,7 +165,7 @@ class epDbPortable {
             if (in_array($indexname, array_keys($curIndex))) {
 
                 // check to see if the columns are the same
-                if (count($key) == count($curIndex[$indexname]) 
+                if (count($key) == count($curIndex[$indexname])
                     && count(array_diff($key, $curIndex[$indexname]) == 0)) {
                     unset($curIndex[$indexname]);
                     continue;
@@ -177,7 +178,7 @@ class epDbPortable {
 
                 $sqls['drop'][] = $sql;
             }
-            
+
             // quote keys
             foreach($key as $k => $v) {
                 $key[$k] = $db->quoteId($v);
@@ -186,9 +187,9 @@ class epDbPortable {
             // make CREATE INDEX stmt
             $sql  = "CREATE INDEX ";
             $sql .= $db->quoteId($indexname);
-            $sql .= " ON "; 
+            $sql .= " ON ";
             $sql .= $db->quoteId($cm->getTable()) . " (" . join(', ', $key) . ");";
-            
+
             // collect stmt
             $sqls['create'][] = $sql;
         }
@@ -221,7 +222,7 @@ class epDbPortable {
             if (in_array($indexname, array_keys($curIndex))) {
 
                 // check to see if the columns are the same
-                if (count($key) == count($curIndex[$indexname]) 
+                if (count($key) == count($curIndex[$indexname])
                     && count(array_diff($key, $curIndex[$indexname]) == 0)) {
                     unset($curIndex[$indexname]);
                     continue;
@@ -234,7 +235,7 @@ class epDbPortable {
 
                 $sqls['drop'][] = $sql;
             }
-            
+
             // quote keys
             foreach($key as $k => $v) {
                 $key[$k] = $db->quoteId($v);
@@ -243,9 +244,9 @@ class epDbPortable {
             // make CREATE UNIQUE INDEX stmt
             $sql  = "CREATE UNIQUE INDEX ";
             $sql .= $db->quoteId($indexname);
-            $sql .= " ON "; 
+            $sql .= " ON ";
             $sql .= $db->quoteId($cm->getTable()) . " (" . join(', ', $key) . ");";
-            
+
             // collect stmt
             $sqls['create'][] = $sql;
         }
@@ -274,7 +275,76 @@ class epDbPortable {
     }
 
     /**
-     * SQL to drop table 
+     * SQL to alter table.
+     *
+     * Sql is returned in array keyed by operations (drop,change,add).
+     *
+     * @param epClassMap $ncm New class map
+     * @param epDb $db
+     * @param $force
+     * @return array('drop', 'alter', 'add', 'ignore', 'table')
+     * @author David Moises Paz <davidmpaz@gmail.com>
+     * @version 1.1.6
+     */
+    public function alterTable($ncm, $db, $force = false) {
+        $sqls = array(
+            epDbUpdate::OP_ADD => array(),
+            epDbUpdate::OP_ALTER => array(),
+            epDbUpdate::OP_DROP => array(),
+            epDbUpdate::OP_IGNORE => array(),
+            epDbUpdate::OP_TABLE => array()
+        );
+
+        if(!($oldtable = $ncm->getTag(epDbUpdate::SCHEMA_NAMED_TAG))){
+            $oldtable = $newtable = $ncm->getTable();
+        }else{
+            $newtable = $ncm->getTable();
+        }
+
+        // get queries for alter table
+        foreach ($ncm->getAllFields() as $fm) {
+            // no relationships for now
+            if(!$fm->isPrimitive()){
+                continue;
+            }
+            //get the sql for the column
+            $op = $fm->getTag(epDbUpdate::SCHEMA_OP_TAG);
+            $n = $fm->getTag(epDbUpdate::SCHEMA_NAMED_TAG);
+            $fstr = false;
+            if($op || $n){
+                $fstr = $this->_alterField(
+                    $db->quoteId( ($n) ? $n : $fm->getColumnName() ),
+                    $db->quoteId($fm->getColumnName()),
+                    $fm->getType(),
+                    $op,
+                    $fm->getTypeParams(),
+                    $fm->getDefaultValue()
+                );
+            }
+            if(is_array($fstr)){
+                // more than one query produced
+                foreach ($fstr as $q) {
+                    $sqls[($fm->getTag(epDbUpdate::OP_IGNORE))
+                    ? epDbUpdate::OP_IGNORE
+                    : $op][] = "ALTER TABLE " . $db->quoteId($oldtable) . " " . $q;
+                }
+            }elseif($fstr){
+                $sqls[($fm->getTag(epDbUpdate::OP_IGNORE))
+                    ? epDbUpdate::OP_IGNORE
+                    : $op][] = "ALTER TABLE " . $db->quoteId($oldtable) . " " . $fstr;
+            }
+        }
+
+        if($oldtable != $newtable){
+            $sqls[epDbUpdate::OP_TABLE] =
+                "ALTER TABLE " . $oldtable . "RENAME TO " . $newtable;
+        }
+
+        return $sqls;
+    }
+
+    /**
+     * SQL to drop table
      * @param string $table
      * @param epDb $db
      * @return string
@@ -282,9 +352,9 @@ class epDbPortable {
     public function dropTable($table, $db) {
         return 'DROP TABLE IF EXISTS ' . $db->quoteId($table) . ";\n";
     }
-    
+
     /**
-     * SQL to truncate (empty) table 
+     * SQL to truncate (empty) table
      * @param string $table
      * @param epDb $db
      * @return string
@@ -303,11 +373,11 @@ class epDbPortable {
 
     /**
      * Returns the insert SQL statement
-     * 
+     *
      * By default, we put multiple rows into one INSERT statements.
      * This is allowed by databases like MySQL, but not SQlite or
      * Pgsql.
-     * 
+     *
      * @param string $table
      * @param epDb $db
      * @param array $cols The column names for insert values
@@ -315,7 +385,7 @@ class epDbPortable {
      * @return string|array
      */
     public function insertValues($table, $db, $cols, $rows) {
-        
+
         // make insert sql stmt
         $sql = 'INSERT INTO ' . $db->quoteId($table) . ' (';
 
@@ -338,54 +408,101 @@ class epDbPortable {
 
         // assemble all values
         $sql .= implode(',', $rows_q);
-        
+
         return $sql;
     }
 
     /**
-     * Return column/field definition in CREATE TABLE (called by 
+     * Return column/field definition in CREATE TABLE (called by
      * {@link createTable()})
-     * 
-     * @param string $fname 
+     *
+     * @param string $fname
      * @param string $type
      * @param string $params
      * @param string $default
      * @param bool $autoinc
-     * @return false|string 
+     * @return false|string
      */
     protected function _defineField($fname, $type, $params = false, $default = false, $autoinc = false, $notnull = false) {
-        
+
         // get field name and type(params)
         $sql = $fname . ' ' . $this->_fieldType($type, $params);
-        
+
         // does the field have default value?
         if ($default) {
             $sql .= ' DEFAULT ' . $default;
         }
-        
+
         // is it not null?
         if ($notnull || $autoinc) {
             $sql .= ' NOT NULL';
         }
-        
+
         // is it an auto-incremental?
         if ($autoinc) {
             $sql .= ' AUTO_INCREMENT';
         }
-        
+
         return $sql;
     }
 
     /**
-     * Translate EZPDO datatype to the field type 
-     * @param string $ftype 
-     * @param string $params 
+     * Return column/field alter sql in ALTER TABLE (called by
+     * {@link alterTable()})
+     *
+     * @param string $ofname Old name
+     * @param string $fname New name
+     * @param string $type
+     * @param string $op Whether to ADD|CHANGE|DROP the field
+     * @param string $params
+     * @return false|string
+     * @author David Moises Paz <davidmpaz@gmail.com>
+     * @version 1.1.6
+     */
+    protected function _alterField(
+        $ofname, $fname, $type, $op, $params = false, $default = false) {
+
+        $sql = "";
+        //get operation
+        switch (strtolower($op)) {
+            case ("add"):
+                $sql .= "ADD ";
+                // get field name and type(params)
+                $sql .= "COLUMN " . $ofname . " " . $this->_fieldType($type, $params);
+                // does the field have default value?
+                if ($default) {
+                    $sql .= ' DEFAULT ' . $default;
+                }
+                break;
+            case ("alter"):
+                $sql .= "CHANGE COLUMN " . $ofname . " " . $fname . " ";
+                $sql .= $this->_fieldType($type, $params);
+                if($default){
+                    $sql .= ' DEFAULT ' . $default;
+                }
+                break;
+            case ("drop"):
+                $sql .= "DROP COLUMN " . $ofname;
+                break;
+
+            default:
+                return false;
+            break;
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Translate EZPDO datatype to the field type
+     * @param string $ftype
+     * @param string $params
      * @return false|string
      */
     protected function _fieldType($ftype, $params = false) {
-        
+
         switch($ftype) {
-            
+
             case epFieldMap::DT_BOOL:
             case epFieldMap::DT_BOOLEAN:
             case epFieldMap::DT_BIT:
@@ -396,13 +513,13 @@ class epDbPortable {
             case epFieldMap::DT_DATE:
             case epFieldMap::DT_TIME:
             case epFieldMap::DT_DATETIME:
-                // currently date/time/datetime are all mapped to integer 
-                // this should be changed once we work out unixDate() and 
+                // currently date/time/datetime are all mapped to integer
+                // this should be changed once we work out unixDate() and
                 // dbDate() (as in ADODB)
                 return "int(16)";
 
             case epFieldMap::DT_CHAR:
-                // data type char is mapped to varchar for space saving 
+                // data type char is mapped to varchar for space saving
                 if (!$params) {
                     $params = '255';
                 }
@@ -444,7 +561,7 @@ class epDbPortable {
     /**
      * SQL to genreate one unique key
      * @param string $name The name of the key (already quoted)
-     * @param array $keys The columns for the key 
+     * @param array $keys The columns for the key
      * @return string
      */
     protected function _uniqueKey($name, $keys) {
@@ -455,7 +572,7 @@ class epDbPortable {
      * Returns the index name for CREATE INDEX statement
      * @param string $index_name The name of the index
      * @param string $table The table name
-     * @return string 
+     * @return string
      */
     protected function _indexName($index_name, $table = false) {
         $_i = ($index_name[0] == '_') ? '' : '_';
@@ -466,7 +583,7 @@ class epDbPortable {
 
 /**
  * Exception class for epDbPortFactory
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 992 $ $Date: 2006-06-01 07:04:15 -0400 (Thu, 01 Jun 2006) $
  * @package ezpdo
@@ -477,16 +594,16 @@ class epExceptionDbPortFactory extends epException {
 
 /**
  * Class of database portability factory
- * 
+ *
  * The factory creates one portability object for each database type
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 992 $ $Date: 2006-06-01 07:04:15 -0400 (Thu, 01 Jun 2006) $
  * @package ezpdo
  * @subpackage ezpdo.db
  */
 class epDbPortFactory implements epFactory, epSingleton  {
-    
+
     /**#@+
      * Used for return value to avoid reference notice in 5.0.x and up
      * @var bool
@@ -501,13 +618,13 @@ class epDbPortFactory implements epFactory, epSingleton  {
      * @var array
      */
     private $dbps = array();
-    
+
     /**
      * Constructor
      */
-    private function __construct() { 
+    private function __construct() {
     }
-    
+
     /**
      * Implements factory method {@link epFactory::make()}
      * @param string $dbtype
@@ -529,7 +646,7 @@ class epDbPortFactory implements epFactory, epSingleton  {
         $args = func_get_args();
         return $this->get($args[0], true); // true: tracking
     }
-    
+
     /**
      * Either create db portability object or find one
      * @param $dbtype
@@ -538,23 +655,23 @@ class epDbPortFactory implements epFactory, epSingleton  {
      * @throws epExceptionDbPortFactory
      */
     private function & get($dbtype, $tracking = false) {
-        
-        // check if dsn is empty 
+
+        // check if dsn is empty
         if (empty($dbtype)) {
             throw new epExceptionDbPortFactory('Database type is empty');
             return self::$null;
         }
-        
+
         // check if class map has been created
         if (isset($this->dbps[$dbtype])) {
             return $this->dbps[$dbtype];
         }
-        
+
         // check if it's in tracking mode
         if ($tracking) {
             return self::$null;
         }
-        
+
         // instantiate the right db port object
         $port_class = 'epDbPort' . $dbtype;
         if (!file_exists($port_class_file = EP_SRC_DB . '/port/' . $port_class . '.php')) {
@@ -564,7 +681,7 @@ class epDbPortFactory implements epFactory, epSingleton  {
             include_once($port_class_file);
             $dbp = new $port_class;
         }
-        
+
         // check if portability object is created successfully
         if (!$dbp) {
             throw new epExceptionDbPortFactory('Cannot instantiate portability class for [' . $dbType . ']');
@@ -576,7 +693,7 @@ class epDbPortFactory implements epFactory, epSingleton  {
 
         return $this->dbps[$dbtype];
     }
-    
+
     /**
      * Implement factory method {@link epFactory::allMade()}
      * Return all db connections made by factory
@@ -586,7 +703,7 @@ class epDbPortFactory implements epFactory, epSingleton  {
     public function allMade() {
         return array_values($this->dbps);
     }
-    
+
     /**
      * Implement factory method {@link epFactory::removeAll()}
      * @return void
@@ -594,7 +711,7 @@ class epDbPortFactory implements epFactory, epSingleton  {
     public function removeAll() {
         $this->dbps = array();
     }
-    
+
     /**
      * Implements {@link cpSingleton} interface
      * @return epDbPortFactory
@@ -606,10 +723,10 @@ class epDbPortFactory implements epFactory, epSingleton  {
         }
         return self::$instance;
     }
-    
+
     /**
      * Implement {@link epSingleton} interface
-     * Forcefully destroy old instance (only used for tests). 
+     * Forcefully destroy old instance (only used for tests).
      * After reset(), {@link instance()} returns a new instance.
      */
     static public function destroy() {
@@ -619,7 +736,7 @@ class epDbPortFactory implements epFactory, epSingleton  {
     /**
      * epDbPortFactory instance
      */
-    static private $instance; 
+    static private $instance;
 }
 
 ?>

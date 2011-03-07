@@ -2,9 +2,9 @@
 
 /**
  * $Id: epFieldMap.php 998 2006-06-05 12:57:26Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 998 $ $Date: 2006-06-05 08:57:26 -0400 (Mon, 05 Jun 2006) $
  * @package ezpdo
@@ -18,17 +18,17 @@ include_once(EP_SRC_BASE.'/epBase.php');
 
 /**
  * The base class of field mapping info (or "field map" in short)
- * 
- * The class keeps ORM info of a variable in a class, i.e. how a variable in a 
- * a class is mapped to a database column. 
- * 
+ *
+ * The class keeps ORM info of a variable in a class, i.e. how a variable in a
+ * a class is mapped to a database column.
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 998 $ $Date: 2006-06-05 08:57:26 -0400 (Mon, 05 Jun 2006) $
  * @package ezpdo
  * @subpackage ezpdo.orm
  */
 class epFieldMap extends epBase {
-    
+
     /**#@+
      * Primitive type constants that can be mapped to db column directly
      */
@@ -48,21 +48,21 @@ class epFieldMap extends epBase {
     const DT_TIME     = 'time';
     const DT_DATETIME = 'datetime';
     /**#@-*/
-    
+
     /**#@+
      * Relationship type constants
      */
     const DT_HAS         = 'has';
     const DT_COMPOSED_OF = 'composed_of';
     /**#@-*/
-    
+
     /**
      * The class map this field map belongs to (for trackback)
      * @var epClassMap
      * @access protected
      */
     protected $class_map;
-    
+
     /**
      * The base relationship field
      * @var epFieldMap
@@ -71,7 +71,7 @@ class epFieldMap extends epBase {
 
     /**
      * The database column type for the field to be mapped
-     * @var string 
+     * @var string
      * @access protected
      */
     protected $type;
@@ -89,42 +89,42 @@ class epFieldMap extends epBase {
      * @access protected
      */
     protected $default_value;
-         
+
     /**
      * Custom class tags
      * @var array
      * @access protected
      */
     protected $custom_tags = array();
-    
+
     /**
      * Constructor
      * @param string name of the corresponding class
-     * @param string $type type consts 
+     * @param string $type type consts
      * @param false|epClassMap $class_map
      */
     public function __construct($name, $type = self::DT_CHAR, $class_map = false) {
-        
+
         parent::__construct($name);
-        
+
         $this->setType($type);
-        
+
         if ($class_map) {
             $this->setClassMap($class_map);
         }
     }
-    
+
     /**
-     * Gets value of class_map 
-     * @return epClassMap 
+     * Gets value of class_map
+     * @return epClassMap
      * @access public
      */
     public function & getClassMap() {
         return $this->class_map;
     }
-     
+
     /**
-     * Sets value to class_map 
+     * Sets value to class_map
      * @param epClassMap
      * @return void
      * @access public
@@ -132,13 +132,13 @@ class epFieldMap extends epBase {
     public function setClassMap($class_map) {
         $this->class_map = $class_map;
     }
-    
+
     /**
-     * Returns the base (root) field map 
+     * Returns the base (root) field map
      * @return null|epFieldMap
      */
     protected function &getBase() {
-        
+
         // return cached one
         if ($this->base) {
             return $this->base;
@@ -149,11 +149,11 @@ class epFieldMap extends epBase {
             return self::$false;
         }
 
-        // get the base 
+        // get the base
         if (!($this->base = $this->class_map->getBaseField($this->name))) {
             $this->base = $this;
         }
-        
+
         return $this->base;
     }
 
@@ -165,9 +165,9 @@ class epFieldMap extends epBase {
     public function getType() {
         return $this->type;
     }
-     
+
     /**
-     * Sets value to type 
+     * Sets value to type
      * @param string
      * @return void
      * @access public
@@ -175,7 +175,7 @@ class epFieldMap extends epBase {
     public function setType($type) {
         $this->type = $type;
     }
-    
+
     /**
      * Gets value of column name
      * @return string
@@ -188,7 +188,7 @@ class epFieldMap extends epBase {
         }
         return $this->column_name;
     }
-     
+
     /**
      * Sets value to column_name
      * @param string
@@ -198,18 +198,18 @@ class epFieldMap extends epBase {
     public function setColumnName($column_name) {
         $this->column_name = $column_name;
     }
-     
+
     /**
-     * Gets value of default_value 
+     * Gets value of default_value
      * @return mixed
      * @access public
      */
     public function getDefaultValue() {
         return $this->default_value;
     }
-     
+
     /**
-     * Sets value to default_value 
+     * Sets value to default_value
      * @param mixed
      * @return void
      * @access public
@@ -238,6 +238,29 @@ class epFieldMap extends epBase {
     }
 
     /**
+     * Get fields tag by name
+     * @param string $tagName name of field tag
+     * @return false|string the value of field tag or false if not set
+     * @access public
+     */
+    public function getTag($tagName) {
+        return (isset($this->custom_tags[$tagName]))
+            ? $this->custom_tags[$tagName]
+            : false;
+    }
+
+    /**
+     * Set field tag by name
+     * @param string $tagName name of field tag
+     * @param string $tagValue value of field tag
+     * @return bool
+     * @access public
+     */
+    public function setTag($tagName, $tagValue) {
+        return $this->custom_tags[$tagName] = $tagValue;
+    }
+
+    /**
      * Returns whether field is primitive
      * @return boolean
      * @access public
@@ -245,19 +268,41 @@ class epFieldMap extends epBase {
     public function isPrimitive() {
         return true;
     }
-    
+
+    /**
+     * Returns whether this field map is equal to $fm field map
+     * Optionally can be skipped the name checking. Called by {@link epDbUpdate}.
+     *
+     * @param epFieldMap $fm
+     * @param bool Whether to check also for name fileds
+     * @return bool
+     */
+    public function equal($fm, $checkName = true){
+
+        $result =
+            $this->getColumnName() == $fm->getColumnName() &&
+            $this->getDefaultValue() == $fm->getDefaultValue() &&
+            $this->getType() == $fm->getType();
+
+        if($checkName){
+            return $result && ( $this->getName() == $fm->getName() );
+        }
+
+        return $result;
+    }
+
     /**
      * Returns all supported column types
      * @return array
      */
     static public function getSupportedTypes() {
-        
+
         return array(
-            
+
             // primitive types
             self::DT_BOOL,
             self::DT_BOOLEAN,
-            self::DT_BIT, 
+            self::DT_BIT,
             self::DT_INT,
             self::DT_INTEGER,
             self::DT_DECIMAL,
@@ -270,7 +315,7 @@ class epFieldMap extends epBase {
             self::DT_DATE,
             self::DT_TIME,
             self::DT_DATETIME,
-            
+
             // relationship types
             self::DT_HAS,
             self::DT_COMPOSED_OF,
@@ -284,7 +329,13 @@ class epFieldMap extends epBase {
     public function __toString() {
         $vars = array();
         foreach($this as $k => $v) {
-            if ($k != 'class_map') {
+            if($k == 'custom_tags'){
+                foreach ($v as $k1 => $v1) {
+                    $c[] = $k1 . ': ' . $v1;
+                }
+                $vars[] = $k . ': [' . implode('; ', $c) . ']';
+            }
+            elseif ($k != 'class_map') {
                 $vars[] = $k . ': ' . $v;
             }
         }
@@ -294,14 +345,14 @@ class epFieldMap extends epBase {
 
 /**
  * The field map for primitive types
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 998 $ $Date: 2006-06-05 08:57:26 -0400 (Mon, 05 Jun 2006) $
  * @package ezpdo
  * @subpackage ezpdo.orm
  */
 class epFieldMapPrimitive extends epFieldMap {
-    
+
     /**
      * Any parameters associated to the column type
      * For example, in "char(m)", m is the parameter.
@@ -325,7 +376,7 @@ class epFieldMapPrimitive extends epFieldMap {
             $this->setTypeParams($type_params);
         }
     }
-    
+
     /**
      * Gets parameters for type (comma seperated string)
      * @return string
@@ -337,9 +388,9 @@ class epFieldMapPrimitive extends epFieldMap {
         }
         return $this->type_params;
     }
-     
+
     /**
-     * Sets type params 
+     * Sets type params
      * @param string|array $type_params
      * @return void
      * @access public
@@ -348,60 +399,128 @@ class epFieldMapPrimitive extends epFieldMap {
         $this->type_params = $type_params;
     }
 
+    /**
+     * Overrides {@link epDbUpdate::equal()}
+     *
+     * @param epFieldMap $fm
+     * @param bool $checkName
+     * @return boolean|boolean
+     */
+    public function equal($fm, $checkName = true) {
+        //not primitive too, call parent
+        if(! $fm->isPrimitive()){
+            return parent::equal($fm, $checkName);
+        }
+
+        return
+            parent::equal($fm, $checkName) &&
+            //also compare type_params
+            $this->getTypeParams() == $this->getTypeParams();
+    }
+
+    /**
+     * Whether $this is type compatible with $fm. This is: field tye of $this
+     * can be changed to field type of $fm without loose data.
+     * @param epFieldMap $fm field map to verify against it
+     * @return boolean
+     */
+    public function isTypeCompatible($fm){
+        switch ($this->getType()) {
+            case self::DT_BIT:
+            case self::DT_BOOL:
+            case self::DT_BOOLEAN:
+                $type = $fm->getType();
+                return
+                    $type == self::DT_BIT ||
+                    $type == self::DT_BOOL ||
+                    $type == self::DT_BOOLEAN;
+                    $type == self::DT_INTEGER;
+                    $type == self::DT_INT;
+                break;
+
+            case self::DT_CHAR:
+            case self::DT_DECIMAL:
+            case self::DT_CLOB:
+                $type = $fm->getType();
+                return
+                    $type == self::DT_CHAR ||
+                    $type == self::DT_DECIMAL ||
+                    $type == self::DT_CLOB;
+                break;
+
+            case self::DT_INT:
+            case self::DT_INTEGER:
+                $type = $fm->getType();
+                return
+                    $type == self::DT_INT ||
+                    $type == self::DT_INTEGER;
+                break;
+
+            case self::DT_BLOB:
+                return $fm->getType() == self::DT_BLOB;
+                break;
+
+            default:
+                return false;
+            break;
+        }
+        return true;
+    }
+
 }
 
 /**
  * Class of field map for relationship vars
- * 
- * A relationship field has two types, either "has" or "composed_of", 
- * corresponding to the @orm has/composed_of tag. 
- * 
- * A relationship field can be a single-valued or many-valued field and 
- * it must have a "related" class that it has relationship with. 
- * 
- * A relationship field can have a field as its inverse in its related 
+ *
+ * A relationship field has two types, either "has" or "composed_of",
+ * corresponding to the @orm has/composed_of tag.
+ *
+ * A relationship field can be a single-valued or many-valued field and
+ * it must have a "related" class that it has relationship with.
+ *
+ * A relationship field can have a field as its inverse in its related
  * class. When two fields are specified as inverses of one another,
- * they can be used to form bidirectional links. An update to one field 
+ * they can be used to form bidirectional links. An update to one field
  * will automatically trigger a corresponding update to the other
- * field, maintaining consistency between the fields. One or both fields 
+ * field, maintaining consistency between the fields. One or both fields
  * can be mulitvalued, or both can be single-valued.
- * 
- * Using "inverse()" in the var @orm tag, you can make a pair of vars in 
- * two classes as inverses to each other. For example, 
+ *
+ * Using "inverse()" in the var @orm tag, you can make a pair of vars in
+ * two classes as inverses to each other. For example,
  * <pre>
  *   // class A
  *   class classA {
  *     // @orm has one classB inverse(a)
  *     public $b;
  *   }
- * 
+ *
  *   // class B
  *   class classB {
  *     // @orm has one ClassA inverse(b)
  *     public $a;
  *   }
  * </pre>
- * 
- * Varibles classA::$b and classB::$a forms a bidirectional link. 
- * Assigning one object to another will also install relationship 
- * on the other direction. That is, 
+ *
+ * Varibles classA::$b and classB::$a forms a bidirectional link.
+ * Assigning one object to another will also install relationship
+ * on the other direction. That is,
  * <pre>
  *   $a-&gt;b = $b;
  * </pre>
- * is equivalent to 
+ * is equivalent to
  * <pre>
  *   $a-&gt;b = $b;
  *   $b-&gt;a = $a;
  * </pre>
- * if A::$b and B::$a are specified as inverses.   
- * 
+ * if A::$b and B::$a are specified as inverses.
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 998 $ $Date: 2006-06-05 08:57:26 -0400 (Mon, 05 Jun 2006) $
  * @package ezpdo
  * @subpackage ezpdo.orm
  */
 class epFieldMapRelationship extends epFieldMap {
-    
+
     /**#@+
      * Multiplicity  cconstants: one or many
      */
@@ -411,22 +530,22 @@ class epFieldMapRelationship extends epFieldMap {
 
     /**
      * The related class
-     * @var string 
+     * @var string
      */
     protected $class = false;
 
     /**
-     * The field map for the inverse in the related class. 
+     * The field map for the inverse in the related class.
      * @var epFieldMap
      */
     protected $inverse = false;
-    
+
     /**
      * Whether field is a many-valued field
      * @var boolean
      */
     protected $is_many = false;
-    
+
     /**
      * Constructor
      * @param string $name name of the corresponding class
@@ -435,14 +554,14 @@ class epFieldMapRelationship extends epFieldMap {
      * @param epClassMap
      */
     public function __construct($name, $type, $class, $is_many = false, $inverse = false, $class_map = false) {
-        
+
         parent::__construct($name, $type, $class_map);
-        
+
         $this->setIsMany($is_many);
         $this->setClass($class);
         $this->setInverse($inverse);
     }
-    
+
     /**
      * Is the data type of the field a primitive one? Always return false.
      * @return bool
@@ -450,7 +569,7 @@ class epFieldMapRelationship extends epFieldMap {
     public function isPrimitive() {
        return false;
     }
-    
+
     /**
      * Is this a "has" relationship field?
      * @return bool
@@ -458,7 +577,7 @@ class epFieldMapRelationship extends epFieldMap {
     public function isHas() {
         return $this->type == self::DT_HAS;
     }
-    
+
     /**
      * Is this a "composed_of" relationship field?
      * @return bool
@@ -466,7 +585,7 @@ class epFieldMapRelationship extends epFieldMap {
     public function isComposedOf() {
         return ($this->type == self::DT_COMPOSED_OF);
     }
-    
+
     /**
      * Is this a "has one" or "composed_of one" (i.e. single-valued) relationship field?
      * @return bool
@@ -474,7 +593,7 @@ class epFieldMapRelationship extends epFieldMap {
     public function isSingle() {
         return (!$this->is_many);
     }
-    
+
     /**
      * Is this a "has many" or "composed_of many" relationship field?
      * @return bool
@@ -482,7 +601,7 @@ class epFieldMapRelationship extends epFieldMap {
     public function setIsMany($is_many = true) {
         $this->is_many = $is_many;
     }
-    
+
     /**
      * Is this a "has many" or "composed_of many" relationship field?
      * @return bool
@@ -490,7 +609,7 @@ class epFieldMapRelationship extends epFieldMap {
     public function isMany() {
         return $this->is_many;
     }
-    
+
     /**
      * Is this a "has one" relationship field?
      * @return bool
@@ -498,7 +617,7 @@ class epFieldMapRelationship extends epFieldMap {
     public function isHasOne() {
         return ($this->type == self::DT_HAS && !$this->is_many);
     }
-    
+
     /**
      * Is this a "has many" relationship field?
      * @return bool
@@ -506,7 +625,7 @@ class epFieldMapRelationship extends epFieldMap {
     public function isHasMany() {
         return ($this->type == self::DT_HAS && $this->is_many);
     }
-    
+
     /**
      * Is this a "composed_of one" relationship field?
      * @return bool
@@ -514,7 +633,7 @@ class epFieldMapRelationship extends epFieldMap {
     public function isComposedOfOne() {
         return ($this->type == self::DT_COMPOSED_OF && !$this->is_many);
     }
-    
+
     /**
      * Is this a "composed_of many" relationship field?
      * @return bool
@@ -522,7 +641,7 @@ class epFieldMapRelationship extends epFieldMap {
     public function isComposedOfMany() {
         return ($this->type == self::DT_COMPOSED_OF && $this->is_many);
     }
-    
+
     /**
      * Retrurns the related class
      * @return false|string
@@ -542,13 +661,13 @@ class epFieldMapRelationship extends epFieldMap {
     }
 
     /**
-     * Returns the inverse to this field 
-     * @return string 
+     * Returns the inverse to this field
+     * @return string
      */
     public function getInverse() {
         return $this->inverse;
     }
-    
+
     /**
      * Set the inverse to this field
      * @param string $inverse
@@ -576,27 +695,27 @@ class epFieldMapRelationship extends epFieldMap {
 
 /**
  * The exception class for {@link epFieldMapFactory}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 998 $ $Date: 2006-06-05 08:57:26 -0400 (Mon, 05 Jun 2006) $
  * @package ezpdo
  * @subpackage ezpdo.orm
  */
-class epExceptionFieldMapFactory extends epException { 
+class epExceptionFieldMapFactory extends epException {
 }
 
 /**
- * The simple factory class of ezpdo field mapping info. 
- * 
- * The factory manufactures field maps ({@link epFieldMap}) according 
+ * The simple factory class of ezpdo field mapping info.
+ *
+ * The factory manufactures field maps ({@link epFieldMap}) according
  * to given parameters.
- * 
- * Note that since the class map factory ({@link epClassMapFactory}) 
- * keeps all class maps and their field maps, there is no need for 
+ *
+ * Note that since the class map factory ({@link epClassMapFactory})
+ * keeps all class maps and their field maps, there is no need for
  * field map factory to keep the same information. Thus this factory
- * does not implement the {@link epFactory} interface, but only a 
+ * does not implement the {@link epFactory} interface, but only a
  * static method of {@link make()}.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 998 $ $Date: 2006-06-05 08:57:26 -0400 (Mon, 05 Jun 2006) $
  * @package ezpdo
@@ -612,17 +731,17 @@ class epFieldMapFactory {
      * @return false|epFieldMap
      */
     static function &make($name, $type, $params = array()) {
-        
+
         // the return value
         $fm = false;
-        
+
         // must have field (var) name and type
         if (!$name || !$type) {
             return $fm;
         }
-        
+
         switch (strtolower($type)) {
-        
+
         // primitive types
         case epFieldMap::DT_BOOL:
         case epFieldMap::DT_BOOLEAN:
@@ -642,21 +761,21 @@ class epFieldMapFactory {
             $fm = new epFieldMapPrimitive($name, $type, $params);
             break;
         }
-        
+
         case epFieldMap::DT_HAS:
         case epFieldMap::DT_COMPOSED_OF: {
-            
+
             // create a relationship field
             $fm = new epFieldMapRelationship(
-                $name, $type, 
-                $params['class'], 
-                $params['is_many'], 
+                $name, $type,
+                $params['class'],
+                $params['is_many'],
                 $params['inverse']
                 );
             break;
         }
-            
-        default: 
+
+        default:
             throw new epExceptionFieldMapFactory('Unrecognized field type [' . $type . ']');
         }
 

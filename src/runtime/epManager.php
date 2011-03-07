@@ -173,6 +173,12 @@ class epManagerBase extends epConfigurableWithLog {
     protected $t = false;
 
     /**
+     * The schema updater
+     * @var false|epDbUpdate
+     */
+    protected $su = false;
+
+    /**
      * Constructor
      * @param epConfig|array
      * @access public
@@ -1945,6 +1951,15 @@ class epManagerBase extends epConfigurableWithLog {
     }
 
     /**
+     * Return the updater
+     * @return epDbUpdate
+     * @access public
+     */
+    public function getUpdater(){
+        return $this->su;
+    }
+
+    /**
      * Returns an array of queries conducted (key'ed by database name)
      * @return false|array
      */
@@ -3367,6 +3382,89 @@ class epManager extends epManagerBase implements epSingleton {
                     $classes_done[] = $base_a_b;
                 }
             }
+        }
+
+        return $classes_done;
+    }
+
+    /**
+     * Alter all tables for classes mapped so far
+     *
+     * This method may be useful if you want to update your schema
+     * with class changes.
+     *
+     * @return false|array (of classes for which tables were altered)
+     * @access public
+     */
+    public function alterTables() {
+
+        // if class map factory does not exist yet
+        if (! ($this->cmf && $this->cm_obj_rel)) {
+            // initialize
+            $this->initialize(true);
+        }
+
+        // not initialized the updater
+        if (!$this->su){
+            include_once (EP_SRC_DB.'/epDbUpdate.php');
+            $this->su = epDbUpdate::instance();
+        }
+
+        // done if no class at all
+        if (!($cms = $this->cmf->allMade())) {
+            return array();
+        }
+
+        // array to hold queries per classes tables done
+        $classes_done = array();
+
+        // reset dbs cache so they will be created
+        $this->dbs = array();
+
+        // do we force updates ?
+        $force = $this->getConfigOption("force_update");
+
+        // do we execute queries or log them ?
+        $update = $this->getConfigOption('update_strategy') == 'alter';
+
+        try{
+            // go through all classes
+            foreach($cms as $cm) {
+
+                // done if abstract class
+                if($cm->isAbstract()){
+                    continue;
+                }
+
+                // get class name
+                $class = $cm->getName();
+
+                // relation table dealt with for each class
+                if ($class == $this->cm_obj_rel->getName()) {
+                    continue;
+                }
+
+                // call updater to alter
+                if($ret = $this->su->updateSchema($cm, $update, $force)){
+                    $classes_done[] = $ret;
+                }
+
+            }
+
+            // at this point, if there is any class map outdated not processed
+            // it is not used, could be said the class was deleted
+            $this->su->cleanupSchema($update, $force);
+        }
+        catch (epExceptionDb $edb){
+
+            // if we are not using "update from file" feature
+            if (!$this->getConfigOption('update_from')){
+                // unsucessfull update, need to delete last backup
+                epRmBackup($this->getConfigOption('compiled_dir'));
+            }
+
+            // continue with the exception
+            throw $edb;
         }
 
         return $classes_done;

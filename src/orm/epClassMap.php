@@ -283,6 +283,29 @@ class epClassMap extends epContainer {
     }
 
     /**
+     * Get class tag by name
+     * @param string $tagName name of class tag
+     * @return false|string the value of class tag or false if not set
+     * @access public
+     */
+    public function getTag($tagName) {
+        return (isset($this->custom_tags[$tagName]))
+            ? $this->custom_tags[$tagName]
+            : false;
+    }
+
+    /**
+     * Set class tag by name
+     * @param string $tagName name of class tag
+     * @param string $tagValue value of class tag
+     * @return bool
+     * @access public
+     */
+    public function setTag($tagName, $tagValue) {
+        return $this->custom_tags[$tagName] = $tagValue;
+    }
+
+    /**
      * Get unique keys
      * @param boolean $recursive (default to true)
      * @return array
@@ -717,6 +740,32 @@ class epClassMap extends epContainer {
 
         // recompile if class compiled earlier than the modification
         return $this->compile_time < $mt;
+    }
+
+    /**
+     * Determine if this class map is equal to other
+     *
+     * Equals means having the same fields and same name
+     *
+     * @param epClassMap $cm class map to compare
+     */
+    public function equal($cm){
+        // same number of fields and name
+        if (
+            count($this->getAllFields()) != count($cm->getAllFields()) ||
+            $this->getName() != $cm->getName() ){
+            return false;
+        }
+
+        // are all of them equals
+        foreach ($this->getAllFields() as $f) {
+            $fm = $cm->getField($f->getName());
+            if ($fm && !$f->equal($fm, false) ){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

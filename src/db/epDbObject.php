@@ -7,6 +7,7 @@
  *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @author Trevan Richins <developer@ckiweb.com>
+ * @author David Moises Paz <davidmpaz@gmail.com>
  * @version $Revision: 1044 $ $Date: 2007-03-07 21:25:07 -0500 (Wed, 07 Mar 2007) $
  * @package ezpdo
  * @subpackage ezpdo.db
@@ -127,6 +128,43 @@ class epObj2Sql {
             $indexes['drop'], $uniques['drop'],
             $indexes['create'], $uniques['create']
             );
+
+        return $sqls;
+    }
+
+    /**
+     * Makes a SQL alter table statement for a class map
+     *
+     * @param epDbObject $db the db connection
+     * @param epClassMap $ncm the new class map for the object
+     * @param boolean $force whether to include queries to update schema ignoring information lost. BE AWARE OF THIS!!
+     * @return false|array Array of queries to execute
+     * @author David Moises Paz <davidmpaz@gmail.com>
+     * @version 1.1.6
+     */
+    static public function sqlAlter($db, $ncm, $force = false) {
+
+        // get the portable
+        if (!($dbp = & epObj2Sql::getPortable($db->dbType()))) {
+            return self::$false;
+        }
+
+        // array to hold sql stmts
+        $sqls = array();
+        // call portability object to produce
+        $sqls = $dbp->alterTable($ncm, $db, $force);
+
+        // build the CREATE INDEX queries as well
+        $indexes = $dbp->createIndex($ncm, $db);
+
+        // build the CREATE UNIQUE INDEX queries as well
+        $uniques = $dbp->createUnique($ncm, $db);
+
+        // merge all sql statements
+        $sqls["index"] = array_merge(
+            $indexes['drop'], $uniques['drop'],
+            $indexes['create'], $uniques['create']
+        );
 
         return $sqls;
     }
@@ -1307,6 +1345,148 @@ class epDbObject {
 
         // execute sql
         return ($r = $this->_execute($sql));
+    }
+
+    /**
+     * Alter a table specified in class map.
+     *
+     * Depending of config options it run/log/ignore queries.
+     *
+     * @param epClassMap $cm The class map
+     * @param boolean $update run queries or log them
+     * @param boolean $force Whether to force schema update WARNING!!!
+     * @return false|array  of sql to execute and result of operations.
+     * @author David Moises Paz <davidmpaz@gmail.com>
+     * @version 1.1.6
+     */
+    public function alter($cm, $update = false, $force = false) {
+
+        // verify particular case
+        if(($table = $cm->getTag(epDbUpdate::SCHEMA_NAMED_TAG)) && $table != $cm->getTable()){
+            // check if target table exists
+            if ($this->_tableExists($cm->getTable())) {
+                // alter to an existent table as target, throw exception
+                throw new epExceptionDbObject(
+                    "Invalid operation. Triying to change name of table ".
+                    "[" . $table . "] to existent table [" . $cm->getTable() . "]");
+                return false;
+            }
+
+            // check if table to modify exist
+            if ( !$this->_tableExists($table)) {
+                return false;
+            }
+        }else{
+            // only one table name, check if exist
+            if (!$this->_tableExists($cm->getTable())) {
+                return false;
+            }
+        }
+
+        // we will return array of queries
+        $result = array('executed' => array(), 'ignored' => array(), 'sucess' => false);
+
+        //to drop?
+        $droping = $cm->getTag(epDbUpdate::SCHEMA_OP_TAG) == epDbUpdate::OP_DROP;
+
+        // force to drop?
+        if($force && $droping){
+            //marked table for drop, WARN HERE!!
+            if(! $sql = epObj2Sql::sqlDrop($this, $cm)){
+                return false;
+            }
+            // return result of executed query or sql generated
+            $result['executed'][] = $sql;
+            $result['sucess'] = $update ? $this->_execute($sql) : true;
+            return $result;
+        }
+
+        //not forced, report it!!
+        if(!$force && $droping){
+            if(! $sql = epObj2Sql::sqlDrop($this, $cm)){
+                return false;
+            }
+            $result['ignored'][] = $sql;
+            $result['sucess'] = true;
+            return $result;
+        }
+
+        // we can continue so prepare sql statement
+        $sql = epObj2Sql::sqlAlter($this, $cm, $force);
+        if(!$sql || (
+            empty($sql[epDbUpdate::OP_ADD]) &&
+            empty($sql[epDbUpdate::OP_ALTER]) &&
+            empty($sql[epDbUpdate::OP_DROP]) &&
+            empty($sql[epDbUpdate::OP_IGNORE]) &&
+            empty($sql[epDbUpdate::OP_TABLE]) &&
+            empty($sql["index"])) ) {
+            return false;
+        }
+
+        // get the sqls
+        $queries = array();
+        $queries = empty($sql[epDbUpdate::OP_DROP])
+            ? array() : array_merge($queries, $sql[epDbUpdate::OP_DROP]);
+        $queries = empty($sql[epDbUpdate::OP_IGNORE])
+            ? $queries : array_merge($queries, $sql[epDbUpdate::OP_IGNORE]);
+
+        // here the queries that need to be forced to execute
+        $forced = $queries;
+
+        // reinitialize for queries to be executed without forcing
+        $queries = array();
+        $queries = empty($sql[epDbUpdate::OP_ADD])
+            ? array() : array_merge($queries, $sql[epDbUpdate::OP_ADD]);
+        $queries = empty($sql[epDbUpdate::OP_ALTER])
+            ? $queries : array_merge($queries, $sql[epDbUpdate::OP_ALTER]);
+        $queries = empty($sql["index"])
+            ? $queries : array_merge($queries, $sql["index"]);
+        $queries = empty($sql[epDbUpdate::OP_TABLE])
+            ? $queries : array_merge($queries, $sql[epDbUpdate::OP_TABLE]);
+
+        // if not force but $forced queries not empty
+        if(!($force || empty($forced))){
+            $result['ignored'] = $forced;
+        }
+
+        // force and forced queries not empty
+        if($force && !empty($forced)){
+            //WARN HERE, could be really destructive
+            $queries = array_merge($forced, $queries);
+            $result['ignored'] = array();
+        }
+
+        // report queries
+        $result['executed'] = $queries;
+
+        // do we want to run queries or log them
+        if(! $update){
+            $result['sucess'] = true;
+            return $result;
+        }
+
+        // do changes atomically
+        if(!($in_transact = $this->db->inTransaction())){
+            $this->db->beginTransaction();
+        }
+        try {
+            if( !empty($queries) && ($result['sucess'] = $this->_execute( $queries ))){
+                // if was in transaction dont commit
+                if(! $in_transact){
+                    $result['sucess'] = $this->db->commit();
+                }
+                return $result;
+            }
+
+            return $result;
+
+        }catch (Exception $e){
+            if(! $in_transact){
+                $this->db->rollback();
+            }
+            throw $e;
+            return false;
+        }
     }
 
     /**

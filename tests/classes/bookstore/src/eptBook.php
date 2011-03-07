@@ -2,9 +2,9 @@
 
 /**
  * $Id: eptBook.php 908 2006-04-06 12:37:03Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 908 $ $Date: 2006-04-06 08:37:03 -0400 (Thu, 06 Apr 2006) $
  * @package ezpdo_t
@@ -18,27 +18,30 @@ include_once(realpath(dirname(__FILE__)).'/eptBase.php');
 
 /**
  * Class of a book
- * 
+ *
  * This is a test class for ezpdo
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 908 $ $Date: 2006-04-06 08:37:03 -0400 (Thu, 06 Apr 2006) $
+ * @uuid 003
  * @package ezpdo_t
  * @subpackage ezpdo_t.bookstore
  */
 class eptBook extends eptBase {
-    
+
     /**
      * Bool title
      * @var string
      * @orm title char(80)
+     * @uuid 0031
      */
     public $title;
-    
+
     /**
      * Number of pages
      * @var integer
      * @orm integer
+     * @uuid 0032
      */
     public $pages = -1;
 
@@ -46,6 +49,7 @@ class eptBook extends eptBase {
      * Price of the book (in dollar)
      * @var float
      * @orm decimal(5,2)
+     * @uuid 0033
      */
     public $price = 0.0;
 
@@ -53,6 +57,7 @@ class eptBook extends eptBase {
      * Is book recommended?
      * @var boolean
      * @orm boolean
+     * @uuid 0034
      */
     public $recommended;
 
@@ -60,41 +65,47 @@ class eptBook extends eptBase {
      * Long excerpt that needs to use clob
      * @var string
      * @orm text(8192)
+     * @uuid 0035
      */
     public $excerpt;
-    
+
     /**
      * The cover image
      * @var string
      * @orm blob
+     * @uuid 0036
      */
     public $coverimg;
-    
+
     /**
      * Date published
      * @var string
      * @orm date
+     * @uuid 0037
      */
     public $pubdate;
-    
+
     /**
      * Bookstore
      * @var eptBookstore
      * @orm has one eptBookstore
+     * @uuid 0038
      */
     public $bookstore = false;
-    
+
     /**
      * Book author (fictious: kept for testing "has_one")
      * @var eptAuthor
      * @orm has one eptAuthor
+     * @uuid 0039
      */
     public $author = false;
 
     /**
-     * Book authors 
+     * Book authors
      * @var eptAuthor
      * @orm has many eptAuthor
+     * @uuid 00310
      */
     public $authors = false;
 
@@ -102,14 +113,14 @@ class eptBook extends eptBase {
      * Constructor
      * @param string
      */
-    public function __construct($title = '') { 
+    public function __construct($title = '') {
         parent::__construct();
         $this->title = $title;
     }
-    
+
     /**
      * Counter of events
-     * @var array (keyed by event) 
+     * @var array (keyed by event)
      */
     static public $counts = array();
 
@@ -186,12 +197,12 @@ class eptBook extends eptBase {
     /**
      * Increment event counts
      * @param string $method (value of __METHOD__ from the caller method)
-     * @param mixed $params 
+     * @param mixed $params
      * @return void
      * @access protected
      */
     static public function _inc($method, $params = null) {
-        
+
         // rip off 'eptListener::' in method name
         $method = str_replace(__CLASS__ . '::', '', $method);
 
