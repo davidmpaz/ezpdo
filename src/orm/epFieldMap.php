@@ -421,7 +421,7 @@ class epFieldMapPrimitive extends epFieldMap {
     /**
      * Whether $this is type compatible with $fm. This is: field tye of $this
      * can be changed to field type of $fm without loose data.
-     * @param epFieldMap $fm field map to verify against it
+     * @param epFieldMapPrimitive $fm field map to verify against it
      * @return boolean
      */
     public function isTypeCompatible($fm){
@@ -433,31 +433,71 @@ class epFieldMapPrimitive extends epFieldMap {
                 return
                     $type == self::DT_BIT ||
                     $type == self::DT_BOOL ||
-                    $type == self::DT_BOOLEAN;
-                    $type == self::DT_INTEGER;
+                    $type == self::DT_BOOLEAN ||
+                    $type == self::DT_INTEGER ||
                     $type == self::DT_INT;
                 break;
 
             case self::DT_CHAR:
-            case self::DT_DECIMAL:
             case self::DT_CLOB:
                 $type = $fm->getType();
+                $lenght = $fm->getTypeParams();
                 return
-                    $type == self::DT_CHAR ||
-                    $type == self::DT_DECIMAL ||
-                    $type == self::DT_CLOB;
+                    ($type == self::DT_CHAR || $type == self::DT_CLOB) &&
+                    (int)$this->getTypeParams() >= (int)$lenght;
                 break;
 
             case self::DT_INT:
             case self::DT_INTEGER:
                 $type = $fm->getType();
+                $lenght = $fm->getTypeParams();
                 return
-                    $type == self::DT_INT ||
-                    $type == self::DT_INTEGER;
+                    ($type == self::DT_INT ||
+                    $type == self::DT_INTEGER ||
+                    $type == self::DT_TIME ||
+                    $type == self::DT_DATE ||
+                    $type == self::DT_DATETIME) &&
+                    (int)$this->getTypeParams() >= (int)$lenght;
+                break;
+
+            case self::DT_TIME:
+            case self::DT_DATE:
+            case self::DT_DATETIME:
+                $type = $fm->getType();
+                $lenght = $fm->getTypeParams();
+                return
+                    ($type == self::DT_INT ||
+                    $type == self::DT_INTEGER ||
+                    $type == self::DT_TIME ||
+                    $type == self::DT_DATE ||
+                    $type == self::DT_DATETIME) &&
+                    (int)$this->getTypeParams() >= (int)$lenght;
+                break;
+
+            case self::DT_FLOAT:
+            case self::DT_REAL:
+                $type = $fm->getType();
+                $lenght = $fm->getTypeParams();
+                return
+                    ($type == self::DT_REAL ||
+                    $type == self::DT_FLOAT) &&
+                    (int)$this->getTypeParams() >= (int)$lenght;
                 break;
 
             case self::DT_BLOB:
-                return $fm->getType() == self::DT_BLOB;
+                $lenght = $fm->getTypeParams();
+                return
+                    ($fm->getType() == self::DT_BLOB) &&
+                    ((int)$this->getTypeParams() >= (int)$lenght);
+                break;
+
+            case self::DT_DECIMAL:
+                $param = explode(',', $fm->getTypeParams());
+                $thisparam = explode(',', $this->getTypeParams());
+                return
+                    ($fm->getType() == self::DT_DECIMAL) &&
+                    (int)$thisparam[0] >= (int)$param[0] &&
+                    (int)$thisparam[1] >= (int)$param[1];
                 break;
 
             default:
