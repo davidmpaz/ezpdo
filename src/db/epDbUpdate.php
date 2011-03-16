@@ -117,7 +117,8 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
 
         // check config preconditions, no file specified
         // to get old class map factory
-        if(!($this->getConfigOption('backup_compiled') || $this->getConfigOption('update_from'))){
+        if(!($this->getConfigOption('backup_compiled') || $this->getConfigOption('update_from')) &&
+            ($this->getConfigOption('update_strategy') != 'drop')){
             throw new epExceptionDbUpdate(
                 'Failed to create updater, backup or old class map needed to update.');
             return false;
@@ -136,7 +137,7 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
         }
 
         //strategy defined but no backup to work with
-        if( $this->strategy && !$this->ocmf){
+        if( ($strategy = $this->strategy) && $strategy != 'drop' && !$this->ocmf){
             // no backup file was found
             throw new epExceptionDbUpdate('Failing in loading backup class map.');
             return false;
