@@ -742,6 +742,69 @@ class epObj2Sql {
     }
 
     /**
+     * Rename relationships classes for a relationship
+     *
+     * Whenever a class name is changed, every relationship
+     * with reference to old class name must be updated.
+     *
+     * @param string $rtable the name of the relationship table
+     * @param string $oclass name of the old class name
+     * @param string $nclass name of the new class name
+     * @return false|array
+     */
+    static public function sqlRenameRelationshipClass($db, $rtable, $oclass, $nclass) {
+
+        // make sure we have params
+        if (!($rtable && $oclass && $nclass) ) {
+            return false;
+        }
+
+        // quoted ids
+        $class_a_q = $db->quoteId('class_a');
+        $class_b_q = $db->quoteId('class_b');
+        $base_b_q = $db->quoteId('base_b');
+
+        // rename all existing relationships for the table
+        $sql = array();
+        $sql[] = sprintf('UPDATE %s SET %s = %s WHERE %s = %s',
+            $db->quoteId($rtable), $class_a_q, $nclass, $class_a_q, $oclass);
+        $sql[] = sprintf('UPDATE %s SET %s = %s WHERE %s = %s',
+            $db->quoteId($rtable), $class_b_q, $nclass, $class_b_q, $oclass);
+        $sql[] = sprintf('UPDATE %s SET %s = %s WHERE %s = %s',
+            $db->quoteId($rtable), $base_b_q, $nclass, $base_b_q, $oclass);
+
+        return $sql;
+    }
+
+    /**
+     * Rename relationships var name for a relationship
+     *
+     * Whenever a var name is changed, every relationship
+     * with reference to old var name must be updated.
+     *
+     * @param string $rtable the name of the relationship table
+     * @param string $oclass name of the old class name
+     * @param string $nclass name of the new class name
+     * @return false|array
+     */
+    static public function sqlRenameRelationshipName($db, $rtable, $ofname, $nfname) {
+
+        // make sure we have params
+        if (!($rtable && $ofname && $nfname) ) {
+            return false;
+        }
+
+        // quoted ids
+        $var_a = $db->quoteId('var_a');
+
+        // rename all existing relationships var name for the table
+        $sql = sprintf('UPDATE %s SET %s = %s WHERE %s = %s',
+            $db->quoteId($rtable), $var_a, $nfname, $var_a, $ofname);
+
+        return $sql;
+    }
+
+    /**
      * Makes a SQL comment for a table (class map)
      * @param epClassMap the class map for the object
      * @return string
