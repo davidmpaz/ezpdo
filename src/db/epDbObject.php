@@ -1603,7 +1603,7 @@ class epDbObject {
         if (!$this->_tableExists($cm->getTable())) {
 
             // done if -not- forced to create
-            if (!$force) {
+            if (!$create) {
                 return true;
             }
 

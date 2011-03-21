@@ -684,7 +684,7 @@ class epDbPortFactory implements epFactory, epSingleton  {
 
         // check if portability object is created successfully
         if (!$dbp) {
-            throw new epExceptionDbPortFactory('Cannot instantiate portability class for [' . $dbType . ']');
+            throw new epExceptionDbPortFactory('Cannot instantiate portability class for [' . $dbtype . ']');
             return self::$null;
         }
 
