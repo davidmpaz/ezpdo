@@ -55,6 +55,7 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
     const SCHEMA_OP_TAG = "schemaop";
     const SCHEMA_UI_TAG = "uuid";
     const SCHEMA_NAMED_TAG = "named";
+    const SCHEMA_TNAMED_TAG = "tablename";
 
     const OP_TABLE      = "table";
     const OP_IGNORE     = "ignore";
@@ -288,6 +289,10 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
         // annotate class name
         if($updCm->getName() != $outdCm->getName()){
             $updCm->setTag(epDbUpdate::SCHEMA_NAMED_TAG, $outdCm->getName());
+            $updCm->setTag(epDbUpdate::SCHEMA_TNAMED_TAG, $outdCm->getTable());
+        }
+        else{
+            $updCm->setTag(epDbUpdate::SCHEMA_NAMED_TAG, false);
         }
         // annotate fields
         $ofm = $outdCm->getAllFields();

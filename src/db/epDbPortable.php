@@ -295,10 +295,12 @@ class epDbPortable {
             epDbUpdate::OP_TABLE => array()
         );
 
-        if(!($oldtable = $ncm->getTag(epDbUpdate::SCHEMA_NAMED_TAG))){
+        $newtable = ''; $oldtable = '';
+        if(!$ncm->getTag(epDbUpdate::SCHEMA_NAMED_TAG)){
             $oldtable = $newtable = $ncm->getTable();
         }else{
             $newtable = $ncm->getTable();
+            $oldtable = $ncm->getTag(epDbUpdate::SCHEMA_TNAMED_TAG);
         }
 
         // get queries for alter table
