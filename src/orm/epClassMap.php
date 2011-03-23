@@ -938,6 +938,18 @@ class epClassMapFactory implements epFactory, epSingleton, epValidateable {
     }
 
     /**
+     * Remove a class map from factory. Called by {@link epDbUpdate::_updateSchema}
+     * when a class was renamed.
+     * @param string $class
+     * @return void
+     */
+    public function remove($class) {
+        if (isset($this->class_maps[$class])) {
+            unset($this->class_maps[$class]);
+        }
+    }
+
+    /**
      * Sort class maps by key (only for testing)
      * @return void
      * @access public

@@ -916,6 +916,9 @@ class epDbObject {
      */
     public function __construct($db) {
         $this->db = $db;
+
+        // cached manager
+        $this->ep_m = epManager::instance();
     }
 
     /**
