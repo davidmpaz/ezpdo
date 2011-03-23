@@ -137,7 +137,7 @@ class epLib_Log_composite extends epLib_Log
     {
         /* Make sure this is a Log instance. */
         //if (!is_a($child, 'epLib_Log')) {
-        if (!is_a($child, 'epLib_Log')) {
+        if (! ($child instanceof epLib_Log)) {
             return false;
         }
 
