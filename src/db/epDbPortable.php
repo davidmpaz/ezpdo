@@ -338,8 +338,8 @@ class epDbPortable {
         }
 
         if($oldtable != $newtable){
-            $sqls[epDbUpdate::OP_TABLE] =
-                "ALTER TABLE " . $oldtable . "RENAME TO " . $newtable;
+            $sqls[epDbUpdate::OP_TABLE][] =
+                "ALTER TABLE " . $db->quoteId($oldtable) . " RENAME TO " . $db->quoteId($newtable);
         }
 
         return $sqls;
