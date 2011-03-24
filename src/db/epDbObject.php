@@ -747,12 +747,13 @@ class epObj2Sql {
      * Whenever a class name is changed, every relationship
      * with reference to old class name must be updated.
      *
-     * @param string $rtable the name of the relationship table
+     * @param string $rtable the name of the old relationship table
+     * @param string $nrtable the name of the new relationship table
      * @param string $oclass name of the old class name
      * @param string $nclass name of the new class name
      * @return false|array
      */
-    static public function sqlRenameRelationshipClass($db, $rtable, $oclass, $nclass) {
+    static public function sqlRenameRelationshipClass($db, $rtable, $nrtable, $oclass, $nclass) {
 
         // make sure we have params
         if (!($rtable && $oclass && $nclass) ) {
@@ -775,6 +776,9 @@ class epObj2Sql {
         $sql[] = sprintf('UPDATE %s SET %s = %s WHERE %s = %s',
             $db->quoteId($rtable), $base_b_q, $db->quote($nclass),
             $base_b_q, $db->quote($oclass));
+        // rename relationship table itself
+        $sql[] = sprintf('ALTER TABLE %s RENAME TO %s',
+            $db->quoteId($rtable), $db->quoteId($nrtable));
 
         return $sql;
     }
