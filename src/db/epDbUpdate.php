@@ -389,8 +389,19 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
             return false;
         }
 
+        // if was renamed the class
+        if($old_class = $annClassMap->getTag(epDbUpdate::SCHEMA_NAMED_TAG)){
+            // get all realtions fields where it is involved before
+            $ofmaps = $this->ocmf->getRelationFields($old_class);
+            // get all realtions fields where it is involved now
+            $nfmaps = $this->ep_m->getClassMapFactory()->
+                getRelationFields($annClassMap->getName());
+            // remove old class class map factory repeated, but with different name
+            //$this->ep_m->getClassMapFactory()->remove($found->getName());
+        }
+
         // real alter table schema operation
-        if(!$ret = $dbo->alter($annClassMap, $update, $force)){
+        if(!$ret = $dbo->alter($annClassMap, $ofmaps, $nfmaps, $update, $force)){
             $this->log("Schema for class [".$annClassMap->getName()."] was not updated.",
                 epLog::LOG_WARN);
             return false;
