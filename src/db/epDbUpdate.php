@@ -244,7 +244,7 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
         //if not found a match, drop it is requested!
         $this->log('DOING SCHEMA CLEANUP', epLog::LOG_INFO);
         foreach ($outdated as $ocm) {
-            if(!($cm = $this->_findMatch($this->processed, $ocm))){
+            if(!($cm = $this->findMatch($this->processed, $ocm))){
                 // annotate for drop the class
                 $annClassMap = $this->processClassMaps($ocm, null);
 
@@ -367,7 +367,7 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
      */
     protected function _updateSchema($outdCmaps, $ccm, $update = false, $force = false){
 
-        $found = $this->_findMatch($outdCmaps, $ccm);
+        $found = $this->findMatch($outdCmaps, $ccm);
 
         $annClassMap = null;
         if(!$found || $ccm->equal($found)){
@@ -400,26 +400,31 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
     }
 
     /**
-     * Find match for class in classes
+     * Find match for class/field in list
      *
      * Do the work by looking
      *
-     * @param array of epClassMap $classes
-     * @param epClassMap $class
+     * @param array of epClassMap|epFieldMap $item_list
+     * @param epClassMap|epFieldMap $item
+     * @return epClassMap|epFieldMap|false
      */
-    protected function _findMatch($classes, $class){
+    public function findMatch($item_list, $item){
+
+        // prevent key'd by name arrays
+        $item_list = array_values($item_list);
+
         // check fresh class maps to find its match in outdated
-        $ret = null; $count = count($classes);
+        $ret = null; $count = count($item_list);
         $found = false; $i = 0;
         while( !$found && ($i < $count) ){
-            $ocm = $classes[$i];
+            $oitem = $item_list[$i];
             $i++;
             // found class by name or by named custom tag?
-            $found = ($class->getName() == $ocm->getName()) ||
-                ($class->getTag(epDbUpdate::SCHEMA_UI_TAG) && $ocm->getTag(epDbUpdate::SCHEMA_UI_TAG) &&
-                ($class->getTag(epDbUpdate::SCHEMA_UI_TAG) == $ocm->getTag(epDbUpdate::SCHEMA_UI_TAG)));
+            $found = ($item->getName() == $oitem->getName()) ||
+                ($item->getTag(epDbUpdate::SCHEMA_UI_TAG) && $oitem->getTag(epDbUpdate::SCHEMA_UI_TAG) &&
+                ($item->getTag(epDbUpdate::SCHEMA_UI_TAG) == $oitem->getTag(epDbUpdate::SCHEMA_UI_TAG)));
         }
-        return $found ? $ocm : $found;
+        return $found ? $oitem : $found;
     }
 
     /**
