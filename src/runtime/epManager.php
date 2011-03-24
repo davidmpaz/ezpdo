@@ -3480,7 +3480,7 @@ class epManager extends epManagerBase implements epSingleton {
 
             // at this point, if there is any class map outdated not processed
             // it is not used, could be said the class was deleted
-            $this->su->cleanupSchema($update, $force);
+            //$this->su->cleanupSchema($update, $force);
         }
         catch (epExceptionDb $edb){
 
