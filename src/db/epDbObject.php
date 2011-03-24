@@ -767,11 +767,14 @@ class epObj2Sql {
         // rename all existing relationships for the table
         $sql = array();
         $sql[] = sprintf('UPDATE %s SET %s = %s WHERE %s = %s',
-            $db->quoteId($rtable), $class_a_q, $nclass, $class_a_q, $oclass);
+            $db->quoteId($rtable), $class_a_q, $db->quote($nclass),
+            $class_a_q, $db->quote($oclass));
         $sql[] = sprintf('UPDATE %s SET %s = %s WHERE %s = %s',
-            $db->quoteId($rtable), $class_b_q, $nclass, $class_b_q, $oclass);
+            $db->quoteId($rtable), $class_b_q, $db->quote($nclass),
+            $class_b_q, $db->quote($oclass));
         $sql[] = sprintf('UPDATE %s SET %s = %s WHERE %s = %s',
-            $db->quoteId($rtable), $base_b_q, $nclass, $base_b_q, $oclass);
+            $db->quoteId($rtable), $base_b_q, $db->quote($nclass),
+            $base_b_q, $db->quote($oclass));
 
         return $sql;
     }
@@ -798,10 +801,10 @@ class epObj2Sql {
         $var_a = $db->quoteId('var_a');
 
         // rename all existing relationships var name for the table
-        $sql = sprintf('UPDATE %s SET %s = %s WHERE %s = %s',
-            $db->quoteId($rtable), $var_a, $nfname, $var_a, $ofname);
+        $sql = sprintf('UPDATE %s SET %s = %s WHERE %s = %s', $db->quoteId($rtable),
+            $var_a, $db->quote($nfname), $var_a, $db->quote($ofname));
 
-        return $sql;
+        return array($sql);
     }
 
     /**
