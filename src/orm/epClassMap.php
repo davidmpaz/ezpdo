@@ -500,7 +500,7 @@ class epClassMap extends epContainer {
 
         // or let's try parent
         if ($parent = $this->getParent()) {
-            if ($f  = & $parent->getFieldByColumnName($fieldname)) {
+            if ($f  = & $parent->getFieldByColumnName($colname)) {
                 // return immediately if found
                 return $f;
             }
