@@ -274,7 +274,7 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
         //if not found a match, drop it is requested!
         $this->log('DOING SCHEMA CLEANUP', epLog::LOG_INFO);
         foreach ($outdated as $ocm) {
-            if(!($cm = $this->findMatch($this->processed, $ocm))){
+            if(!($cm = $this->_findMatch($this->processed, $ocm))){
                 // annotate for drop the class
                 $annClassMap = $this->processClassMaps($ocm, null);
 
@@ -395,18 +395,19 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
      * @param bool $force whether to force to run destructive queries
      * @return boolean|array of sql refused to execute
      */
-    protected function _updateSchema($outdCmaps, $ccm, $update = false, $force = false){
+    protected function _updateSchema($ocm, $ccm, $update = false, $force = false){
 
-        $found = $this->findMatch($outdCmaps, $ccm);
+        $found = $this->_findMatch($ocm, $ccm);
 
-        $annClassMap = null;
+        // annotated class map
+        $acm = null;
         if(!$found || $ccm->equal($found)){
             // not found fresh class or already equals
             return false;
         }
 
         // compare fields and annotate
-        $annClassMap = $this->processClassMaps($found, $ccm, $force);
+        $acm = $this->processClassMaps($found, $ccm, $force);
 
         // report processed class map
         $this->processed[] = $ccm;
@@ -420,19 +421,24 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
         }
 
         // if was renamed the class
-        if($old_class = $annClassMap->getTag(epDbUpdate::SCHEMA_NAMED_TAG)){
+        $rtables = array();
+        if($old_class = $acm->getTag(epDbUpdate::SCHEMA_NAMED_TAG)){
             // get all realtions fields where it is involved before
             $ofmaps = $this->ocmf->getRelationFields($old_class);
             // get all realtions fields where it is involved now
-            $nfmaps = $this->ep_m->getClassMapFactory()->
-                getRelationFields($annClassMap->getName());
+            $cmf = $this->ep_m->getClassMapFactory();
+            $nfmaps = $cmf->getRelationFields($acm->getName());
+
+            // get relation table info
+            $rtables = $this->_findRelations($acm, $ofmaps, $nfmaps);
+
             // remove old class class map factory repeated, but with different name
             //$this->ep_m->getClassMapFactory()->remove($found->getName());
         }
 
         // real alter table schema operation
-        if(!$ret = $dbo->alter($annClassMap, $ofmaps, $nfmaps, $update, $force)){
-            $this->log("Schema for class [".$annClassMap->getName()."] was not updated.",
+        if(!$ret = $dbo->alter($acm, $rtables, $update, $force)){
+            $this->log("Schema for class [".$acm->getName()."] was not updated.",
                 epLog::LOG_WARN);
             return false;
         }
@@ -449,7 +455,7 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
      * @param epClassMap|epFieldMap $item
      * @return epClassMap|epFieldMap|false
      */
-    public function findMatch($item_list, $item){
+    protected function _findMatch($item_list, $item){
 
         // prevent key'd by name arrays
         $item_list = array_values($item_list);
@@ -466,6 +472,47 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
                 ($item->getTag(epDbUpdate::SCHEMA_UI_TAG) == $oitem->getTag(epDbUpdate::SCHEMA_UI_TAG)));
         }
         return $found ? $oitem : $found;
+    }
+
+    /**
+     * Returns array with information about relations betwenn field maps.
+     * @param epClassMap $cm Class map related to relationship fields
+     * @param array of epFieldMapRelationship $ofcm
+     * @param array of epFieldMapRelationship $nfcm
+     * @return array of array('new_table', 'old_table', 'new_class', 'old_class')
+     */
+    protected function _findRelations($cm, $ofms, $nfms) {
+
+        $result = array();
+
+        // find relation tables
+        foreach ( $ofms as $fn => $fm ) {
+            $base_a = $fm->getBase_a();
+            $base_b = $fm->getBase_b();
+            $ortable = $this->ep_m->getRelationTable( $base_a, $base_b );
+
+            // get the name of new relationship table
+            if(!($new_fm = $this->_findMatch($nfms, $fm))){
+                // not found, so move on
+                continue;
+            }
+
+            // get new table name
+            $nbase_a = $new_fm->getBase_a();
+            $obase_a = $new_fm->getBase_b();
+            $nrtable = $this->ep_m->getRelationTable($nbase_a, $obase_a);
+
+            // class names
+            $oc = $cm->getTag( epDbUpdate::SCHEMA_NAMED_TAG );
+            $nc = $cm->getName();
+
+            $result[] = array(
+                "old_table" => $ortable, "new_table" => $nrtable,
+                "old_class" => $oc, "new_class" => $nc);
+
+        }
+
+        return $result;
     }
 
     /**

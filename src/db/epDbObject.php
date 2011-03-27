@@ -923,9 +923,6 @@ class epDbObject {
      */
     public function __construct($db) {
         $this->db = $db;
-
-        // cached manager
-        $this->ep_m = epManager::instance();
     }
 
     /**
@@ -1428,15 +1425,14 @@ class epDbObject {
      * dropping the table
      *
      * @param epClassMap $cm The class map
-     * @param array of epFieldMap relation fields where old $cm is involved
-     * @param array of epFieldMap relation fields where new class map is involved
+     * @param array $rtables relation table information for renaming
      * @param boolean $update run queries or log them
      * @param boolean $force Whether to force schema update WARNING!!!
      * @return false|array  of sql to execute and result of operations.
      * @author David Moises Paz <davidmpaz@gmail.com>
      * @version 1.1.6
      */
-    public function alter($cm, $ofms = array(), $nfms = array(), $update = false, $force = false) {
+    public function alter($cm, $rtables = array(), $update = false, $force = false) {
 
         // we will return array of queries
         $result = array('executed' => array(), 'ignored' => array(), 'sucess' => false);
@@ -1482,33 +1478,14 @@ class epDbObject {
         }
 
         // rename relationship classes
-        foreach ( $ofms as $fn => $fm ) {
-            $base_a = $fm->getBase_a();
-            $base_b = $fm->getBase_b();
-            $rtable = $this->ep_m->getRelationTable( $base_a, $base_b );
-            if ($this->_tableExists( $rtable )) {
-                // get the name of new relationship table
-                if(!($new_fm = $this->ep_m->getUpdater()->findMatch($nfms, $fm))){
-                    // not found a match for old field map in new class map
-                    throw new epExceptionDbObject(
-                        "Can not rename relationship table [$rtable].");
-                    return false;
-                }
+        foreach ($rtables as $t) {
+            $queries = epObj2Sql::sqlRenameRelationshipClass($this,
+                $t['old_table'], $t['new_table'],
+                $t['old_class'], $t['new_class'] );
 
-                // get new table name
-                $nrtable = $this->ep_m->getRelationTable(
-                    $new_fm->getBase_a(), $new_fm->getBase_b() );
-
-                // class names
-                $oc = $cm->getTag( epDbUpdate::SCHEMA_NAMED_TAG );
-                $nc = $cm->getName();
-
-                $queries = epObj2Sql::sqlRenameRelationshipClass(
-                    $this, $rtable, $nrtable, $oc, $nc );
-                // merge first relation modifications, lastly table renaming
-                $sql[epDbUpdate::OP_TABLE] =
-                    array_merge($queries, $sql[epDbUpdate::OP_TABLE]);
-            }
+            // merge first relation modifications, lastly table renaming
+            $sql[epDbUpdate::OP_TABLE] =
+                array_merge($queries, $sql[epDbUpdate::OP_TABLE]);
         }
 
         // eliminate possibles duplicates
