@@ -88,10 +88,40 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
     protected $processed = array();
 
     /**
+     * Get Outdated class map factory to compare against
+     * @return the $ocmf
+     */
+    public function getClassMapFactory() {
+        return $this->ocmf;
+    }
+
+    /**
+     * Set Outdated class map factory to compare against
+     * @param $ocmf the $ocmf to set
+     */
+    public function setClassMapFactory($ocmf) {
+        $this->ocmf = $ocmf;
+    }
+
+    /**
+     * @param $processed the $processed to set
+     */
+    public function setProcessed($processed) {
+        $this->processed = $processed;
+    }
+
+    /**
      * @return array the $processed
      */
     public function getProcessed() {
         return $this->processed;
+    }
+
+	/**
+     * @param $strategy the $strategy to set
+     */
+    public function setStrategy($strategy) {
+        $this->strategy = $strategy;
     }
 
     /**
@@ -107,7 +137,7 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
      * @access public
      * @see epConfig
      */
-	public function __construct($config = null) {
+    public function __construct($config = null) {
         parent::__construct($config);
 
         // get manager
