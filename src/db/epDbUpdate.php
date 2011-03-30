@@ -82,12 +82,6 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
     protected $ep_m = false;
 
     /**
-     * A record of processed classes
-     * @var array
-     */
-    protected $processed = array();
-
-    /**
      * Get Outdated class map factory to compare against
      * @return the $ocmf
      */
@@ -101,20 +95,6 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
      */
     public function setClassMapFactory($ocmf) {
         $this->ocmf = $ocmf;
-    }
-
-    /**
-     * @param $processed the $processed to set
-     */
-    public function setProcessed($processed) {
-        $this->processed = $processed;
-    }
-
-    /**
-     * @return array the $processed
-     */
-    public function getProcessed() {
-        return $this->processed;
     }
 
 	/**
@@ -258,43 +238,46 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
         return $ret['sucess'];
     }
 
-    public function cleanupSchema($update, $force) {
+    public function cleanupSchema() {
+
         // sanity check
-        if(!($this->processed && $this->ocmf)){
+        if(!($this->ocmf || $updated = $this->ep_m->getClassMapFactory()->allMade())){
             return false;
         }
 
         // lets find surplus classes and drop them
         $outdated = $this->ocmf->allMade();
-        if(!(count($outdated) > count($this->processed))){
+        if(!(count($outdated) > count($updated))){
             //nothing to do
             return false;
         }
 
         //if not found a match, drop it is requested!
-        $this->log('DOING SCHEMA CLEANUP', epLog::LOG_INFO);
+        include_once(EP_SRC_DB.'/epDbObject.php');
+        $this->log('Cleaning schema - start', epLog::LOG_INFO);
+
         foreach ($outdated as $ocm) {
-            if(!($cm = $this->_findMatch($this->processed, $ocm))){
-                // annotate for drop the class
-                $annClassMap = $this->processClassMaps($ocm, null);
+
+            if(!($cm = $this->_findMatch($updated, $ocm))){
 
                 // get db object
-                include_once(EP_SRC_DB.'/epDbObject.php');
                 $dbo = epDbFactory::instance()->make($ocm->getDsn());
                 if( !($dbo)){
                     throw new epExceptionDbUpdate("Can not create db object.");
                     continue;
                 }
-                // real alter table schema operation
-                if(!$ret = $dbo->alter($annClassMap, $update, $force)){
-                    $this->log(
-                        "Schema for class [" . $annClassMap->getName() . "] was not droped.",
-                        epLog::LOG_WARN);
-                    continue;
+
+                // drop the class
+                $log = "Schema for class [%s] was %sdroped.";
+                if(!$ret = $dbo->drop($ocm)){
+                    $this->log(sprintf($log, $ocm->getName(), "not "), epLog::LOG_ALERT);
+                }else{
+                    $this->log(sprintf($log, $ocm->getName(), ""), epLog::LOG_ALERT);
                 }
             }
         }
-        $this->log('END OF SCHEMA CLEANUP', epLog::LOG_INFO);
+
+        $this->log('Cleaning schema - end', epLog::LOG_INFO);
     }
 
     /**
@@ -409,9 +392,6 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
         // compare fields and annotate
         $acm = $this->processClassMaps($found, $ccm, $force);
 
-        // report processed class map
-        $this->processed[] = $ccm;
-
         // get db object
         include_once(EP_SRC_DB.'/epDbObject.php');
         $dbo = epDbFactory::instance()->make($ccm->getDsn());
@@ -432,8 +412,9 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
             // get relation table info
             $rtables = $this->_findRelations($acm, $ofmaps, $nfmaps);
 
-            // remove old class class map factory repeated, but with different name
-            //$this->ep_m->getClassMapFactory()->remove($found->getName());
+            // remove old class class map repeated, but with different name
+            $this->ep_m->getClassMapFactory()->remove($found->getName());
+            $this->ocmf->remove($found->getName());
         }
 
         // real alter table schema operation
