@@ -752,6 +752,19 @@ class epFieldMapRelationship extends epFieldMap {
             ! ( empty($this->inverse) || empty($fm->inverse) ) &&
             $this->getInverse()->equal($fm->getInverse());
     }
+
+    /**
+     * Whether $this is type compatible with $fm. This is: field type of $this
+     * can be changed to field type of $fm without loose data.
+     *
+     * Since we won't allow change relationship type (for now ?), false is returned
+     *
+     * @param epFieldMapRelationship $fm field map to verify against it
+     * @return boolean
+     */
+    public function isTypeCompatible($fm){
+        return false;
+    }
 }
 
 /**
