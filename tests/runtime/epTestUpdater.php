@@ -70,7 +70,6 @@ class epTestUpdater extends epTestRuntime {
         // created
         $this->assertTrue($updater = new epDbUpdate($m->getConfig()));
         $this->assertEqual($updater->getStrategy(), 'drop');
-        $this->assertFalse($updater->getProcessed());
         $this->assertFalse($updater->getClassMapFactory());
         $this->u = $updater;
     }
