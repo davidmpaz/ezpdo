@@ -400,22 +400,22 @@ class epFieldMapPrimitive extends epFieldMap {
     }
 
     /**
-     * Overrides {@link epDbUpdate::equal()}
+     * Overrides {@link epFieldMap::equal()}
      *
      * @param epFieldMap $fm
      * @param bool $checkName
      * @return boolean|boolean
      */
     public function equal($fm, $checkName = true) {
-        //not primitive too, call parent
+        // not primitive ?
         if(! $fm->isPrimitive()){
-            return parent::equal($fm, $checkName);
+            return false;
         }
 
         return
             parent::equal($fm, $checkName) &&
-            //also compare type_params
-            $this->getTypeParams() == $this->getTypeParams();
+            // also compare type_params
+            $this->getTypeParams() == $fm->getTypeParams();
     }
 
     /**
@@ -730,6 +730,27 @@ class epFieldMapRelationship extends epFieldMap {
      */
     public function getBase_b() {
         return $this->getBase()->getClass();
+    }
+
+    /**
+     * Overrides {@link epFieldMap::equal()}
+     *
+     * @param epFieldMap $fm
+     * @param bool $checkName
+     * @return boolean|boolean
+     */
+    public function equal($fm, $checkName = true) {
+        // is primitive?
+        if($fm->isPrimitive()){
+            return false;
+        }
+
+        return
+            parent::equal($fm, $checkName) &&
+            // also compare multiplicity and inverse relationship
+            $this->isMany() == $fm->isMany() &&
+            ! ( empty($this->inverse) || empty($fm->inverse) ) &&
+            $this->getInverse()->equal($fm->getInverse());
     }
 }
 
