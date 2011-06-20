@@ -750,7 +750,7 @@ class epFieldMapRelationship extends epFieldMap {
             // also compare multiplicity and inverse relationship
             $this->isMany() == $fm->isMany() &&
             ! ( empty($this->inverse) || empty($fm->inverse) ) &&
-            $this->getInverse()->equal($fm->getInverse());
+            $this->getInverse() == $fm->getInverse();
     }
 
     /**
