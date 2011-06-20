@@ -88,8 +88,13 @@ class epTestUpdater extends epTestRuntime {
 
         $fm2 = new epFieldMapPrimitive('age', 'integer', 16, $cm);
         $fm2->setTag('uuid', '021');
+
+        $fm3 = new epFieldMapRelationship('books', 'has', 'Book', true, false, $cm);
+        $fm3->setTag('uuid', '022');
         // add the fields
-        $cm->addField($fm1); $cm->addField($fm2);
+        $cm->addField($fm1);
+        $cm->addField($fm2);
+        $cm->addField($fm3);
 
 
         $cm2 = new epClassMap('Person');
@@ -97,10 +102,16 @@ class epTestUpdater extends epTestRuntime {
 
         $fm21 = new epFieldMapPrimitive('id', 'integer', 16, $cm2);
         $fm21->setTag('uuid', '031');
+
         $fm22 = new epFieldMapPrimitive('name', 'char', 50, $cm2);
         $fm22->setTag('uuid', '011');
+
+        $fm23 = new epFieldMapRelationship('magazines', 'has', 'Book', true, false, $cm2);
+        $fm23->setTag('uuid', '022');
         // add the fields
-        $cm2->addField($fm21); $cm2->addField($fm22);
+        $cm2->addField($fm21);
+        $cm2->addField($fm22);
+        $cm2->addField($fm23);
 
         $this->assertTrue($anncm = $this->u->processClassMaps($cm, $cm2));
 
@@ -109,7 +120,7 @@ class epTestUpdater extends epTestRuntime {
         $this->assertEqual('Person', $anncm->getName());
 
         $fields = $anncm->getAllFields();
-        $this->assertEqual(3, count($fields));
+        $this->assertEqual(4, count($fields));
         $this->assertTrue(isset($fields['name']));
         $this->assertTrue(isset($fields['id']));
         $this->assertTrue(isset($fields['age']));
@@ -117,6 +128,10 @@ class epTestUpdater extends epTestRuntime {
         // this doesn't changed
         $this->assertFalse($fields['name']->getTag(epDbUpdate::SCHEMA_NAMED_TAG));
         $this->assertFalse($fields['name']->getTag(epDbUpdate::SCHEMA_OP_TAG));
+
+        // name of this was changed
+        $this->assertEqual($fields['magazines']->getTag(epDbUpdate::SCHEMA_OP_TAG), 'alter');
+        $this->assertEqual($fields['magazines']->getTag(epDbUpdate::SCHEMA_NAMED_TAG), 'books');
 
         // this one was added
         $this->assertEqual($fields['id']->getTag(epDbUpdate::SCHEMA_OP_TAG), 'add');
@@ -158,7 +173,7 @@ class epTestUpdater extends epTestRuntime {
         $fm5 = new epFieldMapRelationship('books', 'eptBook', 'eptBook', true, false, $cm);
         $fm5->setTag('uuid', '0015');
 
-        $fm6 = new epFieldMapRelationship('contact', 'eptContact', 'eptContact', false, false, $cm);
+        $fm6 = new epFieldMapRelationship('business_contact', 'eptContact', 'eptContact', false, false, $cm);
         $fm6->setTag('uuid', '0016');
 
         // add the fields

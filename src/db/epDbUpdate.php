@@ -311,8 +311,6 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
         $ofm = $outdCm->getAllFields();
         $cfm = $updCm->getAllFields();
         foreach ($cfm as $fname => &$ufm) {
-            //no relation for now
-            if(! $ufm->isPrimitive()) continue;
 
             // directly found field
             if( isset($ofm[$fname]) ){
@@ -344,8 +342,8 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
                 $ufm->setTag(epDbUpdate::SCHEMA_NAMED_TAG, $last_name);
                 unset($ofm[$last_name]);
             }
-            //needs to be added
-            else{
+            //needs to be added, only if primitive, relationship are maintained apart
+            elseif($ufm->isPrimitive()){
                 $ufm->setTag(epDbUpdate::SCHEMA_OP_TAG, epDbUpdate::OP_ADD);
             }
         }
@@ -359,6 +357,9 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
                         $fm->getName(), $fm->getType(), $fm->getTypeParams());
                 $f->setTag(epDbUpdate::SCHEMA_OP_TAG, epDbUpdate::OP_DROP);
                 $updCm->addField($f);
+            // }else{
+                // should be deleted the relationship table ?
+                // DO NOTHING mean while
             }
         }
 
