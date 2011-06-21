@@ -1727,6 +1727,34 @@ class epDbObject {
     }
 
     /**
+     * Rename relationships var name for a relationship class map or
+     * produce the sql for it.
+     *
+     * @param epClassMap $cm
+     * @param string $rtable
+     * @param string $ofname
+     * @param string $nfname
+     * @author David Moises Paz <davidmpaz@gmail.com>
+     * @since 1.1.6
+     */
+    public function renameRelationship($cm, $rtable, $ofname, $nfname, $force = false) {
+
+        // make sure the table is created
+        if (!$this->create($cm, false)) {
+            return false;
+        }
+
+        // make sql for relationship update
+        $sql = epObj2Sql::sqlRenameRelationshipName($this, $rtable, $ofname, $nfname);
+        if (!$sql) {
+            return false;
+        }
+
+        // run query if force, return sql in other case
+        return $force ? $this->_execute($sql) : $sql;
+    }
+
+    /**
      * Returns the last insert id
      * @param string $oid the oid column
      * @return integer
