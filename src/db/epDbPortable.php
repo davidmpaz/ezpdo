@@ -280,7 +280,7 @@ class epDbPortable {
      * Sql is returned in array keyed by operations (drop,change,add).
      *
      * @param epClassMap $ncm New class map
-     * @param epDb $db
+     * @param epDbObject $db
      * @param $force
      * @return array('drop', 'alter', 'add', 'ignore', 'table')
      * @author David Moises Paz <davidmpaz@gmail.com>
