@@ -56,6 +56,7 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
     const SCHEMA_UI_TAG = "uuid";
     const SCHEMA_NAMED_TAG = "named";
     const SCHEMA_TNAMED_TAG = "tablename";
+    const SCHEMA_RELATION_TAG = "relationtable";
 
     const OP_TABLE      = "table";
     const OP_IGNORE     = "ignore";
@@ -340,6 +341,16 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
                 // annotate field to modify
                 $ufm->setTag(epDbUpdate::SCHEMA_OP_TAG, epDbUpdate::OP_ALTER);
                 $ufm->setTag(epDbUpdate::SCHEMA_NAMED_TAG, $last_name);
+
+                if(!$ufm->isPrimitive()){
+                    // annotate relation table
+                    $base_a = $fm->getBase_a();
+                    $base_b = $fm->getBase_b();
+                    $ufm->setTag(
+                        epDbUpdate::SCHEMA_RELATION_TAG,
+                        $this->ep_m->getRelationTable($base_a, $base_b)
+                    );
+                }
                 unset($ofm[$last_name]);
             }
             //needs to be added, only if primitive, relationship are maintained apart

@@ -305,15 +305,22 @@ class epDbPortable {
 
         // get queries for alter table
         foreach ($ncm->getAllFields() as $fm) {
-            // no relationships for now
-            if(!$fm->isPrimitive()){
-                continue;
-            }
+
             //get the sql for the column
             $op = $fm->getTag(epDbUpdate::SCHEMA_OP_TAG);
             $n = $fm->getTag(epDbUpdate::SCHEMA_NAMED_TAG);
             $fstr = false;
-            if($op || $n){
+
+            // relationships now
+            if(!$fm->isPrimitive() || $n){
+                $table = $fm->getTag(epDbUpdate::SCHEMA_RELATION_TAG);
+                // rename the var name in relationship table
+                $fstr = $db->renameRelationship($ncm, $table, $n, $fm->getName());
+
+                $sqls[($fm->getTag(epDbUpdate::OP_IGNORE))
+                    ? epDbUpdate::OP_IGNORE
+                    : $op] = $fstr;
+            }elseif($op || $n){
                 $fstr = $this->_alterField(
                     $db->quoteId( ($n) ? $n : $fm->getColumnName() ),
                     $db->quoteId($fm->getColumnName()),
@@ -322,18 +329,19 @@ class epDbPortable {
                     $fm->getTypeParams(),
                     $fm->getDefaultValue()
                 );
-            }
-            if(is_array($fstr)){
-                // more than one query produced
-                foreach ($fstr as $q) {
+
+                if(is_array($fstr)){
+                    // more than one query produced
+                    foreach ($fstr as $q) {
+                        $sqls[($fm->getTag(epDbUpdate::OP_IGNORE))
+                        ? epDbUpdate::OP_IGNORE
+                        : $op][] = "ALTER TABLE " . $db->quoteId($oldtable) . " " . $q;
+                    }
+                }elseif($fstr){
                     $sqls[($fm->getTag(epDbUpdate::OP_IGNORE))
-                    ? epDbUpdate::OP_IGNORE
-                    : $op][] = "ALTER TABLE " . $db->quoteId($oldtable) . " " . $q;
+                        ? epDbUpdate::OP_IGNORE
+                        : $op][] = "ALTER TABLE " . $db->quoteId($oldtable) . " " . $fstr;
                 }
-            }elseif($fstr){
-                $sqls[($fm->getTag(epDbUpdate::OP_IGNORE))
-                    ? epDbUpdate::OP_IGNORE
-                    : $op][] = "ALTER TABLE " . $db->quoteId($oldtable) . " " . $fstr;
             }
         }
 
