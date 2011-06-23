@@ -197,7 +197,7 @@ class epTestUpdater extends epTestRuntime {
         else $queries = $this->u->updateSchema($cm);
 
         $this->assertTrue($queries['sucess']);
-        $this->assertEqual(10, count($queries['executed']));
+        $this->assertEqual(11, count($queries['executed']));
         $this->assertEqual(2, count($queries['ignored']));
 
         $method = "_assert". $dbtpye ."UpdateSchema";
@@ -208,24 +208,26 @@ class epTestUpdater extends epTestRuntime {
 
         $this->assertEqual("ALTER TABLE `eptAuthor` ADD COLUMN `address` varchar(255)",
             $queries['executed'][0]);
-        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptcontact` SET `class_a` = 'Author' WHERE `class_a` = 'eptAuthor'",
+        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptcontact` SET `var_a` = 'business_contact' WHERE `var_a` = 'contact'",
             $queries['executed'][1]);
-        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptcontact` SET `class_b` = 'Author' WHERE `class_b` = 'eptAuthor'",
+        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptcontact` SET `class_a` = 'Author' WHERE `class_a` = 'eptAuthor'",
             $queries['executed'][2]);
-        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptcontact` SET `base_b` = 'Author' WHERE `base_b` = 'eptAuthor'",
+        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptcontact` SET `class_b` = 'Author' WHERE `class_b` = 'eptAuthor'",
             $queries['executed'][3]);
-        $this->assertEqual("ALTER TABLE `_ez_relation_eptauthor_eptcontact` RENAME TO `_ez_relation_author_eptcontact`",
+        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptcontact` SET `base_b` = 'Author' WHERE `base_b` = 'eptAuthor'",
             $queries['executed'][4]);
-        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptbook` SET `class_a` = 'Author' WHERE `class_a` = 'eptAuthor'",
+        $this->assertEqual("ALTER TABLE `_ez_relation_eptauthor_eptcontact` RENAME TO `_ez_relation_author_eptcontact`",
             $queries['executed'][5]);
-        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptbook` SET `class_b` = 'Author' WHERE `class_b` = 'eptAuthor'",
+        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptbook` SET `class_a` = 'Author' WHERE `class_a` = 'eptAuthor'",
             $queries['executed'][6]);
-        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptbook` SET `base_b` = 'Author' WHERE `base_b` = 'eptAuthor'",
+        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptbook` SET `class_b` = 'Author' WHERE `class_b` = 'eptAuthor'",
             $queries['executed'][7]);
-        $this->assertEqual("ALTER TABLE `_ez_relation_eptauthor_eptbook` RENAME TO `_ez_relation_author_eptbook`",
+        $this->assertEqual("UPDATE `_ez_relation_eptauthor_eptbook` SET `base_b` = 'Author' WHERE `base_b` = 'eptAuthor'",
             $queries['executed'][8]);
-        $this->assertEqual("ALTER TABLE `eptAuthor` RENAME TO `Author`",
+        $this->assertEqual("ALTER TABLE `_ez_relation_eptauthor_eptbook` RENAME TO `_ez_relation_author_eptbook`",
             $queries['executed'][9]);
+        $this->assertEqual("ALTER TABLE `eptAuthor` RENAME TO `Author`",
+            $queries['executed'][10]);
 
         $this->assertEqual("ALTER TABLE `eptAuthor` DROP COLUMN `uuid`",
             $queries['ignored'][0]);
@@ -237,24 +239,26 @@ protected function _assertPostgresUpdateSchema($queries){
 
         $this->assertEqual('ALTER TABLE "eptAuthor" ADD COLUMN "address" varchar(255)',
             $queries['executed'][0]);
-        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptcontact" SET "class_a" = \'Author\' WHERE "class_a" = \'eptAuthor\'',
+        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptcontact" SET "var_a" = \'business_contact\' WHERE "var_a" = \'contact\'',
             $queries['executed'][1]);
-        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptcontact" SET "class_b" = \'Author\' WHERE "class_b" = \'eptAuthor\'',
+        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptcontact" SET "class_a" = \'Author\' WHERE "class_a" = \'eptAuthor\'',
             $queries['executed'][2]);
-        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptcontact" SET "base_b" = \'Author\' WHERE "base_b" = \'eptAuthor\'',
+        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptcontact" SET "class_b" = \'Author\' WHERE "class_b" = \'eptAuthor\'',
             $queries['executed'][3]);
-        $this->assertEqual('ALTER TABLE "_ez_relation_eptauthor_eptcontact" RENAME TO "_ez_relation_author_eptcontact"',
+        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptcontact" SET "base_b" = \'Author\' WHERE "base_b" = \'eptAuthor\'',
             $queries['executed'][4]);
-        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptbook" SET "class_a" = \'Author\' WHERE "class_a" = \'eptAuthor\'',
+        $this->assertEqual('ALTER TABLE "_ez_relation_eptauthor_eptcontact" RENAME TO "_ez_relation_author_eptcontact"',
             $queries['executed'][5]);
-        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptbook" SET "class_b" = \'Author\' WHERE "class_b" = \'eptAuthor\'',
+        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptbook" SET "class_a" = \'Author\' WHERE "class_a" = \'eptAuthor\'',
             $queries['executed'][6]);
-        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptbook" SET "base_b" = \'Author\' WHERE "base_b" = \'eptAuthor\'',
+        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptbook" SET "class_b" = \'Author\' WHERE "class_b" = \'eptAuthor\'',
             $queries['executed'][7]);
-        $this->assertEqual('ALTER TABLE "_ez_relation_eptauthor_eptbook" RENAME TO "_ez_relation_author_eptbook"',
+        $this->assertEqual('UPDATE "_ez_relation_eptauthor_eptbook" SET "base_b" = \'Author\' WHERE "base_b" = \'eptAuthor\'',
             $queries['executed'][8]);
-        $this->assertEqual('ALTER TABLE "eptAuthor" RENAME TO "Author"',
+        $this->assertEqual('ALTER TABLE "_ez_relation_eptauthor_eptbook" RENAME TO "_ez_relation_author_eptbook"',
             $queries['executed'][9]);
+        $this->assertEqual('ALTER TABLE "eptAuthor" RENAME TO "Author"',
+            $queries['executed'][10]);
 
         $this->assertEqual('ALTER TABLE "eptAuthor" DROP COLUMN "uuid"',
             $queries['ignored'][0]);
