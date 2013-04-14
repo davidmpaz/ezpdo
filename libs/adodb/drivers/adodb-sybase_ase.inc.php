@@ -1,14 +1,18 @@
 <?php
 /*
-  V4.65 22 July 2005  (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
-  Released under both BSD license and Lesser GPL library license.
-  Whenever there is any discrepancy between the two licenses,
+  V5.18 3 Sep 2012  (c) 2000-2012 John Lim (jlim#natsoft.com). All rights reserved.
+  Released under both BSD license and Lesser GPL library license. 
+  Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence.
   
   Set tabs to 4.
   
   Contributed by Interakt Online. Thx Cristian MARIN cristic#interaktonline.com
 */
+
+
+require_once ADODB_DIR."/drivers/adodb-sybase.inc.php";
+
 class ADODB_sybase_ase extends ADODB_sybase {
  	var $databaseType = "sybase_ase";
 	
@@ -21,7 +25,7 @@ class ADODB_sybase_ase extends ADODB_sybase {
 	}
 	
 	// split the Views, Tables and procedures.
-	function &MetaTables($ttype=false,$showSchema=false,$mask=false)
+	function MetaTables($ttype=false,$showSchema=false,$mask=false)
 	{
 		$false = false;
 		if ($this->metaTablesSQL) {
@@ -31,7 +35,7 @@ class ADODB_sybase_ase extends ADODB_sybase {
 						$sql = str_replace('U', 'V', $this->metaTablesSQL);
 			}elseif (false === $ttype){
 						$sql = str_replace('U',"U' OR type='V", $this->metaTablesSQL);
-			}else{ // TABLES OR ANY OTHER
+			}else{ // TABLES OR ANY OTHER 
 						$sql = $this->metaTablesSQL;
 			}
 			$rs = $this->Execute($sql);
@@ -39,7 +43,7 @@ class ADODB_sybase_ase extends ADODB_sybase {
 			if ($rs === false || !method_exists($rs, 'GetArray')){
 					return $false;
 			}
-			$arr =& $rs->GetArray();
+			$arr = $rs->GetArray();
 
 			$arr2 = array();
 			foreach($arr as $key=>$value){
@@ -67,7 +71,7 @@ class ADODB_sybase_ase extends ADODB_sybase {
 	}
 
 	// fix a bug which prevent the metaColumns query to be executed for Sybase ASE
-	function &MetaColumns($table,$upper=false)
+	function MetaColumns($table,$upper=false) 
 	{
 		$false = false;
 		if (!empty($this->metaColumnsSQL)) {
@@ -77,12 +81,7 @@ class ADODB_sybase_ase extends ADODB_sybase {
 
 			$retarr = array();
 			while (!$rs->EOF) {
-/*
-				New code because assigning the return valure of new by reference is deprecated
 				$fld = new ADOFieldObject();
-*/
-				$fldObj = new ADOFieldObject();
-				$fld =& $fldObj;
 				$fld->name = $rs->Fields('field_name');
 				$fld->type = $rs->Fields('type');
 				$fld->max_length = $rs->Fields('width');
@@ -90,7 +89,7 @@ class ADODB_sybase_ase extends ADODB_sybase {
 				$rs->MoveNext();
 			}
 			$rs->Close();
-			return $retarr;
+			return $retarr;	
 		}
 		return $false;
 	}
@@ -105,7 +104,7 @@ class ADODB_sybase_ase extends ADODB_sybase {
 		if (!function_exists('sybase_connect')){
 				return 'Your PHP doesn\'t contain the Sybase connection module!';
 		}
-		return parent::ErrorMsg();
+		return parent::ErrorMsg();	
 	}
 }
 

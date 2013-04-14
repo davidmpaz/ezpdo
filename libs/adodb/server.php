@@ -1,7 +1,7 @@
 <?php
 
 /** 
- * @version V4.65 22 July 2005 (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
+ * @version V4.93 10 Oct 2006 (c) 2000-2012 John Lim (jlim#natsoft.com). All rights reserved.
  * Released under both BSD license and Lesser GPL library license. 
   Whenever there is any discrepancy between the two licenses, 
   the BSD license will take precedence. 
@@ -26,7 +26,7 @@
  * Define the IP address you want to accept requests from 
  * as a security measure. If blank we accept anyone promisciously!
  */
-$ACCEPTIP = '';
+$ACCEPTIP = '127.0.0.1';
 
 /*
  * Connection parameters
@@ -34,7 +34,7 @@ $ACCEPTIP = '';
 $driver = 'mysql';
 $host = 'localhost'; // DSN for odbc
 $uid = 'root';
-$pwd = '';
+$pwd = 'garbase-it-is';
 $database = 'test';
 
 /*============================ DO NOT MODIFY BELOW HERE =================================*/
@@ -67,24 +67,26 @@ function undomq(&$m)
 
 $remote = $_SERVER["REMOTE_ADDR"]; 
  
-if (empty($_GET['sql'])) err('No SQL');
 
 if (!empty($ACCEPTIP))
  if ($remote != '127.0.0.1' && $remote != $ACCEPTIP) 
  	err("Unauthorised client: '$remote'");
+	
+	
+if (empty($_REQUEST['sql'])) err('No SQL');
 
 
-$conn = &ADONewConnection($driver);
+$conn = ADONewConnection($driver);
 
 if (!$conn->Connect($host,$uid,$pwd,$database)) err($conn->ErrorNo(). $sep . $conn->ErrorMsg());
-$sql = undomq($_GET['sql']);
+$sql = undomq($_REQUEST['sql']);
 
-if (isset($_GET['fetch']))
-	$ADODB_FETCH_MODE = $_GET['fetch'];
+if (isset($_REQUEST['fetch']))
+	$ADODB_FETCH_MODE = $_REQUEST['fetch'];
 	
-if (isset($_GET['nrows'])) {
-	$nrows = $_GET['nrows'];
-	$offset = isset($_GET['offset']) ? $_GET['offset'] : -1;
+if (isset($_REQUEST['nrows'])) {
+	$nrows = $_REQUEST['nrows'];
+	$offset = isset($_REQUEST['offset']) ? $_REQUEST['offset'] : -1;
 	$rs = $conn->SelectLimit($sql,$nrows,$offset);
 } else 
 	$rs = $conn->Execute($sql);

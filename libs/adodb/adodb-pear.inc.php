@@ -1,12 +1,12 @@
 <?php
-/**
- * @version V4.65 22 July 2005 (c) 2000-2005 John Lim (jlim@natsoft.com.my). All rights reserved.
- * Released under both BSD license and Lesser GPL library license.
- * Whenever there is any discrepancy between the two licenses,
- * the BSD license will take precedence.
+/** 
+ * @version V5.18 3 Sep 2012  (c) 2000-2012 John Lim (jlim#natsoft.com). All rights reserved.
+ * Released under both BSD license and Lesser GPL library license. 
+ * Whenever there is any discrepancy between the two licenses, 
+ * the BSD license will take precedence. 
  *
  * Set tabs to 4 for best viewing.
- *
+ * 
  * PEAR DB Emulation Layer for ADODB.
  *
  * The following code is modelled on PEAR DB code by Stig Bakken <ssb@fast.no>								   |
@@ -109,19 +109,11 @@ class DB
 	 * error
 	 */
 
-	function &factory($type)
+	function factory($type)
 	{
 		include_once(ADODB_DIR."/drivers/adodb-$type.inc.php");
-		$obj = &NewADOConnection($type);
-/*
-		New code because assigning the return valure of new by reference is deprecated
+		$obj = NewADOConnection($type);
 		if (!is_object($obj)) $obj = new PEAR_Error('Unknown Database Driver: '.$dsninfo['phptype'],-1);
-*/
-		if (!is_object($obj))
-		{
-		    $objObj = new PEAR_Error('Unknown Database Driver: '.$dsninfo['phptype'],-1);
-		    $obj =& $objObj;
-		}
 		return $obj;
 	}
 
@@ -144,7 +136,7 @@ class DB
 	 * @see DB::parseDSN
 	 * @see DB::isError
 	 */
-	static function &connect($dsn, $options = false)
+	function connect($dsn, $options = false)
 	{
 		if (is_array($dsn)) {
 			$dsninfo = $dsn;
@@ -165,14 +157,9 @@ class DB
 			 @include_once("adodb-$type.inc.php");
 		}
 
-		@$obj =& NewADOConnection($type);
+		@$obj = NewADOConnection($type);
 		if (!is_object($obj)) {
-/*
-			New code because assigning the return valure of new by reference is deprecated
-			$obj =& new PEAR_Error('Unknown Database Driver: '.$dsninfo['phptype'],-1);
-*/
-			$objObj = new PEAR_Error('Unknown Database Driver: '.$dsninfo['phptype'],-1);
-			$obj =& $objObj;
+			$obj = new PEAR_Error('Unknown Database Driver: '.$dsninfo['phptype'],-1);
 			return $obj;
 		}
 		if (is_array($options)) {
@@ -221,11 +208,11 @@ class DB
 	 *
 	 * @return bool whether $value is an error
 	 */
-	static function isError($value)
+	function isError($value)
 	{
 		if (!is_object($value)) return false;
-		$class = get_class($value);
-		return $class == 'pear_error' || is_subclass_of($value, 'pear_error') ||
+		$class = strtolower(get_class($value));
+		return $class == 'pear_error' || is_subclass_of($value, 'pear_error') || 
 				$class == 'db_error' || is_subclass_of($value, 'db_error');
 	}
 
@@ -239,7 +226,7 @@ class DB
 	 *
 	 * @return bool whether $value is a warning
 	 */
-	static function isWarning($value)
+	function isWarning($value)
 	{
 		return false;
 		/*
@@ -280,7 +267,7 @@ class DB
 	 *
 	 * @author Tomas V.V.Cox <cox@idecnet.com>
 	 */
-	static function parseDSN($dsn)
+	function parseDSN($dsn)
 	{
 		if (is_array($dsn)) {
 			return $dsn;
