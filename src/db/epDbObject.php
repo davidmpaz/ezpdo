@@ -1798,7 +1798,12 @@ class epDbObject {
 
             case epFieldMap::DT_BLOB:
             //case epFieldMap::DT_TEXT:
-                $v = epStr2Hex($v);
+                //$v = epStr2Hex($v);
+                // fix postgresql issue when storing binary strings into
+                // bytea records until a method is added for dealing with it,
+                // lets use this
+                // @TODO remove this when support for binary string comes in
+                return $this->db->quoteBlob($v);
                 break;
             }
         }
@@ -2054,7 +2059,8 @@ class epDbObject {
 
             case epFieldMap::DT_BLOB:
             //case epFieldMap::DT_TEXT:
-                $val = (string)epHex2Str($val);
+                //$val = (string)epHex2Str($val);
+                $val = $this->db->castBlob($val);
                 break;
 
             case epFieldMap::DT_INT:

@@ -411,6 +411,31 @@ abstract class epDb {
     abstract public function quote($input);
 
     /**
+     * Formats input so it can be safely used as binary string
+     *
+     * Classes inheriting should override this.
+     *
+     * @param mixed $input
+     * @return mixed
+     */
+    public function quoteBlob($input) {
+        return $this->quote(epStr2Hex($input));
+    }
+
+    /**
+     * Formats input so it can be safely used in objects vars
+     *
+     * Unescape binary strings formatted with self::quoteBlob(), classes
+     * inheriting should override this if needed.
+     *
+     * @param mixed $input
+     * @return mixed
+     */
+    public function castBlob($input) {
+        return (string)epHex2Str($input);
+    }
+
+    /**
      * Formats a string so it can be safely used as an identifier (e.g. table, column names)
      * @param mixed $input
      * @return mixed

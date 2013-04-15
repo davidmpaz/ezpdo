@@ -327,21 +327,77 @@ class epDbPeardb extends epDb {
      * @return mixed
      */
     public function quote($input) {
-        // open connection if not already 
+        // open connection if not already
         if (!$this->open()) {
             return false;
         }
         return $this->db->quoteSmart($input);
     }
-    
+
     /**
-     * Get the largest oid inserted with the values specified in an 
-     * example object ($o). 
+     * Formats input so it can be safely used as a binary
+     *
+     * Fix postgresql issue when storing hex binary strings into bytea records
+     *
+     * When storing hex string into bytea fields the conversion back to
+     * binary from hex doesn't apply properly, until support is added for
+     * dealing with it, lets use this.
+     *
+     * @TODO Remove this when support for this comes in
+     *
+     * @param mixed $input
+     * @return mixed
+     */
+    public function quoteBlob($input) {
+        // open connection if not already
+        if (!$this->open()) {
+            return false;
+        }
+
+        if ($this->dbType() == self::EP_DBT_POSTGRES && function_exists('pg_escape_bytea')) {
+            $quoted = pg_escape_bytea($this->connection()->connection, $input);
+            return "'$quoted'";
+        }
+
+        return $this->db->quoteSmart(epStr2Hex($input));
+    }
+
+    /**
+     * Formats input so it can be safely used in objects vars
+     *
+     * Fix postgresql issue when storing hex binary strings into bytea records,
+     * this should be the counter part of self::quoteBlob()
+     *
+     * When storing hex string into bytea fields the conversion back to
+     * binary from hex doesn't apply properly, until support is added for
+     * dealing with it, lets use this.
+     *
+     * @TODO Remove this when support for this comes in
+     *
+     * @param mixed $input
+     * @return mixed
+     */
+    public function castBlob($input) {
+        // open connection if not already
+        if (!$this->open()) {
+            return false;
+        }
+
+        if ($this->dbType() == self::EP_DBT_POSTGRES && function_exists('pg_unescape_bytea')) {
+            return (string)pg_unescape_bytea($input);
+        }
+
+        return (string)epHex2Str($input);
+    }
+
+    /**
+     * Get the largest oid inserted with the values specified in an
+     * example object ($o).
      * @param string table name
      * @return false|integer
      */
     private function _getMaxId($table, $oid = 'oid') {
-        
+
         // preapre sql statement
         $sql = 'SELECT MAX(' . $this->quoteId($oid) . ') FROM ' . $this->quoteId($table) . ' WHERE 1=1;';
 
