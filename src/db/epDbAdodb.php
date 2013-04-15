@@ -52,35 +52,36 @@ class epDbAdodb extends epDb {
     public function __construct($dsn) {
         parent::__construct($dsn);
     }
-    
+
     /**
      * Establishes a DB connection
      * @access public
      * @return bool
      */
     public function open() {
-        
+
         // check if connected already
         if ($this->db) {
             return true;
         }
-        
+
         // need adodb and exceptions
         include_once(EP_LIBS_ADODB.'/adodb-exceptions.inc.php');
         include_once(EP_LIBS_ADODB.'/adodb.inc.php');
-        
+
         // connect db now
         try {
-            $this->db = & ADONewConnection($this->dsn);
-        } 
+            $db = ADONewConnection($this->dsn);
+            $this->db = & $db;
+        }
         catch (ADODB_Exception $e) {
             throw new epExceptionDbAdodb('Cannot connect db: ' . $e->getMessage());
             return false;
         }
 
-        // set fetch mode to assoc 
+        // set fetch mode to assoc
         $this->db->SetFetchMode(ADODB_FETCH_ASSOC);
-        
+
         return true;
     }
 
