@@ -817,13 +817,40 @@
 	{
 		return $this->Close();
 	}
-	
+
+    /**
+    * Tell whether a query is a data manipulation or data definition query
+    *
+    * Examples of data manipulation queries are INSERT, UPDATE and DELETE.
+    * Examples of data definition queries are CREATE, DROP, ALTER, GRANT,
+    * REVOKE.
+    *
+    * Copied from PEAR DB
+    *
+    * @param string $query  the query
+    *
+    * @return boolean  whether $query is a data manipulation query
+    */
+    public function isManip($query)
+    {
+        $manips = 'INSERT|UPDATE|DELETE|REPLACE|'
+                . 'CREATE|DROP|'
+                . 'LOAD DATA|SELECT .* INTO .* FROM|COPY|'
+                . 'ALTER|GRANT|REVOKE|'
+                . 'LOCK|UNLOCK';
+        if (preg_match('/^\s*"?(' . $manips . ')\s+/i', $query)) {
+            return true;
+        }
+        return false;
+    }
+
+
 	/*
 		 Returns placeholder for parameter, eg.
 		 $DB->Param('a')
-		 
+
 		 will return ':a' for Oracle, and '?' for most other databases...
-		 
+
 		 For databases that require positioned params, eg $1, $2, $3 for postgresql,
 		 	pass in Param(false) before setting the first parameter.
 	*/

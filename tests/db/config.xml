@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <options>
-    <!-- databases for testing --> 
+    <!-- databases for testing -->
     <dbs>
-        
+
         <mysql>mysql://ezpdo:pdoiseasy@localhost/ezpdo</mysql>
         <sqlite>sqlite://output%2ftest.db</sqlite>sqlite>
 
         <!-- kludge : sqlite dsn for adodb and peardb are incompatible -->
-        <sqlite_adodb>sqlite://output%2ftest.db</sqlite_adodb>
+        <sqlite_adodb>sqlite://output/test.db</sqlite_adodb>
         <sqlite_peardb>sqlite://./output/test.db</sqlite_peardb>
+        <sqlite3_adodb>sqlite3://output/test-v3.db</sqlite3_adodb>
 
     </dbs>
 </options>

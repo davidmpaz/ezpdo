@@ -201,16 +201,23 @@ class ADODB_sqlite3 extends ADOConnection {
 	function _query($sql,$inputarr=false)
 	{
 		//$rez = sqlite_query($sql,$this->_connectionID);//**change
-		$rez = $this->_connectionID->query($sql);
+		// this is needed to prevent the result set from adding a record
+		// twice when inserting
+		if($this->isManip($sql)) {
+            $rez = $this->_connectionID->exec($sql);
+		} else {
+		    $rez = $this->_connectionID->query($sql);
+		}
+
 		if (!$rez) {
 			//$this->_errorNo = sqlite3_last_error($this->_connectionID);**change
 			$this->_connectionID->lastErrorCode();
 		}
-		
+
 		return $rez;
 	}
-	
-	function SelectLimit($sql,$nrows=-1,$offset=-1,$inputarr=false,$secs2cache=0) 
+
+	function SelectLimit($sql,$nrows=-1,$offset=-1,$inputarr=false,$secs2cache=0)
 	{
 		$offsetStr = ($offset >= 0) ? " OFFSET $offset" : '';
 		$limitStr  = ($nrows >= 0)  ? " LIMIT $nrows" : ($offset >= 0 ? ' LIMIT 999999999' : '');
