@@ -130,72 +130,96 @@ class ADODB_sqlite3 extends ADOConnection {
 		//return sqlite_last_insert_rowid($this->_connectionID)->; //**change
 		return $this->_connectionID->lastInsertRowID();
 	}
-	
+
 	function _affectedrows()
 	{
 		return $this->_connectionID->changes();
        //return sqlite3_changes($this->_connectionID); //**tochange
     }
-	
-	function ErrorMsg() 
+
+	function ErrorMsg()
  	{
 		if ($this->_logsql) return $this->_errorMsg;
-		
+
 		return ($this->_errorNo) ? $this->ErrorNo() : ''; //**tochange?
 	}
- 
-	function ErrorNo() 
+
+	function ErrorNo()
 	{
 		return $this->_connectionID->lastErrorCode(); //**tochange??
 	}
-	
+
 	function SQLDate($fmt, $col=false)
 	{
 		$fmt = $this->qstr($fmt);
 		return ($col) ? "adodb_date2($fmt,$col)" : "adodb_date($fmt)";
 	}
-	
-	
+
+
 	function _createFunctions()
 	{
 		//@sqlite3_create_function($this->_connectionID, 'adodb_date', 'adodb_date', 1); *change
 		$this->_connectionID->createFunction('adodb_date', 'adodb_date', 1);
-		
+
 		//@sqlite3_create_function($this->_connectionID, 'adodb_date2', 'adodb_date2', 2);**change
 		$this->_connectionID->createFunction('adodb_date2', 'adodb_date2', 2);
 	}
-	
+
 
 	// returns true or false
 	function _connect($argHostname, $argUsername, $argPassword, $argDatabasename) //**tochange: all the function need to be changed, just hacks for the moment
 	{
-		if (empty($argHostname) && $argDatabasename) $argHostname = $argDatabasename; 
-		$this->_connectionID = new SQLite3($argDatabasename); 
+		if (empty($argHostname) && $argDatabasename) $argHostname = $argDatabasename;
+		$this->_connectionID = new SQLite3($argDatabasename);
 		$this->_createFunctions();
-		
+
 		return true; // hack
 		/*
 		if (!function_exists('sqlite_open')) return null;
 		if (empty($argHostname) && $argDatabasename) $argHostname = $argDatabasename;
-		
+
 		$this->_connectionID = sqlite_open($argHostname);
 		if ($this->_connectionID === false) return false;
 		$this->_createFunctions();
 		return true;
 		*/
 	}
-	
+
 	// returns true or false
 	function _pconnect($argHostname, $argUsername, $argPassword, $argDatabasename) //**tochange
 	{
 		if (!function_exists('sqlite_open')) return null;
 		if (empty($argHostname) && $argDatabasename) $argHostname = $argDatabasename;
-		
+
 		$this->_connectionID = sqlite_popen($argHostname);
 		if ($this->_connectionID === false) return false;
 		$this->_createFunctions();
 		return true;
 	}
+
+    /**
+    * @see parent::isManip()
+    *
+    * For the case of SQLite3 this is also applied to queries that should
+    * return an empty result set.
+    *
+    * @param string $query  the query
+    *
+    * @return boolean  whether $query is a data manipulation query
+    */
+    public function isManip($query)
+    {
+        $manips = 'INSERT|UPDATE|DELETE|REPLACE|'
+                . 'CREATE|DROP|'
+                . 'LOAD DATA|SELECT .* INTO .* FROM|COPY|'
+                . 'ALTER|GRANT|REVOKE|'
+                . 'LOCK|UNLOCK|'
+                . 'BEGIN TRANSACTION|COMMIT|ROLLBACK';
+        if (preg_match('/^\s*"?(' . $manips . ')\s*/i', $query)) {
+            return true;
+        }
+        return false;
+    }
 
 	// returns query ID if successful, otherwise false
 	function _query($sql,$inputarr=false)
