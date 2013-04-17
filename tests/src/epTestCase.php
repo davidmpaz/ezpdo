@@ -76,9 +76,15 @@ class epTestCase extends UnitTestCase {
      * @var boolean
      */
     public static $allow_test_sqlite = true;
-    
+
     /**
-     * If no param, returns if we allow Adodb tests. 
+     * Whether to allow sqlite3 tests
+     * @var boolean
+     */
+    public static $allow_test_sqlite3 = true;
+
+    /**
+     * If no param, returns if we allow Adodb tests.
      * If param is boolean, set whehter we allow Adodb tests.
      * @param null|boolean $v
      * @return boolean
@@ -274,14 +280,38 @@ class epTestCase extends UnitTestCase {
     }
 
     /**
-     * Setup output dir 
+     * If no param, returns if we allow sqlite3 tests.
+     * If param is boolean, set whehter we allow sqlite tests.
+     * @param null|boolean $v
+     * @return boolean
+     */
+    function allowTestSqlite3($v = null) {
+        if (is_null($v)) {
+            return self::$allow_test_sqlite3;
+        } else if (is_boolean($v)) {
+            self::$allow_test_sqlite3 = $v;
+        }
+    }
+
+    /**
+     * Checks if we can test sqite database
+     * @var string $dsn
+     * @return boolean
+     * @todo db file checking for pdo
+     */
+    function canTestSqlite3() {
+        return $this->allowTestSqlite3();
+    }
+
+    /**
+     * Setup output dir
      */
     public function setUp() {
         epMkDir('output');
     }
 
     /**
-     * tearDown: rmove output dir 
+     * tearDown: rmove output dir
      */
     public function tearDown() {
         epRmDir('output');

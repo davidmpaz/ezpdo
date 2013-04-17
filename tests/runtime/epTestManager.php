@@ -2268,6 +2268,33 @@ class epTestManager extends epTestRuntime {
 
         $this->_allTests('pdo', 'sqlite');
     }
+
+    /**
+     * Test adodb & sqlite
+     */
+    function testAdodbSqlite3() {
+
+        // skip testing sqlite if not allowed
+        if (!$this->canTestAdodb() || !$this->canTestSqlite3()) {
+            return;
+        }
+
+        $this->_allTests('adodb', 'sqlite3');
+    }
+
+    /**
+     * Test pdo & sqlite
+     */
+    function testPdoSqlite3() {
+
+        // skip testing sqlite if not allowed
+        if (!$this->canTestPdo('sqlite3') || !$this->canTestSqlite3()) {
+            return;
+        }
+
+        $this->_allTests('pdo', 'sqlite3');
+    }
+
 }
 
 if (!defined('EP_GROUP_TEST')) {

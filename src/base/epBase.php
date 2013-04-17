@@ -179,34 +179,34 @@ class epBase implements epNameable, epIdentifiable, epValidateable {
     /**#@-*/
 
     /**
-     * unique id 
+     * unique id
      * @var mixed (integer or string)
      */
     protected $id;
 
     /**
      * object name
-     * @var string 
+     * @var string
      */
     protected $name;
 
     /**
      * Constructor
-     * 
+     *
      * @param string name of the object
      * @param integer object id
      * @access public
      */
     function __construct($name = null) {
         $this->setName($name);
-        $id = uniqid(); // generate an unique id
+        $this->id = uniqid(); // generate an unique id
     }
 
     /**
      * Get object name
-     * 
+     *
      * Implements interface {@link epNameable::getName()}
-     * 
+     *
      * @return string
      * @access public
      */

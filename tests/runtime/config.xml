@@ -22,6 +22,11 @@
                 <peardb>compiled.ezpdo.peardb</peardb>
                 <pdo>compiled.ezpdo.pdo</pdo>
             </sqlite>
+            <sqlite3>
+                <adodb>compiled.ezpdo3.adodb</adodb>
+                <peardb>compiled.ezpdo3.peardb</peardb>
+                <pdo>compiled.ezpdo3.pdo</pdo>
+            </sqlite3>
         </compiled_file>
 
         <!-- default dsn for testing different dbs -->
@@ -29,10 +34,15 @@
             <mysql>mysql://ezpdo:pdoiseasy@localhost/ezpdo</mysql>
             <pgsql>pgsql://ezpdo:pdoiseasy@localhost/ezpdo</pgsql>
             <sqlite>
-                <adodb>sqlite://output%2ftest.adodb.db</adodb>
+                <adodb>sqlite://output/test.adodb.db</adodb>
                 <peardb>sqlite://./output/test.peardb.db</peardb>
                 <pdo>sqlite://output/test.pdo.db</pdo>
             </sqlite>
+            <sqlite3>
+                <!-- Excluding peardb since it doesnt have support for sqlite3-->
+                <adodb>sqlite3://output/test3.adodb.db</adodb>
+                <pdo>sqlite3://output/test3.pdo.db</pdo>
+            </sqlite3>
         </default_dsn>
 
     </test>

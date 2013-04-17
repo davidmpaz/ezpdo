@@ -72,37 +72,41 @@ class epTestRuntime extends epTestCase {
 
         // set dblib
         $cfg->set('db_lib', $dbal);
-        
+
         // make input/output path absolute (fixed)
         $source_dirs = EP_TESTS . '/classes/';
         $cfg->set('source_dirs', $source_dirs);
 
         // set compiled dir
         switch($db) {
-            
-            case 'mysql': 
+
+            case 'mysql':
                 $compiled_file = $cfg->get('test/compiled_file/mysql');
                 $default_dsn = $cfg->get('test/default_dsn/mysql');
                 break;
-            
-            case 'pgsql': 
+
+            case 'pgsql':
                 $compiled_file = $cfg->get('test/compiled_file/pgsql');
                 $default_dsn = $cfg->get('test/default_dsn/pgsql');
                 $cfg->set('default_oid_column', 'eoid'); // oid is special in pgsql
                 break;
 
-            case 'sqlite': 
+            case 'sqlite':
                 $compiled_file = $cfg->get('test/compiled_file/sqlite/'.$dbal);
                 $default_dsn = $cfg->get('test/default_dsn/sqlite/'.$dbal);
                 break;
+            case 'sqlite3':
+                $compiled_file = $cfg->get('test/compiled_file/sqlite3/'.$dbal);
+                $default_dsn = $cfg->get('test/default_dsn/sqlite3/'.$dbal);
+                break;
         }
-        
+
         $cfg->set('compiled_file', $compiled_file);
         $cfg->set('default_dsn', $default_dsn);
 
         // force compile so default_dsn gets into class map
         $cfg->set('force_compile', true);
-        
+
         // get epManager instance
         include_once(EP_SRC_RUNTIME.'/epManager.php');
         $this->m = null; // force a new instance
