@@ -298,19 +298,19 @@ class ADODB_sqlite3 extends ADOConnection {
 		$start -= 1;
 		return $this->Execute("insert into $seqname values($start)");
 	}
-	
+
 	var $_dropSeqSQL = 'drop table %s';
 	function DropSequence($seqname)
 	{
 		if (empty($this->_dropSeqSQL)) return false;
 		return $this->Execute(sprintf($this->_dropSeqSQL,$seqname));
 	}
-	
+
 	// returns true or false
 	function _close()
 	{
 		//return @sqlite3_close($this->_connectionID);**change
-		return $this->_connectionID->close();
+		return ($this->_connectionID) ? $this->_connectionID->close() : true;
 	}
 
 	function MetaIndexes($table, $primary = FALSE, $owner=false, $owner = false)

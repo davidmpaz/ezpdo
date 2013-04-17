@@ -547,89 +547,89 @@ class ADODB_mysql extends ADOConnection {
 			}
 				$rs->MoveNext();
 			}
-		
+
 			$rs->Close();
-			return $retarr;	
+			return $retarr;
 	}
-		
+
 	// returns true or false
-	function SelectDB($dbName) 
+	function SelectDB($dbName)
 	{
 		$this->database = $dbName;
 		$this->databaseName = $dbName; # obsolete, retained for compat with older adodb versions
 		if ($this->_connectionID) {
-			return @mysql_select_db($dbName,$this->_connectionID);		
+			return @mysql_select_db($dbName,$this->_connectionID);
 		}
-		else return false;	
+		else return false;
 	}
-	
+
 	// parameters use PostgreSQL convention, not MySQL
 	function SelectLimit($sql,$nrows=-1,$offset=-1,$inputarr=false,$secs=0)
 	{
 		$offsetStr =($offset>=0) ? ((integer)$offset)."," : '';
 		// jason judge, see http://phplens.com/lens/lensforum/msgs.php?id=9220
-		if ($nrows < 0) $nrows = '18446744073709551615'; 
-		
+		if ($nrows < 0) $nrows = '18446744073709551615';
+
 		if ($secs)
 			$rs = $this->CacheExecute($secs,$sql." LIMIT $offsetStr".((integer)$nrows),$inputarr);
 		else
 			$rs = $this->Execute($sql." LIMIT $offsetStr".((integer)$nrows),$inputarr);
 		return $rs;
 	}
-	
+
 	// returns queryID or false
 	function _query($sql,$inputarr=false)
 	{
 	//global $ADODB_COUNTRECS;
-		//if($ADODB_COUNTRECS) 
+		//if($ADODB_COUNTRECS)
 		return mysql_query($sql,$this->_connectionID);
 		//else return @mysql_unbuffered_query($sql,$this->_connectionID); // requires PHP >= 4.0.6
 	}
 
-	/*	Returns: the last error message from previous database operation	*/	
-	function ErrorMsg() 
+	/*	Returns: the last error message from previous database operation	*/
+	function ErrorMsg()
 	{
-	
+
 		if ($this->_logsql) return $this->_errorMsg;
 		if (empty($this->_connectionID)) $this->_errorMsg = @mysql_error();
 		else $this->_errorMsg = @mysql_error($this->_connectionID);
 		return $this->_errorMsg;
 	}
-	
-	/*	Returns: the last error number from previous database operation	*/	
-	function ErrorNo() 
+
+	/*	Returns: the last error number from previous database operation	*/
+	function ErrorNo()
 	{
 		if ($this->_logsql) return $this->_errorCode;
 		if (empty($this->_connectionID))  return @mysql_errno();
 		else return @mysql_errno($this->_connectionID);
 	}
-	
+
 	// returns true or false
 	function _close()
 	{
-		@mysql_close($this->_connectionID);
-		
+		if($this->_connectionID) @mysql_close($this->_connectionID);
+
 		$this->charSet = '';
 		$this->_connectionID = false;
 	}
 
-	
+
 	/*
 	* Maximum size of C field
 	*/
 	function CharMax()
 	{
-		return 255; 
+		return 255;
 	}
-	
+
 	/*
 	* Maximum size of X field
 	*/
 	function TextMax()
 	{
-		return 4294967295; 
+		return 4294967295;
 	}
-	
+
 	// "Innox - Juan Carlos Gonzalez" <jgonzalez#innox.com.mx>
 	function MetaForeignKeys( $table, $owner = FALSE, $upper = FALSE, $associative = FALSE )
      {
@@ -776,18 +776,18 @@ class ADORecordSet_mysql extends ADORecordSet{
 		}
 		return false;
 	}
-	
+
 	function _fetch()
 	{
 		$this->fields =  @mysql_fetch_array($this->_queryID,$this->fetchMode);
 		return is_array($this->fields);
 	}
-	
+
 	function _close() {
-		@mysql_free_result($this->_queryID);	
-		$this->_queryID = false;	
+		if($this->_queryID) @mysql_free_result($this->_queryID);
+		$this->_queryID = false;
 	}
-	
+
 	function MetaType($t,$len=-1,$fieldobj=false)
 	{
 		if (is_object($t)) {

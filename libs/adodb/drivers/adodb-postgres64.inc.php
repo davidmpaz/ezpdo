@@ -846,12 +846,12 @@ WHERE (c2.relname=\'%s\' or c2.relname=lower(\'%s\'))';
 			@pg_freeresult($this->_resultid);
 			$this->_resultid = false;
 		}
-		@pg_close($this->_connectionID);
+		if($this->_connectionID) @pg_close($this->_connectionID);
 		$this->_connectionID = false;
 		return true;
 	}
-	
-	
+
+
 	/*
 	* Maximum size of C field
 	*/
@@ -991,24 +991,24 @@ class ADORecordSet_postgres64 extends ADORecordSet{
 			$this->EOF = true;
 		}
 		return false;
-	}		
-	
+	}
+
 	function _fetch()
 	{
-				
+
 		if ($this->_currentRow >= $this->_numOfRows && $this->_numOfRows >= 0)
         	return false;
 
 		$this->fields = @pg_fetch_array($this->_queryID,$this->_currentRow,$this->fetchMode);
-		
+
 		if ($this->fields && isset($this->_blobArr)) $this->_fixblobs();
-			
+
 		return (is_array($this->fields));
 	}
 
-	function _close() 
-	{ 
-		return @pg_freeresult($this->_queryID);
+	function _close()
+	{
+		return ($this->_queryID) ? @pg_freeresult($this->_queryID) : true;
 	}
 
 	function MetaType($t,$len=-1,$fieldobj=false)
