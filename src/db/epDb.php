@@ -442,14 +442,9 @@ abstract class epDb {
      */
     public function quoteId($input) {
 
-        // [kludge] sqlite bug - doesn't like "xxx"."*"
-        if (strpos($input, '.*') && $this->dbType() == self::EP_DBT_SQLITE) {
-            return $input;
-        }
-        
         // the quoting symbol
         $q = $this->_getNameQuote();
-        
+
         // split input into items (xx.yy.zz)
         $quoted = array();
         foreach(explode('.', $input) as $item) {
