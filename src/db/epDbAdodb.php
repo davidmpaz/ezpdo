@@ -118,16 +118,8 @@ class epDbAdodb extends epDb {
 
         // test if table exists
         try {
-            if($this->dbType() == self::EP_DBT_SQLITE) {
-                // SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
-                $rs = $this->db->Execute('SELECT name FROM ' .
-                    $this->quoteId('sqlite_master') .
-                    " WHERE type='table' AND name = " . $this->quoteId($table));
-                return (isset($rs)) ? $rs->Fields('name') : false;
-            } else {
-                // execute a select statement on the table
-                $rs = $this->db->Execute('SELECT COUNT(*) FROM ' . $this->quoteId($table) . ' WHERE 1=1');
-            }
+            // execute a select statement on the table
+            $rs = $this->db->Execute('SELECT COUNT(*) FROM ' . $this->quoteId($table) . ' WHERE 1=1');
         }
         catch (Exception $e) {
             // table does not exist if exception
