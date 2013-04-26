@@ -1,0 +1,17 @@
+language: php
+
+php:
+  - 5.3
+  - 5.4
+
+env:
+  - DB=mysql
+  - DB=pgsql
+  - DB=sqlite
+
+before_script:
+  - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'CREATE USER ezpdo WITH PASSWORD /'ezpdo/';CREATE DATABASE ezpdo;GRANT ALL PRIVILEGES ON DATABASE ezpdo TO ezpdo;' -U postgres; fi"
+  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE USER /'ezpdo/'@/'%/' IDENTIFIED BY /'ezpdo/';create database IF NOT EXISTS ezpdo;GRANT ALL PRIVILEGES ON *.* TO /'ezpdo/'@/'%/' WITH GRANT OPTION;'; fi"
+  - pear install DB
+
+script: php tests/runtests.php
