@@ -33,7 +33,7 @@ Here is a quick look at the features in EZPDO before you delve into any details.
 - Provides a simple runtime API
 - Supports object query ([EZOQL][ezoql])
 - Auto generates database tables
-- Test-driven with continuous integration
+- Test-driven with continuous integration. [![Thanks to Travis!!](https://api.travis-ci.org/davidmpaz/ezpdo.png?branch=master)](https://travis-ci.org/davidmpaz/ezpdo)
 
 ##*Licence*
 
@@ -86,17 +86,17 @@ Need help, want to help, or have comments? Clone or Fork [this][project] project
 
 
 [ORM]: http://www.service-architecture.com/object-relational-mapping/ "Object Relational Mapping"
-[ezoql]: wiki/EZOQL "EZPDO Object Query Language"
+[ezoql]: https://github.com/davidmpaz/ezpdo/wiki/EZOQL "EZPDO Object Query Language"
 [os]: http://opensource.org/index.php
-[BSD]: wiki/BSD "BSD License"
-[quick]: wiki/Quickstart "Quickstart Example"
-[tut]: wiki/Tutorial "Advanced Example"
-[install]: wiki/Installation "Installation Guide"
-[manual]: wiki/UserManual "User Manual"
-[dev]: wiki/Developers "For those who wants to contribute"
-[faq]: wiki/Faqs "Frequently Asked Questions"
-[ref]: wiki/References
+[BSD]: https://github.com/davidmpaz/ezpdo/wiki/BSD "BSD License"
+[quick]: https://github.com/davidmpaz/ezpdo/wiki/Quickstart "Quickstart Example"
+[tut]: https://github.com/davidmpaz/ezpdo/wiki/Tutorial "Advanced Example"
+[install]: https://github.com/davidmpaz/ezpdo/wiki/Installation "Installation Guide"
+[manual]: https://github.com/davidmpaz/ezpdo/wiki/UserManual "User Manual"
+[dev]: https://github.com/davidmpaz/ezpdo/wiki/Developers "For those who wants to contribute"
+[faq]: https://github.com/davidmpaz/ezpdo/wiki/Faqs "Frequently Asked Questions"
+[ref]: https://github.com/davidmpaz/ezpdo/wiki/References
 [project]: https://github.com/davidmpaz/ezpdo
 [wiki]: https://github.com/davidmpaz/ezpdo/wiki
-[migrate]: wiki/Ezpdo-conservative-migration-from-php-5.2-to-php-5.3
+[migrate]: https://github.com/davidmpaz/ezpdo/wiki/Ezpdo-conservative-migration-from-php-5.2-to-php-5.3
 
