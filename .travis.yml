@@ -2,16 +2,16 @@ language: php
 
 php:
   - 5.3
-  - 5.4
 
-env:
-  - DB=mysql
-  - DB=pgsql
-  - DB=sqlite
+branches:
+  only:
+    - master
 
 before_script:
-  - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'CREATE USER ezpdo WITH PASSWORD /'ezpdo/';CREATE DATABASE ezpdo;GRANT ALL PRIVILEGES ON DATABASE ezpdo TO ezpdo;' -U postgres; fi"
-  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE USER /'ezpdo/'@/'%/' IDENTIFIED BY /'ezpdo/';create database IF NOT EXISTS ezpdo;GRANT ALL PRIVILEGES ON *.* TO /'ezpdo/'@/'%/' WITH GRANT OPTION;'; fi"
   - pear install DB
+  - sh -c "psql -c \"CREATE USER ezpdo WITH PASSWORD 'pdoiseasy';\" -U postgres; fi"
+  - sh -c "psql -c \"CREATE DATABASE ezpdo;\" -U postgres; fi"
+  - sh -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE ezpdo TO ezpdo;\" -U postgres; fi"
+  - sh -c "mysql -uroot -e \"CREATE USER 'ezpdo'@'localhost' IDENTIFIED BY 'pdoiseasy'; CREATE DATABASE IF NOT EXISTS ezpdo; GRANT ALL PRIVILEGES ON *.* TO 'ezpdo'@'localhost' WITH GRANT OPTION;\"; fi"
 
 script: php tests/runtests.php
