@@ -2378,9 +2378,9 @@ class epManager extends epManagerBase implements epSingleton {
 
         // check if epObjectRelation has been compiled
         include_once(EP_SRC_ORM . '/epObjectRelation.php');
-        if (!($this->cm_obj_rel = & $this->_getMap('epObjectRelation'))) {
-            if (!($this->cm_obj_rel = & $this->_compileClass('epObjectRelation'))) {
-                throw new epExceptionManager('Failed in compiling class epObjectRelation');
+        if (!($this->cm_obj_rel = & $this->_getMap('ezpdo\\orm\\epObjectRelation'))) {
+            if (!($this->cm_obj_rel = & $this->_compileClass('ezpdo\\orm\\epObjectRelation'))) {
+                throw new epExceptionManager('Failed in compiling class ezpdo\\orm\\epObjectRelation');
                 return false;
             }
         }
@@ -3029,7 +3029,7 @@ class epManager extends epManagerBase implements epSingleton {
         }
 
         // need to create example object (false: no caching, false: no event dispatching)
-        $this->eo_obj_rel = & parent::_create('epObjectRelation', false, false, array($class_a, $oid_a, $var_a, $base_b, $class_b, $oid_b));
+        $this->eo_obj_rel = & parent::_create('ezpdo\\orm\\epObjectRelation', false, false, array($class_a, $oid_a, $var_a, $base_b, $class_b, $oid_b));
         if (!$this->eo_obj_rel) {
             throw new epExceptionManager('Cannot create relation object');
             return false;

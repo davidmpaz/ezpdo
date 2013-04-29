@@ -40,7 +40,7 @@ class epExceptionQueryPath extends epException {
  * @subpackage ezpdo.query
  */
 class epQueryAliasManager extends epBase {
-    
+
     /**
      * The alias counter
      * @var integer
@@ -113,18 +113,18 @@ class epQueryAliasManager extends epBase {
      * @return string
      */
     public function getClassAlias($class, $create = false) {
-        
+
         // if alias exists and create not forced
         if (!$create && ($aliases = $this->getClassAliases($class))) {
             return $aliases[0];
         }
-        
+
         // auto genarete a unique alias ('_%d')
         $alias = '_' . (++ $this->num_aliases);
-        
+
         // put alias into alias_class lookup with class name unquoted
         $this->alias2class[$alias] = $class;
-        
+
         return $alias;
     }
 
@@ -181,18 +181,18 @@ class epQueryAliasManager extends epBase {
      * @return string
      */
     public function getTableAlias($table, $create = false) {
-        
+
         // if alias exists and create not forced
         if (!$create && ($aliases = $this->getTableAliases($table))) {
             return $aliases[0];
         }
-        
+
         // auto genarete a unique alias ('_%d')
         $alias = '_' . (++ $this->num_aliases);
-        
+
         // put alias into alias-to-table lookup
         $this->alias2table[$alias] = $table;
-        
+
         return $alias;
     }
 
@@ -209,14 +209,14 @@ class epQueryAliasManager extends epBase {
  * @subpackage ezpdo.query
  */
 abstract class epQueryPathNode extends epContainer {
-    
+
     /**
      * The cached EZPDO runtime manager
      * @var epManager
      * @static
      */
     static protected $em = false;
-    
+
     /**
      * The underlying database connection for the primary root node
      * @var epDbObject
@@ -229,7 +229,7 @@ abstract class epQueryPathNode extends epContainer {
      * @static
      */
     static protected $am = false;
-    
+
     /**
      * Aliases for classes and their subclasses
      * @var array
@@ -252,7 +252,7 @@ abstract class epQueryPathNode extends epContainer {
 
         // call parent to set name and child key ('Name')
         parent::__construct($name, 'Name');
-        
+
         // set up the EZPDO runtime manager if not already
         if (!self::$em) {
             self::$em = & epManager::instance();
@@ -380,7 +380,7 @@ abstract class epQueryPathNode extends epContainer {
      * @return boolean
      */
     public function prepareDb($class, $rtable = false) {
-        
+
         // if relation table is given, set it to runtime manager
         if ($rtable) {
             self::$em->setRelationTable($rtable);
@@ -390,12 +390,12 @@ abstract class epQueryPathNode extends epContainer {
         if (!($cm = self::$em->getClassMap($class))) {
             return false;
         }
-        
+
         // no table for abstract class
         if ($cm->isAbstract()) {
             return true;
         }
-        
+
         return self::$db->create($cm);
     }
 
@@ -457,11 +457,11 @@ abstract class epQueryPathNode extends epContainer {
      * @throws epExceptionQueryPath
      */
     protected function &_obtainNodeByPath(&$path, $create = true) {
-        
+
         // get the first non-empty piece in path
         while (!($piece = array_shift($path)) && ($path)) {
         }
-        
+
         // this is the end if piece is empty
         if (!$piece) {
             return $this;
@@ -491,7 +491,7 @@ abstract class epQueryPathNode extends epContainer {
         // 1. if the node is a many-valued relationship, then create an contained root node
         //
         if ($fm && !$fm->isPrimitive() && $fm->isMany()) {
-            
+
         // create a child - an alias root
 	    // New code because assigning the return valure of new by reference is deprecated
         //    if (!($child = & new epQueryPathRoot($cm, $piece, epQueryPathRoot::CONTAINED))) {
@@ -512,7 +512,7 @@ abstract class epQueryPathNode extends epContainer {
         //
         // 2. otherwise, create a field node
         //
-        
+
         // get field map for the piece
         if ($piece == 'oid') {
             $fm = new epFieldMapPrimitive('oid', epFieldMap::DT_INTEGER, array(), $cm);
@@ -609,7 +609,7 @@ class epQueryPathRoot extends epQueryPathNode {
      * @param epQueryAliasManager &$am
      */
     public function __construct($class, $alias = false, $type = self::PRIMARY, &$am = false) {
-        
+
         // call parent to set up alias manager
         parent::__construct($alias, $am);
 
@@ -701,7 +701,7 @@ class epQueryPathRoot extends epQueryPathNode {
      * @return string
      */
     public function getTableAlias() {
-        
+
         // quote ids
         $table = $this->quoteId($this->cm->getTable());
         $alias = $this->quoteId($this->alias);
@@ -732,7 +732,7 @@ class epQueryPathRoot extends epQueryPathNode {
      * @return array
      */
     public function getClassMaps($non_abstract_only = true) {
-        
+
         // return array
 		$cms = array();
 
@@ -770,12 +770,12 @@ class epQueryPathRoot extends epQueryPathNode {
      * @return false|string|array
      */
     public function generateSql($recusive = true) {
-        
+
         // the usual stuff for contained root
         if ($this->isContained()) {
             return parent::generateSql($recusive);
         }
-        
+
         // array to hold sql parts
         $sql_parts = array();
 
@@ -784,7 +784,7 @@ class epQueryPathRoot extends epQueryPathNode {
 
             // pass only alias of this class
             $this->class2alias = array($cm->getName() => $this->alias);
-            
+
             // generate sql recursively
             $sql = $this->_generateSql();
             if ($recusive && $children = $this->getChildren()) {
@@ -810,10 +810,10 @@ class epQueryPathRoot extends epQueryPathNode {
 
         // for contained root only
         if (self::CONTAINED == $this->type) {
-            
+
             // pass aliases from the parent to children
             $class2alias = $this->getParent()->getAliases();
-            
+
             // @@@ $class may be in the form of 'ClassName.alias'
             // @@@ for multiple aliases for the same class
             foreach ($class2alias as $class => $alias) {
@@ -860,7 +860,7 @@ class epQueryPathField extends epQueryPathNode {
      * @param epQueryAliasManager &am
      */
     public function __construct(epFieldMap $fm) {
-        
+
         // call parent to set up alias manager
         parent::__construct($fm->getName());
 
@@ -887,7 +887,7 @@ class epQueryPathField extends epQueryPathNode {
      * @throws epExceptionQueryPath
      */
     protected function _generateSql() {
-        
+
         // -no- sql for primitive field
         if ($this->fm->isPrimitive()) {
             // only pass aliases from the parent to children
@@ -897,7 +897,7 @@ class epQueryPathField extends epQueryPathNode {
 
         // get base a
         $base_a = $this->fm->getBase_a();
-        
+
         // get base_b
         $base_b = $this->fm->getBase_b();
 
@@ -921,7 +921,7 @@ class epQueryPathField extends epQueryPathNode {
 				return false;
 			}
 		}
-        
+
         // get relationship table with base_a and base_b
         if (!($rt = $this->_em()->getRelationTable($base_a, $base_b))) {
             throw new epExceptionQueryPath("no relationship table for classes '$base_a' and '$base_b'");
@@ -930,7 +930,7 @@ class epQueryPathField extends epQueryPathNode {
 
         $aliases = array();
         $aliases[] = '';
-        
+
         // check if we have any children contained
         $children_contained = false;
         if ($children = $this->getChildren()) {
@@ -959,7 +959,7 @@ class epQueryPathField extends epQueryPathNode {
             if ($alias || !$children_contained) {
                 $sql .= $this->_generateSqlClassA($rt, $rt_alias, $this->fm->getName(), $class2alias_a);
             }
-            
+
             // assemble sql for class b and subclasses
             $cms_b = array();
 			// collect all children if no specific class set
@@ -969,7 +969,7 @@ class epQueryPathField extends epQueryPathNode {
             array_unshift($cms_b, $cm_b);
 
             foreach($cms_b as $cm_b_) {
-                
+
                 // skip abstract
                 if ($cm_b_->isAbstract()) {
                     continue;
@@ -999,7 +999,7 @@ class epQueryPathField extends epQueryPathNode {
                         $alias_b = $this->class2alias[$class_b];
                     }
                 }
-                
+
                 // generate sql for class b
                 if ($alias || !$children_contained) {
                     $sql .= $this->_generateSqlClassB(
@@ -1034,7 +1034,7 @@ class epQueryPathField extends epQueryPathNode {
         // collect the OR items
         $or_items = array();
         foreach($class2alias_a as $class_a => $alias_a) {
-            
+
             // get oid column
             $oid_col = $this->_em()->getClassMap($class_a)->getOidColumn();
 
@@ -1063,7 +1063,7 @@ class epQueryPathField extends epQueryPathNode {
      * @return string
      */
     private function _generateSqlClassB($rt_alias, $table_b, $base_b, $class_b, $alias_b, $oid_col) {
-        
+
         // quote value/ids
         $rt_alias = $this->quoteId($rt_alias);
         $table_b = $this->quoteId($table_b);
@@ -1181,7 +1181,7 @@ class epQueryPathManager extends epBase {
 
 		// reset primary root
 		$this->proot = false;
-        
+
         // array to hold alias to root lookup
         $this->alias2root = array();
 
@@ -1210,10 +1210,10 @@ class epQueryPathManager extends epBase {
         if (!($node = new epQueryPathRoot($class, $alias, epQueryPathRoot::PRIMARY, $this->am))) {
             return false;
         }
-        
+
         // put it into alias-root lookup
         $this->proot = $this->alias2root[$alias = $node->getAlias()] = & $node;
-        
+
         return true;
     }
 
@@ -1229,7 +1229,7 @@ class epQueryPathManager extends epBase {
         if (!($node = new epQueryPathRoot($class, $alias, epQueryPathRoot::SECONDARY))) {
             return false;
         }
-        
+
         // put it into alias-root lookup
         $this->alias2root[$node->getAlias()] = & $node;
         return true;
@@ -1242,13 +1242,13 @@ class epQueryPathManager extends epBase {
      * @return boolean
      */
     public function addContainedRoot($path, &$alias = false) {
-        
+
         // split path
         list($root_alias, $pieces) = $this->_splitPath($path);
         if (!$root_alias) {
             return false;
         }
-        
+
         // get root
         if (!($root = & $this->_getRoot($root_alias))) {
             return false;
@@ -1287,13 +1287,13 @@ class epQueryPathManager extends epBase {
      * @throws epExceptionQueryPath
      */
     public function generateSql() {
-        
+
         // reset sql parts
         $this->sql_parts = array();
 
         // go through each root
         foreach($this->alias2root as $alias => &$root) {
-            
+
             // skip contained root (as they are taken care in recursion)
             if ($root->isContained()) {
                 continue;
@@ -1304,7 +1304,7 @@ class epQueryPathManager extends epBase {
                 $this->sql_parts[$alias] = $sql_part;
             }
         }
-        
+
         return true;
     }
 
@@ -1315,13 +1315,13 @@ class epQueryPathManager extends epBase {
      * @return false|epQueryPathNode
      */
     public function insertPath($path) {
-        
+
         // split path
         list($alias, $pieces) = $this->_splitPath($path);
         if (!$alias) {
             return false;
         }
-        
+
         // get root
         if (!($root = & $this->_getRoot($alias))) {
             return false;
@@ -1348,12 +1348,12 @@ class epQueryPathManager extends epBase {
         if (!$alias) {
             return false;
         }
-        
+
         // get root
         if (!($root = & $this->_getRoot($alias))) {
             return false;
         }
-        
+
         // find node by path
         if (!($node = & $root->findNode($pieces))) {
             return false;
@@ -1362,20 +1362,20 @@ class epQueryPathManager extends epBase {
 		// set specific class
 		return $node->specificClass($class) ? true : false;
 	}
-    
+
     /**
      * Returns class aliases for the last node on path
      * @param string $path
      * @return array
      */
     public function getAliases($path) {
-        
+
         // split path
         list($alias, $pieces) = $this->_splitPath($path);
         if (!$alias) {
             return false;
         }
-        
+
         // get root
         if (!($root = & $this->_getRoot($alias))) {
             return false;
@@ -1396,13 +1396,13 @@ class epQueryPathManager extends epBase {
      * @return array
      */
     public function isObject($path) {
-        
+
         // split path
         list($alias, $pieces) = $this->_splitPath($path);
         if (!$alias) {
             return false;
         }
-        
+
         // get root
         if (!($root = & $this->_getRoot($alias))) {
             return false;
@@ -1412,21 +1412,21 @@ class epQueryPathManager extends epBase {
 		if (!$pieces) {
 			return true;
 		}
-        
+
         // find node by path
         if (!($node = & $root->findNode($pieces))) {
             return false;
         }
-        
+
         if ($node->isRoot()) {
             return false;
         }
-        
+
         // get the fm from the node
         if (!($fm = & $node->getMap())) {
             return false;
         }
-        
+
         // return true if not primitive
         return !$fm->isPrimitive();
     }
@@ -1457,11 +1457,11 @@ class epQueryPathManager extends epBase {
                 }
             }
         }
-        
+
         // make sure relationship tables are created as well
         if ($tables = $this->am->getAllTables()) {
             foreach($tables as $table) {
-                if (!$this->proot->prepareDb('epObjectRelation', $table)) {
+                if (!$this->proot->prepareDb('ezpdo\\orm\\epObjectRelation', $table)) {
                     $status = false;
                 }
             }
@@ -1535,13 +1535,13 @@ class epQueryPathManager extends epBase {
         if (!($fm = $cm->getField($var))) {
             return "no field map for '$class::$var'";
         }
-        
+
         // replace var name with column name
         $pvar = $this->quoteId($alias).'.'.$this->quoteId($fm->getColumnName());
-        
+
         // quote value
         $v = $this->quote($v, $fm);
-        
+
         return true;
     }
 
@@ -1552,15 +1552,15 @@ class epQueryPathManager extends epBase {
      * @return array ($alias, $pieces)
      */
     private function _splitPath($path) {
-        
+
         // explode path into pieces
         if (!($pieces = explode('.', $path))) {
             return array(false, false);
         }
-        
+
         // get the first piece - alias
         $alias = array_shift($pieces);
-        
+
         // return an array
         return array($alias, $pieces);
     }
@@ -1571,12 +1571,12 @@ class epQueryPathManager extends epBase {
      * @return false|epQueryPathRoot
      */
     private function &_getRoot($alias) {
-        
+
         // check if root exists
         if (!isset($this->alias2root[$alias])) {
             return self::$false;
         }
-        
+
         // get the root
         return $this->alias2root[$alias];
     }
