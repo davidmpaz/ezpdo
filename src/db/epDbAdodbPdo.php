@@ -2,14 +2,15 @@
 
 /**
  * $Id: epDbAdodbPdo.php 927 2006-04-28 17:15:44Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 927 $ $Date: 2006-04-28 13:15:44 -0400 (Fri, 28 Apr 2006) $
  * @package ezpdo
  * @subpackage ezpdo.db
  */
+namespace ezpdo\db;
 
 /**
  * need base class epDbAdodb
@@ -18,7 +19,7 @@ include_once(EP_SRC_DB.'/epDbAdodb.php');
 
 /**
  * Exception class for {@link epDbAdodbPdo}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 927 $ $Date: 2006-04-28 13:15:44 -0400 (Fri, 28 Apr 2006) $
  * @package ezpdo
@@ -29,14 +30,14 @@ class epExceptionDbAdodbPdo extends epExceptionDbAdodb {
 
 /**
  * A wrapper class to use PDO via ADODb
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 927 $ $Date: 2006-04-28 13:15:44 -0400 (Fri, 28 Apr 2006) $
  * @package ezpdo
  * @subpackage ezpdo.db
  */
 class epDbAdodbPdo extends epDbAdodb {
-    
+
     /**
      * Constructor
      * @param string $dsn the DSN to access the database
@@ -46,19 +47,19 @@ class epDbAdodbPdo extends epDbAdodb {
     public function __construct($dsn) {
         parent::__construct($dsn);
     }
-    
+
     /**
      * Establishes a DB connection
      * @access public
      * @return bool
      */
     public function open() {
-        
+
         // check if connected already
         if ($this->db) {
             return true;
         }
-        
+
         // need adodb and exceptions
         include_once(EP_LIBS_ADODB.'/adodb-exceptions.inc.php');
         include_once(EP_LIBS_ADODB.'/adodb.inc.php');
@@ -76,15 +77,15 @@ class epDbAdodbPdo extends epDbAdodb {
 
             // connect through PDO
             $this->db->Connect($dsn_pdo, $username, $password);
-        } 
-        catch (Exception $e) {
+        }
+        catch (\ADODB_Exception $e) {
             throw new epExceptionDbAdodb('Cannot connect db: ' . $e->getMessage());
             return false;
         }
 
-        // set fetch mode to assoc 
+        // set fetch mode to assoc
         $this->db->SetFetchMode(ADODB_FETCH_ASSOC);
-        
+
         return true;
     }
 
@@ -97,8 +98,8 @@ class epDbAdodbPdo extends epDbAdodb {
      * @throws epExceptionDbAdodbPdo
      */
     protected function _convertDsn($dsn, &$username, &$password, &$phptype) {
-        
-        // use epDbDsn to parse PEAR DSN 
+
+        // use epDbDsn to parse PEAR DSN
         include_once(EP_SRC_DB . '/epDbDsn.php');
         if (!($d = new epDbDsn($dsn))) {
             throw new epExceptionDbAdodbPdo('Error in DSN parsing');
@@ -108,7 +109,7 @@ class epDbAdodbPdo extends epDbAdodb {
         // set dbtype
         $phptype = $d['phptype'];
 
-        // convert PEAR DSN to PDO DSN 
+        // convert PEAR DSN to PDO DSN
         return $d->toPdoDsn($username, $password);
     }
 

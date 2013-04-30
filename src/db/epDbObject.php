@@ -12,6 +12,18 @@
  * @package ezpdo
  * @subpackage ezpdo.db
  */
+namespace ezpdo\db;
+
+use ezpdo\base as Base;
+use ezpdo\base\epFactory;
+use ezpdo\base\epSingleton;
+use ezpdo\base\epException;
+
+use ezpdo\orm\epFieldMap;
+
+use ezpdo\runtime\epArray;
+use ezpdo\runtime\epObject;
+use ezpdo\runtime\epManager;
 
 /**
  * need epClassMap class
@@ -1087,8 +1099,8 @@ class epDbObject {
 
             // get values from a and b
             $path = $orderby['path'];
-            $va = epArrayGet($a, $path);
-            $vb = epArrayGet($b, $path);
+            $va = Base\epArrayGet($a, $path);
+            $vb = Base\epArrayGet($b, $path);
 
             // boolean or numeric
             if (is_bool($va) || is_numeric($va)) {

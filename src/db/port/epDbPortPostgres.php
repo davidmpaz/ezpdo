@@ -9,8 +9,16 @@
  * @author David Moises Paz <davidmpaz@gmail.com>
  * @version $Revision: 1051 $
  * @package ezpdo
- * @subpackage ezpdo.db
+ * @subpackage ezpdo.db.port
  */
+namespace ezpdo\db\port;
+
+use ezpdo\db\epDbPortable;
+use ezpdo\db\epExceptionDbObject;
+
+use ezpdo\orm\epClassMap;
+use ezpdo\orm\epFieldMap;
+use ezpdo\orm\epFieldMapFactory;
 
 /**
  * Class to handle database portability for Postgres

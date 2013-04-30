@@ -10,6 +10,13 @@
  * @package ezpdo
  * @subpackage ezpdo.orm
  */
+namespace ezpdo\orm;
+
+use ezpdo\base\epFactory;
+use ezpdo\base\epSingleton;
+use ezpdo\base\epException;
+use ezpdo\base\epContainer;
+use ezpdo\base\epValidateable;
 
 /**
  * need epContainer class

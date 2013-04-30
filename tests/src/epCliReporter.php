@@ -2,14 +2,15 @@
 
 /**
  * $Id: epCliReporter.php 544 2005-09-28 21:30:22Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 544 $ $Date: 2005-09-28 17:30:22 -0400 (Wed, 28 Sep 2005) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.src
  */
+namespace ezpdo\tests\src;
 
 /**
  * need ezpdo.php
@@ -32,20 +33,20 @@ if (! defined('ST_FAILS_RETURN_CODE')) {
 }
 
 /**
- * A CLI reporter that is understood by Rephlux 
+ * A CLI reporter that is understood by Rephlux
  * {@link http://rephlux.sourceforge.net/running.rephlux.php}
- * 
+ *
  * Minimal command line test displayer. Writes fail details to STDERR. Returns 0
  * to the shell if all tests pass, ST_FAILS_RETURN_CODE if any test fails.
- * 
- * Copied from Rephlux var/tests/lib. Credits to jon@bangoid.com. 
- * 
+ *
+ * Copied from Rephlux var/tests/lib. Credits to jon@bangoid.com.
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 544 $ $Date: 2005-09-28 17:30:22 -0400 (Wed, 28 Sep 2005) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.src
  */
-class epCliReporter extends SimpleReporter {
+class epCliReporter extends \SimpleReporter {
 
     var $faildetail_separator = ST_FAILDETAIL_SEPARATOR;
 

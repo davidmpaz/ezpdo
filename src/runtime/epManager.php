@@ -10,6 +10,23 @@
  * @package ezpdo
  * @subpackage ezpdo.runtime
  */
+namespace ezpdo\runtime;
+
+use ezpdo\base as Base;
+use ezpdo\base\epSingleton;
+use ezpdo\base\epConfigurableWithLog;
+use ezpdo\base\epExceptionConfigurableWithLog;
+
+use ezpdo\db\epDb;
+use ezpdo\db\epDbFactory;
+use ezpdo\db\epExceptionDb;
+use ezpdo\db\epExceptionDbAdodb;
+use ezpdo\db\epExceptionDbAdodbPdo;
+use ezpdo\db\epExceptionDbPeardb;
+
+use ezpdo\orm\epClassMap;
+use ezpdo\orm\epClassMapFactory;
+use ezpdo\compiler\epClassCompiler;
 
 /**
  * Need {@link epConfigurableWithLog} as the super class
@@ -760,7 +777,7 @@ class epManagerBase extends epConfigurableWithLog {
         // in case the argument is not object, create it
         if (!$o) {
             // make a new instance
-            if (!($o = & epNewObject($class, $args))) {
+            if (!($o = & Base\epNewObject($class, $args))) {
                 // throw if failed to create an object
                 throw new epExceptionManagerBase('Cannot create object for class [' . $class . ']');
                 return self::$null;
@@ -2186,7 +2203,7 @@ class epManagerBase extends epConfigurableWithLog {
             // check if method exists in object
             if ($obj_or_class->epMethodExists($event)) {
                 // static method
-                if (epIsMethodStatic($class, $event)) {
+                if (Base\epIsMethodStatic($class, $event)) {
                     //$class::$event($params);
                     call_user_func_array(array($class, $event), $params);
                 }
@@ -2199,7 +2216,7 @@ class epManagerBase extends epConfigurableWithLog {
         // or if involved is a class
         else {
             // only static method can be called for a class event
-            if (epIsMethodStatic($class, $event)) {
+            if (Base\epIsMethodStatic($class, $event)) {
                 //$class::$event($params);
                 call_user_func_array(array($class, $event), $params);
             }
@@ -2388,7 +2405,7 @@ class epManager extends epManagerBase implements epSingleton {
         // append overall table prefix
         $this->rel_tbl_prefix = $this->getConfigOption('relation_table');
         if ($prefix = $this->getConfigOption('table_prefix')) {
-            $this->rel_tbl_prefix = epUnquote($prefix) . $this->rel_tbl_prefix;
+            $this->rel_tbl_prefix = Base\epUnquote($prefix) . $this->rel_tbl_prefix;
         }
 
         // set relation table name

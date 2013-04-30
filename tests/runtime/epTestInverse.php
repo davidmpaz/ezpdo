@@ -2,14 +2,17 @@
 
 /**
  * $Id: epTestInverse.php 1005 2006-06-23 09:40:05Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1005 $ $Date: 2006-06-23 05:40:05 -0400 (Fri, 23 Jun 2006) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.runtime
  */
+namespace ezpdo\tests\runtime;
+
+use ezpdo\base as Base;
 
 /**
  * need epTestCase
@@ -17,20 +20,20 @@
 include_once(dirname(__FILE__).'/epTestRuntime.php');
 
 /**
- * The unit test class for inverses   
- * 
+ * The unit test class for inverses
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1005 $ $Date: 2006-06-23 05:40:05 -0400 (Fri, 23 Jun 2006) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.runtime
  */
 class epTestInverse extends epTestRuntime {
-    
+
     /**
      * Test inverses
      */
     function testOneValuedInverses() {
-        
+
         // setup manager
         $this->_setup('adodb', 'sqlite');
         $this->assertTrue($this->m);
@@ -49,7 +52,7 @@ class epTestInverse extends epTestRuntime {
         // remove $b1 from $a1
         $a1->b = null;
         $this->assertTrue(empty($b1->a));
-    
+
         // create eptInvOneA and eptInvOneB
         $this->assertTrue($a2 = $this->m->create('eptInvOneA'));
         $this->assertTrue($b2 = $this->m->create('eptInvOneB'));
@@ -57,7 +60,7 @@ class epTestInverse extends epTestRuntime {
         // set $b2 to $a2->b
         $a2->b = $b2;
         $this->assertTrue($b2->a === $a2);
-        
+
         // remove $a2 from $b2
         $b2->a = null;
         $this->assertTrue(empty($a2->b));
@@ -67,7 +70,7 @@ class epTestInverse extends epTestRuntime {
      * Test one-valued inverses with refresh (bug #118)
      */
     function testOneValuedInversesAfterRefresh() {
-        
+
         // setup manager
         $this->_setup('adodb', 'sqlite');
         $this->assertTrue($this->m);
@@ -86,7 +89,7 @@ class epTestInverse extends epTestRuntime {
         $this->m->flush();
         $this->m->refresh($a1);
         $this->m->refresh($b1);
-        
+
         $this->assertTrue($a1->b === $b1);
         //used to fail in ezpdo 1.1.0rc2 and ezpdo.2005.12.05/06
     }
@@ -104,30 +107,30 @@ class epTestInverse extends epTestRuntime {
 
         // delete all items
         $this->m->deleteAll('eptSortedList');
-        
+
         // create a sorted list
         $listItem1 = $this->m->create('eptSortedList');
         $listItem2 = $this->m->create('eptSortedList');
         $listItem3 = $this->m->create('eptSortedList');
         $listItem4 = $this->m->create('eptSortedList');
-        
+
         // link the list
         $listItem1->predecessor = null;
         $listItem1->successor = $listItem2;
         $listItem1->entry = "_1_";
-        
+
         $listItem2->predecessor = $listItem1;
         $listItem2->successor = $listItem3;
         $listItem2->entry = "_2_";
-        
+
         $listItem3->predecessor = $listItem2;
         $listItem3->successor = $listItem4;
         $listItem3->entry = "_3_";
-        
+
         $listItem4->predecessor = $listItem3;
         $listItem4->successor = null;
         $listItem4->entry = "_4_";
-        
+
 
         // assert order is right
         $this->assertTrue(is_null($listItem1->predecessor));
@@ -171,7 +174,7 @@ class epTestInverse extends epTestRuntime {
      * Test many-valued inverses
      */
     function testManyValuedInverses() {
-        
+
         // setup manager
         $this->_setup('adodb', 'sqlite');
         $this->assertTrue($this->m);
@@ -187,12 +190,12 @@ class epTestInverse extends epTestRuntime {
         $b1->as[] = $a1;
         $this->assertTrue($b1->as->inArray($a1));
         $this->assertTrue($a1->bs->inArray($b1));
-    
+
         // remove $b1 from $a1->bs
         $a1->bs->remove($b1);
         $this->assertFalse($b1->as->inArray($a1));
         $this->assertFalse($a1->bs->inArray($b1));
-    
+
         // create eptInvOneA and eptInvOneB
         $this->assertTrue($a2 = $this->m->create('eptInvManyA'));
         $this->assertTrue($b2 = $this->m->create('eptInvManyB'));
@@ -201,18 +204,18 @@ class epTestInverse extends epTestRuntime {
         $a2->bs[] = $b2;
         $this->assertTrue($a2->bs->inArray($b2));
         $this->assertTrue($b2->as->inArray($a2));
-        
+
         // remove $a2 from $b2->as
         $b2->as->remove($a2);
         $this->assertFalse($b2->as->inArray($a2));
         $this->assertFalse($a2->bs->inArray($b2));
     }
-    
+
     /**
      * Test one-valued and many-valued inverses
      */
     function testOneManyValuedInverses() {
-        
+
         // setup manager
         $this->_setup('adodb', 'sqlite');
         $this->assertTrue($this->m);
@@ -228,7 +231,7 @@ class epTestInverse extends epTestRuntime {
         $b1->a = $a1;
         $this->assertTrue($b1->a === $a1);
         $this->assertTrue($a1->bs->inArray($b1));
-    
+
         // remove $b1 from $a1->bs
         $a1->bs->remove($b1);
         $this->assertFalse($a1->bs->inArray($b1));
@@ -242,19 +245,19 @@ class epTestInverse extends epTestRuntime {
         $a2->bs[] = $b2;
         $this->assertTrue($a2->bs->inArray($b2));
         $this->assertTrue($b2->a === $a2);
-        
+
         // reset $b2->a
         $b2->a = null;
         $this->assertFalse($b2->a);
         $this->assertFalse($a2->bs->inArray($b2));
     }
-    
+
     /**
      * Test one-valued inverses with non commitable item
      * Check for bug 188
      */
     function testOneNonCommittableInverses() {
-        
+
         // setup manager
         $this->_setup('adodb', 'mysql');
         $this->assertTrue($this->m);
@@ -314,13 +317,13 @@ class epTestInverse extends epTestRuntime {
         $this->assertFalse($b2->a);
         $this->assertFalse($a1->b);
     }
-    
+
     /**
      * Test many-valued inverses with non commitable item
      * Check for bug 188
      */
     function testManyNonCommittableInverses() {
-        
+
         // setup manager
         $this->_setup('adodb', 'mysql');
         $this->assertTrue($this->m);
@@ -392,29 +395,29 @@ class epTestInverse extends epTestRuntime {
         $this->assertFalse($a1->bs->inArray($b3));
         $this->assertTrue($a1->bs->count() == 1);
     }
-    
+
     /**
      * Test many-valued inverses delete
      */
     function testOneManyValuedInversesDelete() {
-         
+
         // setup manager
         $this->_setup('adodb', 'sqlite');
         $this->assertTrue($this->m);
-        
+
         include_once(EP_TESTS.'/classes/inverses/src/eptInvOneManyA.php');
         include_once(EP_TESTS.'/classes/inverses/src/eptInvOneManyB.php');
-        
+
         // create eptInvOneA and eptInvOneB
         $this->assertTrue($a1 = $this->m->create('eptInvOneManyA'));
         $this->assertTrue($b1 = $this->m->create('eptInvOneManyB'));
         $this->assertTrue($b2 = $this->m->create('eptInvOneManyB'));
-        
+
         // set $a to $b->a
         $b1->a = $a1;
         $this->assertTrue($b1->a === $a1);
         $this->assertTrue($a1->bs->inArray($b1));
-        
+
         // bug #161
         // delete $b1 (which is bs[0])
         $a1->bs[0]->delete();
@@ -423,17 +426,17 @@ class epTestInverse extends epTestRuntime {
         $this->assertFalse($b1->a);
         $this->assertTrue($b2->a === $a1);
         $this->assertTrue($a1->bs->inArray($b2));
-        
+
         // create eptInvOneA and eptInvOneB
         $this->assertTrue($a3 = $this->m->create('eptInvOneManyA'));
         $this->assertTrue($b3 = $this->m->create('eptInvOneManyB'));
         $this->assertTrue($b4 = $this->m->create('eptInvOneManyB'));
-        
+
         // set $a to $b->a
         $b3->a = $a3;
         $this->assertTrue($b3->a === $a3);
         $this->assertTrue($a3->bs->inArray($b3));
-        
+
         // check that overwriting position 0
         // actually overwrites it
         $a3->bs[0] = $b4;
@@ -453,7 +456,7 @@ class epTestInverse extends epTestRuntime {
      * Test many-valued inverses delete
      */
     function testManyValuedInversesDelete() {
-         
+
         // setup manager
         $this->_setup('adodb', 'sqlite');
         $this->assertTrue($this->m);
@@ -470,7 +473,7 @@ class epTestInverse extends epTestRuntime {
         $b1->as[] = $a1;
         $this->assertTrue($b1->as->inArray($a1));
         $this->assertTrue($a1->bs->inArray($b1));
-        
+
         // bug #161
         // delete $b1 (which is bs[0])
         $a1->bs[0]->delete();
@@ -486,21 +489,21 @@ class epTestInverse extends epTestRuntime {
      * works correctly
      */
     function testDuplicateValuesInMany() {
-         
+
         // setup manager
         $this->_setup('adodb', 'sqlite');
         $this->assertTrue($this->m);
-        
+
         include_once(EP_TESTS.'/classes/inverses/src/eptInvOneManyA.php');
         include_once(EP_TESTS.'/classes/inverses/src/eptInvOneManyB.php');
-        
+
         // -------------------------------------------------
         // check 1-many relationship
-    
+
         // create eptInvOneA and eptInvOneB
         $this->assertTrue($a1 = $this->m->create('eptInvOneManyA'));
         $this->assertTrue($b1 = $this->m->create('eptInvOneManyB'));
-        
+
         // set $a to $b->a
         $b1->a = $a1;
         $this->assertTrue($b1->a === $a1);
@@ -519,7 +522,7 @@ class epTestInverse extends epTestRuntime {
         $a1 = $this->m->get('eptInvOneManyA', $a1_oid);
         $b1 = $this->m->get('eptInvOneManyB', $b1_oid);
 
-        // put in a duplicate 
+        // put in a duplicate
         // this should delete the old relationship
         // and rebuild it
         $b1->a = $a1;
@@ -538,7 +541,7 @@ class epTestInverse extends epTestRuntime {
         // retrieve entries
         $a1 = $this->m->get('eptInvOneManyA', $a1_oid);
         $b1 = $this->m->get('eptInvOneManyB', $b1_oid);
-        
+
         // check duplicates
         $this->assertTrue($b1->a === $a1);
         $this->assertTrue($a1->bs->inArray($b1));
@@ -551,11 +554,11 @@ class epTestInverse extends epTestRuntime {
 
         // -------------------------------------------------
         // check many-1 relationship
-        
+
         // create eptInvOneA and eptInvOneB
         $this->assertTrue($a1 = $this->m->create('eptInvOneManyA'));
         $this->assertTrue($b1 = $this->m->create('eptInvOneManyB'));
-        
+
         // set $b1 to $a1->bs[]
         $a1->bs[] = $b1;
         $this->assertTrue($b1->a === $a1);
@@ -574,7 +577,7 @@ class epTestInverse extends epTestRuntime {
         $a1 = $this->m->get('eptInvOneManyA', $a1_oid);
         $b1 = $this->m->get('eptInvOneManyB', $b1_oid);
 
-        // put in a duplicate 
+        // put in a duplicate
         // this should delete the old relationship
         // and rebuild it
         $a1->bs[] = $b1;
@@ -593,7 +596,7 @@ class epTestInverse extends epTestRuntime {
         // retrieve entries
         $a1 = $this->m->get('eptInvOneManyA', $a1_oid);
         $b1 = $this->m->get('eptInvOneManyB', $b1_oid);
-        
+
         // check duplicates
         $this->assertTrue($b1->a === $a1);
         $this->assertTrue($a1->bs->inArray($b1));
@@ -606,14 +609,14 @@ class epTestInverse extends epTestRuntime {
 
         // -------------------------------------------------
         // check many-many relationship
-        
+
         include_once(EP_TESTS.'/classes/inverses/src/eptInvManyA.php');
         include_once(EP_TESTS.'/classes/inverses/src/eptInvManyB.php');
 
         // create eptInvOneA and eptInvOneB
         $this->assertTrue($a1 = $this->m->create('eptInvManyA'));
         $this->assertTrue($b1 = $this->m->create('eptInvManyB'));
-        
+
         // set $b1 to $a1->bs[]
         $a1->bs[] = $b1;
         $this->assertTrue($b1->as->inArray($a1));
@@ -633,7 +636,7 @@ class epTestInverse extends epTestRuntime {
         $a1 = $this->m->get('eptInvManyA', $a1_oid);
         $b1 = $this->m->get('eptInvManyB', $b1_oid);
 
-        // put in a duplicate 
+        // put in a duplicate
         $a1->bs[] = $b1;
         $this->assertTrue($b1->as->inArray($a1));
         $this->assertTrue($a1->bs->inArray($b1));
@@ -651,7 +654,7 @@ class epTestInverse extends epTestRuntime {
         // retrieve entries
         $a1 = $this->m->get('eptInvManyA', $a1_oid);
         $b1 = $this->m->get('eptInvManyB', $b1_oid);
-        
+
         // check duplicates
         $this->assertTrue($b1->as->inArray($a1));
         $this->assertTrue($a1->bs->inArray($b1));
@@ -677,7 +680,7 @@ class epTestInverse extends epTestRuntime {
         // retrieve entries
         $a1 = $this->m->get('eptInvManyA', $a1_oid);
         $b1 = $this->m->get('eptInvManyB', $b1_oid);
-        
+
         // one should still be in there
         $this->assertTrue($b1->as->inArray($a1));
         $this->assertTrue($a1->bs->inArray($b1));
@@ -702,13 +705,13 @@ class epTestInverse extends epTestRuntime {
         // retrieve entries
         $a1 = $this->m->get('eptInvManyA', $a1_oid);
         $b1 = $this->m->get('eptInvManyB', $b1_oid);
-        
+
         // check duplicates
         $this->assertTrue($b1->as->inArray($a1));
         $this->assertTrue($a1->bs->inArray($b1));
         $this->assertTrue($a1->bs->count() == 2);
         $this->assertTrue($b1->as->count() == 2);
-        
+
         foreach ($b1->as as $a) {
             $this->assertTrue($a->epMatches($a1));
         }
@@ -729,13 +732,13 @@ class epTestInverse extends epTestRuntime {
         // retrieve entries
         $a1 = $this->m->get('eptInvManyA', $a1_oid);
         $b1 = $this->m->get('eptInvManyB', $b1_oid);
-        
+
         // one should still be in there
         $this->assertFalse($b1->as->inArray($a1));
         $this->assertFalse($a1);
         $this->assertTrue($b1->as->count() == 0);
 */
-		
+
         $this->assertTrue($this->m->evictAll('eptInvManyA'));
         $this->assertTrue($this->m->evictAll('eptInvManyB'));
 
@@ -743,23 +746,23 @@ class epTestInverse extends epTestRuntime {
         $this->assertTrue($this->m->deleteAll('eptInvManyB'));
 
     }
-    
-}   
+
+}
 
 if (!defined('EP_GROUP_TEST')) {
-    
+
     $tm = microtime(true);
-    
+
     $t = new epTestInverse;
-    if ( epIsWebRun() ) {
-        $t->run(new HtmlReporter());
+    if ( Base\epIsWebRun() ) {
+        $t->run(new \HtmlReporter());
     } else {
-        $t->run(new TextReporter());
+        $t->run(new \TextReporter());
     }
-    
+
     $elapsed = microtime(true) - $tm;
-    
-    echo epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
+
+    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
 }
 
 ?>

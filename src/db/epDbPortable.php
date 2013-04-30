@@ -11,6 +11,17 @@
  * @package ezpdo
  * @subpackage ezpdo.db
  */
+namespace ezpdo\db;
+
+use ezpdo\base\epFactory;
+use ezpdo\base\epException;
+use ezpdo\base\epSingleton;
+
+use ezpdo\orm\epFieldMap;
+use ezpdo\orm\epClassMap;
+
+use ezpdo\db\port\epDbPortSqlite as epDbPortSqlite;
+use ezpdo\db\port\epDbPortPostgres as epDbPortPostgres;
 
 /**
  * Need field type definition
@@ -689,6 +700,7 @@ class epDbPortFactory implements epFactory, epSingleton  {
             $dbp = new epDbPortable;
         } else {
             include_once($port_class_file);
+            $port_class = "ezpdo\\db\\port\\$port_class";
             $dbp = new $port_class;
         }
 

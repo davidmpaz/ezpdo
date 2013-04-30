@@ -2,14 +2,17 @@
 
 /**
  * $Id: epParser.php 945 2006-05-12 19:34:14Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 945 $
  * @package ezpdo
- * @subpackage ezpdo.parser
+ * @subpackage ezpdo.base.parser
  */
+namespace ezpdo\base\parser;
+
+use ezpdo\base\epBase;
 
 /**#@+
  * need epLexer
@@ -18,33 +21,33 @@ include_once(EP_SRC_BASE_PARSER.'/epLexer.php');
 /**#@-*/
 
 /**
- * A base class for a recursive-descent parser (see 
+ * A base class for a recursive-descent parser (see
  * {@link http://en.wikipedia.org/wiki/Recursive_descent_parser}).
- * 
+ *
  * The class provides nuts and bolts for the implementation
- * of a full-blown parser: lexer hookup, token navigation, 
+ * of a full-blown parser: lexer hookup, token navigation,
  * error reporting and debugging methods.
- * 
+ *
  * The class is used as the base class for the EZOQL query parser
- * ({@link epQueryParser}) and the ORM tag parser ({@link 
+ * ({@link epQueryParser}) and the ORM tag parser ({@link
  * epTagParser}).
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 945 $
  * @package ezpdo
  * @subpackage ezpdo.parser
  */
 abstract class epParser extends epBase {
-    
+
     /**
      * The lexer the parser needs to call
      * @var epQueryLexer
      */
     protected $_lexer = false;
-    
+
     /**
      * Array to keep all errors
-     * @var array 
+     * @var array
      */
     protected $errors = array();
 
@@ -61,17 +64,17 @@ abstract class epParser extends epBase {
     protected $_verbose = false;
 
     /**
-     * The current token 
+     * The current token
      * @var null|false|epToken
      */
     protected $t = false;
-    
+
     /**
-     * The peeked token 
+     * The peeked token
      * @var null|false|epToken
      */
     protected $p = false;
-    
+
     /**
      * Constructor
      * @param string $s
@@ -88,7 +91,7 @@ abstract class epParser extends epBase {
      * @param boolean $force(force to reset errors)
      */
     public function initialize($s) {
-        
+
         // set string to lexer
         if (!$this->_lexer) {
             $this->_lexer = new epLexer($s);
@@ -121,7 +124,7 @@ abstract class epParser extends epBase {
         }
         return $this->_verbose;
     }
-    
+
     /**
      * Returns the errors raised
      * @return array
@@ -129,7 +132,7 @@ abstract class epParser extends epBase {
     public function errors() {
         return $this->errors;
     }
-    
+
     /**
      * Parses the stream and return the root node
      * @return false|epQueryNode
@@ -170,7 +173,7 @@ abstract class epParser extends epBase {
     protected function peek() {
         // peek the next token
         $t = $this->_lexer->peek();
-        // ignore new lines 
+        // ignore new lines
         while ($t && ($t->value == "\n")) {
             $this->_lexer->next();
             $t = $this->_lexer->peek();
@@ -181,19 +184,19 @@ abstract class epParser extends epBase {
 
     /**
      * Raise an error message.
-     * 
-     * The error message is stored in an array that can be 
+     *
+     * The error message is stored in an array that can be
      * retrieved later.
-     * 
-     * This method can also be used to retrieve the curernt 
-     * error if you don't give any argument. 
-     * 
+     *
+     * This method can also be used to retrieve the curernt
+     * error if you don't give any argument.
+     *
      * @param string $msg
      * @return epQueryError
      */
     protected function error($msg = '') {
-        
-        // if empty message, return the current error 
+
+        // if empty message, return the current error
         if (!$msg) {
             return $this->_error;
         }
@@ -204,19 +207,19 @@ abstract class epParser extends epBase {
             $v = $this->t->value;
             $l = $this->t->line;
             $c = $this->t->char;
-        } 
+        }
         $this->_error = new epLexerError($msg, $v, $l, $c);
 
         // keep all errors
         $this->errors[] = $this->_error;
-        
+
         // print out error message
         $emsg = $msg . ' at EOF';
         if ($this->t && $this->t->type !== false) {
             $emsg = $this->_error->__toString();
         }
         $this->message("Error: $emsg");
-                       
+
         // return this error
         return $this->_error;
     }
@@ -230,7 +233,7 @@ abstract class epParser extends epBase {
     protected function syntax_error($msg = 'unspecified') {
         $this->error('syntax error (' . $msg . ')');
     }
-    
+
     /**
      * output message in verbose mode
      * @return void
@@ -260,7 +263,7 @@ abstract class epParser extends epBase {
             }
             $this->message(__METHOD__ . ": " . $msg);
         }
-        
+
         return $this->t->type;
     }
 
@@ -282,7 +285,7 @@ abstract class epParser extends epBase {
             return false;
         }
 
-        // debug 
+        // debug
         if ($this->_verbose) {
             $msg = "EOF";
             if ($t->type) {

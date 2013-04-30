@@ -2,17 +2,22 @@
 
 /**
  * $Id: epTestQueryPath.php 969 2006-05-19 12:20:19Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 969 $ $Date: 2006-05-19 08:20:19 -0400 (Fri, 19 May 2006) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.query
  */
+namespace ezpdo\tests\query;
+
+use ezpdo\base as Base;
+use ezpdo\query\epQueryPathManager;
+use ezpdo\tests\runtime\epTestRuntime;
 
 /**#@+
- * need runtime testcase (under ../runtime) and epQueryBuilder 
+ * need runtime testcase (under ../runtime) and epQueryBuilder
  */
 include_once(dirname(__FILE__).'/../runtime/epTestRuntime.php');
 include_once(EP_SRC_QUERY.'/epQueryPath.php');
@@ -20,28 +25,28 @@ include_once(EP_SRC_QUERY.'/epQueryPath.php');
 
 /**
  * The unit test class for {@link epQueryPathManager}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 969 $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.query
  */
 class epTestQueryPath extends epTestRuntime {
-    
+
     // Setup for tests
     function setUp() {
-        
+
         // call parent setup
         parent::setUp();
-        
+
         // runtime setup
         $this->_setup('adodb', 'mysql');
         $this->assertTrue($this->m);
     }
-    
+
     // test {@link epQueryAliasManager}
     function _testQueryBuilderAlias() {
-        
+
         // get alias generator
         $this->assertTrue($am = new epQueryAliasManager());
 
@@ -53,7 +58,7 @@ class epTestQueryPath extends epTestRuntime {
         $this->assertTrue($class == $am->getClass($alias1));
         $this->assertTrue($class == $am->getClass($alias2));
         $this->assertTrue(2 == count($am->getClassAliases($class)));
-        
+
         // check alias generation for tables
         $table = "TestTable";
         $this->assertTrue($alias3 = $am->getTableAlias($table, true)); // true: create
@@ -72,19 +77,19 @@ class epTestQueryPath extends epTestRuntime {
 
     // test {@link epQueryPathRoot}
     function _testQueryPathNodeRoot() {
-        
+
         // get class map of eptAuthor
         $this->assertTrue($cm = $this->m->getClassMap('eptAuthor'));
-        
+
         // create alias generator
         $this->assertTrue($am = new epQueryAliasManager());
-        
+
         // create a root node
         $this->assertTrue($root = new epQueryPathRoot($cm, $alias = false, epQueryPathRoot::PRIMARY, $am));
-        
+
         // check if class map is set
         $this->assertTrue($cm === $root->getMap());
-        
+
         // check if alias is set
         $this->assertTrue($alias = $am->getClassAlias('eptAuthor'));
         $this->assertTrue($alias == $root->getAlias());
@@ -93,17 +98,17 @@ class epTestQueryPath extends epTestRuntime {
 
         // test find last node on path .contact.zipcode
         $this->assertFalse($node1 = $root->findNode('.contact.zipcode'));
-        
+
         // insert the path to root
         $this->assertTrue($node1 = $root->insertPath('.contact.zipcode'));
-        
+
         // returned node should be epQueryPathField
         $this->assertTrue($node1 instanceof epQueryPathField);
         $this->assertTrue($node1->getName() == 'zipcode');
         $this->assertTrue($node1->getMap()->getName() == 'zipcode');
         $this->assertTrue($node1->getParent()->getName() == 'contact');
         $this->assertTrue($node1->getParent()->getMap()->getName() == 'contact');
-        
+
         // test findNode again
         $this->assertTrue($node1 = $root->findNode('.contact.zipcode'));
         $this->assertTrue($node1 instanceof epQueryPathField);
@@ -116,17 +121,17 @@ class epTestQueryPath extends epTestRuntime {
 
         // test find last node on path .contact.phone
         $this->assertFalse($node2 = $root->findNode('.contact.phone'));
-        
+
         // insert the path to root
         $this->assertTrue($node2 = $root->insertPath('.contact.phone'));
-        
+
         // returned node should be epQueryPathField
         $this->assertTrue($node2 instanceof epQueryPathField);
         $this->assertTrue($node2->getName() == 'phone');
         $this->assertTrue($node2->getMap()->getName() == 'phone');
         $this->assertTrue($node2->getParent()->getName() == 'contact');
         $this->assertTrue($node2->getParent()->getMap()->getName() == 'contact');
-        
+
         // test findNode again
         $this->assertTrue($node2 = $root->findNode('.contact.phone'));
         $this->assertTrue($node2 instanceof epQueryPathField);
@@ -151,7 +156,7 @@ class epTestQueryPath extends epTestRuntime {
         // add the super root
         $this->assertTrue($p->addPrimaryRoot('eptAuthor', $alias));
 
-        // insert path 
+        // insert path
         $this->assertTrue($p->insertPath($alias . '.contact.zipcode'));
 
         // generate sql parts
@@ -165,16 +170,16 @@ class epTestQueryPath extends epTestRuntime {
 
         // check joins
         $this->assertEqual(
-            $sql = trim($sql_parts[$alias]['eptAuthor']), 
-            "LEFT JOIN `_ez_relation_eptauthor_eptcontact` AS `_2` ON " 
-            . "`_2`.var_a = 'contact' " 
-            . "AND (" 
-            . "`_2`.class_a = 'eptAuthor' " 
-            . "AND `_2`.oid_a = `_1`.`eoid`" 
-            . ") " 
-            . "LEFT JOIN `eptContact` AS `_3` ON " 
+            $sql = trim($sql_parts[$alias]['eptAuthor']),
+            "LEFT JOIN `_ez_relation_eptauthor_eptcontact` AS `_2` ON "
+            . "`_2`.var_a = 'contact' "
+            . "AND ("
+            . "`_2`.class_a = 'eptAuthor' "
+            . "AND `_2`.oid_a = `_1`.`eoid`"
+            . ") "
+            . "LEFT JOIN `eptContact` AS `_3` ON "
             . "`_2`.base_b = 'eptContact' "
-            . "AND `_2`.class_b = 'eptContact' " 
+            . "AND `_2`.class_b = 'eptContact' "
             . "AND `_2`.oid_b = `_3`.`eoid`"
             );
         //echo "\n\n$sql\n\n";
@@ -189,12 +194,12 @@ class epTestQueryPath extends epTestRuntime {
         // add the super root
         $this->assertTrue($p->addPrimaryRoot('eptAuthor', $alias));
 
-        // insert path 
+        // insert path
         $this->assertTrue($p->insertPath($alias . '.contact.zipcode'));
 
         // add a secondary root
         $this->assertTrue($p->addSecondaryRoot('eptBook', 'bk'));
-        
+
         // insert path to the secondary root
         $this->assertTrue($p->insertPath('bk.authors'));
 
@@ -210,33 +215,33 @@ class epTestQueryPath extends epTestRuntime {
         // check primary statement
         $this->assertEqual(
             $sql_parts[$alias]['eptAuthor'],
-            "LEFT JOIN `_ez_relation_eptauthor_eptcontact` AS `_2` ON " 
-            . "`_2`.var_a = 'contact' " 
-            . "AND (" 
-            . "`_2`.class_a = 'eptAuthor' " 
-            . "AND `_2`.oid_a = `_1`.`eoid`" 
-            . ") " 
-            . "LEFT JOIN `eptContact` AS `_3` ON " 
-            . "`_2`.base_b = 'eptContact' " 
-            . "AND `_2`.class_b = 'eptContact' " 
-            . "AND `_2`.oid_b = `_3`.`eoid` " 
+            "LEFT JOIN `_ez_relation_eptauthor_eptcontact` AS `_2` ON "
+            . "`_2`.var_a = 'contact' "
+            . "AND ("
+            . "`_2`.class_a = 'eptAuthor' "
+            . "AND `_2`.oid_a = `_1`.`eoid`"
+            . ") "
+            . "LEFT JOIN `eptContact` AS `_3` ON "
+            . "`_2`.base_b = 'eptContact' "
+            . "AND `_2`.class_b = 'eptContact' "
+            . "AND `_2`.oid_b = `_3`.`eoid` "
             );
-        
+
         // check secondary root
         $this->assertTrue(isset($sql_parts['bk']));
 
         // check secondary statement
         $this->assertEqual(
             $sql_parts['bk']['eptBook'],
-            "LEFT JOIN `_ez_relation_eptauthor_eptbook` AS `_4` ON " 
-            . "`_4`.var_a = 'authors' " 
-            . "AND (" 
-            . "`_4`.class_a = 'eptBook' " 
-            . "AND `_4`.oid_a = `bk`.`eoid`" 
-            . ") " 
-            . "LEFT JOIN `eptAuthor` AS `_5` ON " 
-            . "`_4`.base_b = 'eptAuthor' " 
-            . "AND `_4`.class_b = 'eptAuthor' " 
+            "LEFT JOIN `_ez_relation_eptauthor_eptbook` AS `_4` ON "
+            . "`_4`.var_a = 'authors' "
+            . "AND ("
+            . "`_4`.class_a = 'eptBook' "
+            . "AND `_4`.oid_a = `bk`.`eoid`"
+            . ") "
+            . "LEFT JOIN `eptAuthor` AS `_5` ON "
+            . "`_4`.base_b = 'eptAuthor' "
+            . "AND `_4`.class_b = 'eptAuthor' "
             . "AND `_4`.oid_b = `_5`.`eoid` "
             );
     }
@@ -250,7 +255,7 @@ class epTestQueryPath extends epTestRuntime {
         // insert super root
         $this->assertTrue($p->addPrimaryRoot('eptBook', $alias));
 
-        // insert path 
+        // insert path
         $path = $alias . '.authors';
         $this->assertTRue($p->insertPath($path));
 
@@ -266,13 +271,13 @@ class epTestQueryPath extends epTestRuntime {
         // check primary statement
         $this->assertEqual(
             $sql_parts[$alias]['eptBook'],
-            "LEFT JOIN `_ez_relation_eptauthor_eptbook` AS `_2` ON " 
-            . "`_2`.var_a = 'authors' " 
-            . "AND (" 
-            . "`_2`.class_a = 'eptBook' " 
-            . "AND `_2`.oid_a = `_1`.`eoid`" 
-            . ") " 
-            . "LEFT JOIN `eptAuthor` AS `_3` ON " 
+            "LEFT JOIN `_ez_relation_eptauthor_eptbook` AS `_2` ON "
+            . "`_2`.var_a = 'authors' "
+            . "AND ("
+            . "`_2`.class_a = 'eptBook' "
+            . "AND `_2`.oid_a = `_1`.`eoid`"
+            . ") "
+            . "LEFT JOIN `eptAuthor` AS `_3` ON "
             . "`_2`.base_b = 'eptAuthor' "
             . "AND `_2`.class_b = 'eptAuthor' "
             . "AND `_2`.oid_b = `_3`.`eoid` "
@@ -288,12 +293,13 @@ class epTestQueryPath extends epTestRuntime {
         // insert super root
         $this->assertTrue($p->addPrimaryRoot('eptBook', $alias));
 
-        // insert path 
+        // insert path
         $path = $alias . '.authors';
         $this->assertTRue($p->insertPath($path));
 
         // add contained node
-        $this->assertTrue($p->addContainedRoot($path, $a = 'a1'));
+        $a = 'a1';
+        $this->assertTrue($p->addContainedRoot($path, $a));
 
         // insert path to the contained node
         $this->assertTRue($p->insertPath('a1.contact'));
@@ -310,25 +316,25 @@ class epTestQueryPath extends epTestRuntime {
         // check primary statement
         $this->assertEqual(
             $sql_parts[$alias]['eptBook'],
-            "LEFT JOIN `_ez_relation_eptauthor_eptbook` AS `_4` ON " 
-            . "`_4`.var_a = 'authors' " 
-            . "AND (" 
-            . "`_4`.class_a = 'eptBook' " 
-            . "AND `_4`.oid_a = `_1`.`eoid`" 
-            . ") " 
-            . "LEFT JOIN `eptAuthor` AS `_3a1` ON " 
-            . "`_4`.base_b = 'eptAuthor' " 
-            . "AND `_4`.class_b = 'eptAuthor' " 
+            "LEFT JOIN `_ez_relation_eptauthor_eptbook` AS `_4` ON "
+            . "`_4`.var_a = 'authors' "
+            . "AND ("
+            . "`_4`.class_a = 'eptBook' "
+            . "AND `_4`.oid_a = `_1`.`eoid`"
+            . ") "
+            . "LEFT JOIN `eptAuthor` AS `_3a1` ON "
+            . "`_4`.base_b = 'eptAuthor' "
+            . "AND `_4`.class_b = 'eptAuthor' "
             . "AND `_4`.oid_b = `_3a1`.`eoid` "
-            . "LEFT JOIN `_ez_relation_eptauthor_eptcontact` AS `_5` ON " 
-            . "`_5`.var_a = 'contact' " 
-            . "AND (" 
-            . "`_5`.class_a = 'eptAuthor' " 
-            . "AND `_5`.oid_a = `_3a1`.`eoid`" 
-            . ") " 
-            . "LEFT JOIN `eptContact` AS `_6` ON " 
-            . "`_5`.base_b = 'eptContact' " 
-            . "AND `_5`.class_b = 'eptContact' " 
+            . "LEFT JOIN `_ez_relation_eptauthor_eptcontact` AS `_5` ON "
+            . "`_5`.var_a = 'contact' "
+            . "AND ("
+            . "`_5`.class_a = 'eptAuthor' "
+            . "AND `_5`.oid_a = `_3a1`.`eoid`"
+            . ") "
+            . "LEFT JOIN `eptContact` AS `_6` ON "
+            . "`_5`.base_b = 'eptContact' "
+            . "AND `_5`.class_b = 'eptContact' "
             . "AND `_5`.oid_b = `_6`.`eoid` "
             );
     }
@@ -337,13 +343,13 @@ class epTestQueryPath extends epTestRuntime {
 if (!defined('EP_GROUP_TEST')) {
     $tm = microtime(true);
     $t = new epTestQueryPath;
-    if ( epIsWebRun() ) {
-        $t->run(new HtmlReporter());
+    if ( Base\epIsWebRun() ) {
+        $t->run(new \HtmlReporter());
     } else {
-        $t->run(new TextReporter());
+        $t->run(new \TextReporter());
     }
     $elapsed = microtime(true) - $tm;
-    echo epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
+    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
 }
 
 ?>

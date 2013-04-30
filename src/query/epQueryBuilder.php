@@ -11,6 +11,12 @@
  * @package ezpdo
  * @subpackage ezpdo.query
  */
+namespace ezpdo\query;
+
+use ezpdo\base\epBase;
+use ezpdo\base\epException;
+
+use ezpdo\runtime\epObject;
 
 /**
  * need epQueryNode (in epQueryParser.php)
@@ -175,7 +181,7 @@ class epQueryBuilder extends epBase {
      * @var false|string
      */
     protected $orderby  = false;
-    
+
     /**
      * Limit in the query
      * @var false|string
@@ -221,7 +227,7 @@ class epQueryBuilder extends epBase {
 		$this->orderby = array();
 		$this->limit = false;
 		$this->aliases_secondary = false;
-		
+
 		// set input
 		$this->root = & $root;
         $this->args = & $args;
@@ -238,7 +244,7 @@ class epQueryBuilder extends epBase {
 		}
 		$this->pm->initialize();
 	}
-    
+
     /**
      * Returns the root class
      * @return array epClassMap
@@ -282,7 +288,7 @@ class epQueryBuilder extends epBase {
             throw new epExceptionQueryBuilder('syntax tree or the query is not set');
             return false;
         }
-        
+
         // preproc before writing sql
         if (!$this->preproc()) {
             return false;
@@ -297,7 +303,7 @@ class epQueryBuilder extends epBase {
         if (!$this->postproc()) {
             return false;
         }
-        
+
         // finally return the SQL statement
         return $sql;
     }
@@ -308,29 +314,29 @@ class epQueryBuilder extends epBase {
      * @throws epExceptionQueryBuilder
      */
     protected function preproc() {
-        
+
         // get root alias
         $this->aliases_secondary = array();
         if (!($this->processFrom())) {
             return false;
         }
-        
+
 		// collect contained aliases
         $this->aliases_contained = array();
         if (!$this->walk($this->root, 'collectAliases')) {
             return false;
         }
-        
+
         // normalize variables
         if (!$this->walk($this->root, 'normalizeVariable')) {
             return false;
         }
-        
+
         // process 'contains' and 'variable' nodes
         while (!$this->walk($this->root, 'processVariable')) {
             // loop until all aliases and vars are set up
         }
-        
+
         // process array or object place holders
         if (!$this->walk($this->root, 'processPlaceholder')) {
             return false;
@@ -367,24 +373,24 @@ class epQueryBuilder extends epBase {
      * @throws epExceptionQueryBuilder
      */
     private function processFrom() {
-        
+
         // check if we have already done? (if done, root alias must have been set.)
         if ($this->primary_alias) {
             return true;
         }
-        
+
         // get from node
         if (!($from = $this->root->getChild('from'))) {
             throw new epExceptionQueryBuilder($this->_e("cannot found 'from' clause"));
             return false;
         }
-        
+
         // get from items
         if (!($items = $from->getChildren())) {
             throw new epExceptionQueryBuilder($this->_e("no 'from' items specified"));
             return false;
         }
-        
+
         // get the super root (the 1st) from 'from' items
         $item = array_shift($items);
 
@@ -392,10 +398,10 @@ class epQueryBuilder extends epBase {
         $this->primary_class = $item->getParam('class');
         $this->primary_alias = $item->getParam('alias');
         $this->pm->addPrimaryRoot($this->primary_class, $this->primary_alias);
-        
+
         // go through the rest: secondary roots
         foreach($items as &$item) {
-            
+
             // get class from item
             $class = $item->getParam('class');
 
@@ -405,7 +411,7 @@ class epQueryBuilder extends epBase {
                 throw new epExceptionQueryBuilder($this->_e("no alias defined for class [$class]"));
                 continue;
             }
-            
+
             // keep track of aliases for secondary
             $this->aliases_secondary[] = $alias;
 
@@ -427,7 +433,7 @@ class epQueryBuilder extends epBase {
      * @throws epExceptionQueryBuilder
      */
     protected function walk(epQueryNode &$node, $proc, $df = true) {
-        
+
         // make sure we have proc
         if (!$proc) {
             throw new epExceptionQueryBuilder($this->_e('Empty node process method'));
@@ -474,7 +480,7 @@ class epQueryBuilder extends epBase {
                 $this->aliases_contained[] = $arg;
             }
         }
-        
+
         return true;
     }
 
@@ -499,16 +505,16 @@ class epQueryBuilder extends epBase {
         // collect an array of var parts (string)
         $parts = array();
         foreach($children as &$child) {
-            
+
             // if placeholder, get its acutally value
             if (($t = $child->getType()) == EPQ_N_PLACEHOLDER) {
-                
+
                 // get placeholder value
                 if (!($part = $this->_getPlaceholderValue($child)) || !is_string($part)) {
                     throw new epExceptionQueryBuilder($this->_e('invalid placeholder (string expected)', $child));
                     return false;
                 }
-            
+
             } else {
                 // get identifier val
                 $part = $child->getParam('val');
@@ -519,16 +525,16 @@ class epQueryBuilder extends epBase {
 
         // replace root class with root alias
         if ($parts[0] == $this->primary_class) {
-            
+
             // remove the root class name
             array_shift($parts);
-            
+
             // prepend the root alias
             array_unshift($parts, $this->primary_alias);
-            
+
             // set path to variable
             $node->setParam('path', implode('.', $parts));
-            
+
             return true;
         }
 
@@ -537,10 +543,10 @@ class epQueryBuilder extends epBase {
             // prepend super root alias
             array_unshift($parts, $this->primary_alias);
         }
-        
+
         // set path to variable
         $node->setParam('path', implode('.', $parts));
-        
+
         return true;
     }
 
@@ -550,17 +556,17 @@ class epQueryBuilder extends epBase {
      * @return boolean
      */
     protected function _isAlias($s) {
-        
+
         // is it the root alias
         if ($s == $this->primary_alias) {
             return true;
         }
-        
+
         // is it an alias for a secondary root
         if (in_array($s, $this->aliases_secondary)) {
             return true;
         }
-        
+
         // is it an alias for a contained root
         if (in_array($s, $this->aliases_contained)) {
             return true;
@@ -586,13 +592,13 @@ class epQueryBuilder extends epBase {
         if ($node->getParam('done')) {
             return true;
         }
-        
+
         // make sure path has been set for the variable
         if (!($path = $node->getParam('path'))) {
             throw new epExceptionQueryBuilder($this->_e('no path for variable', $node));
             return false;
         }
-        
+
         // insert path into path tree. note that this may not always
         // succeed if contained roots are not inserted already.
         if (!$this->pm->insertPath($path)) {
@@ -622,7 +628,7 @@ class epQueryBuilder extends epBase {
 	 * @param epQueryNode &$node
 	 */
 	protected function undoVariable(epQueryNode &$node) {
-        
+
 		// is it a 'variable' node?
         if ($node->getType() != EPQ_N_VARIABLE) {
             // skip if not
@@ -645,7 +651,7 @@ class epQueryBuilder extends epBase {
      * @return boolean
      */
     protected function processPlaceholder(epQueryNode &$node) {
-        
+
         // done if not a placeholder node
         if ($node->getType() != EPQ_N_PLACEHOLDER) {
             return true;
@@ -677,7 +683,7 @@ class epQueryBuilder extends epBase {
                 }
             }
         }
-        
+
         // or is it a part of equals expr?
         else if ($parent_t == EPQ_N_EXPR_COMPARISON) {
             if ('=' == $parent->getParam('op')) {
@@ -718,7 +724,7 @@ class epQueryBuilder extends epBase {
         if (!($and_node = $this->_andNodes($nodes))) {
             return true;
         }
-        
+
         // get parent's parent
         if (!($grand_parent = $parent->getParent())) {
             return true;
@@ -775,13 +781,13 @@ class epQueryBuilder extends epBase {
             // simply return it back
             return $nodes;
         }
-        
+
         // if only one node
         if (1 == count($nodes)) {
             // simply return it back
             return $nodes[0];
         }
-        
+
         // get the first node
         $node_last = array_pop($nodes);
 
@@ -808,7 +814,7 @@ class epQueryBuilder extends epBase {
      * @return false|epQueryNode
      */
     protected function &_createSyntaxNodes(&$v, $prefix) {
-        
+
         $nodes = array();
 
         // create expression for primitve vars from array or object
@@ -818,7 +824,7 @@ class epQueryBuilder extends epBase {
 
         // create comparison '=' nodes
         foreach($exprs as $path => $value) {
-            
+
             // insert path into tree
             if (!$this->pm->insertPath($path)) {
                 // should not happen
@@ -830,7 +836,7 @@ class epQueryBuilder extends epBase {
                 // should not happen
                 continue;
             }
-            
+
             // set operator '='
             $node->setParam('op', '=');
 
@@ -860,7 +866,7 @@ class epQueryBuilder extends epBase {
             // collect node
             $nodes[] = $node;
         }
-        
+
         return $nodes;
     }
 
@@ -873,17 +879,17 @@ class epQueryBuilder extends epBase {
 
         // array to hold expressions
         $exprs = array();
-        
+
         // always check if key 'oid' exists first
         if (isset($v['oid']) && $v['oid']) {
             // if so, no more deep matching
             $exprs[$prefix . '.oid'] = $v['oid'];
             return $exprs;
         }
-        
+
         // go through each key-value pair
         foreach($v as $_k => $_v) {
-            
+
             // skip oid or null value
             if ($_k == 'oid' || is_null($_v)) {
                 continue;
@@ -891,7 +897,7 @@ class epQueryBuilder extends epBase {
 
             // append key to prefix
             $_prefix = $prefix . '.' . $_k;
-            
+
             // if value is array or object. recursion.
             if (is_array($_v) || ($_v instanceof epObject)) {
                 $exprs = array_merge($exprs, $this->_getPrimitiveExprs($_v, $_prefix));
@@ -924,7 +930,7 @@ class epQueryBuilder extends epBase {
                 return $this->_getPlaceholderValue($arg);
             }
         }
-        
+
         // something wrong
         throw new epExceptionQueryBuilder($this->_e("Invalid 'contains' expression", $node));
         return false;
@@ -948,7 +954,7 @@ class epQueryBuilder extends epBase {
             throw new epExceptionQueryBuilder($this->_e('no argument for placeholder', $node));
             return self::$null;
         }
-        
+
         // return the placeholder value
         return $this->args[$aindex];
     }
@@ -967,16 +973,16 @@ class epQueryBuilder extends epBase {
      * @throws epExceptionQueryBuilder
      */
     protected function buildSql(epQueryNode &$node) {
-        
+
         // get type without
         $type = str_replace(array('EPQ_N_EXPR_', 'EPQ_N_FUNC_', 'EPQ_N_'), '', $node->getType());
-        
+
         // the build sql method for this type
         $method = 'buildSql' . ucfirst(strtolower($type));
-        
+
         // call the method
         $sql = $this->$method($node);
-        
+
         // debug info if in verbose mode
         if ($this->verbose) {
             echo "\n";
@@ -995,7 +1001,7 @@ class epQueryBuilder extends epBase {
      * @throws epExceptionQueryBuilder
      */
     protected function buildSqlAggregate(epQueryNode &$node) {
-        
+
         // child arg?
         if ($c = & $node->getChild('arg')) {
             $argv = $this->buildSql($c);
@@ -1036,7 +1042,7 @@ class epQueryBuilder extends epBase {
      * @throws epExceptionQueryBuilder
      */
     protected function buildSqlBetween(epQueryNode &$node) {
-        
+
         // get expressions and node types (var)
         $vexprs = $this->buildSql($c = & $node->getChild('var'));
         if (!is_array($vexprs)) {
@@ -1050,7 +1056,7 @@ class epQueryBuilder extends epBase {
             $expr1s = array($expr1s);
         }
         $type1 = $c->getType();
-        
+
         // get expressions and node types (expr2)
         $expr2s = $this->buildSql($c = & $node->getChild('expr2'));
         if (!is_array($expr2s)) {
@@ -1067,7 +1073,7 @@ class epQueryBuilder extends epBase {
         foreach($vexprs as $vpvar) {
             foreach($expr1s as $pvar1) {
                 foreach($expr2s as $pvar2) {
-                    
+
                     // collect exprs
                     $exprs = array();
 
@@ -1240,7 +1246,7 @@ class epQueryBuilder extends epBase {
                 }
             }
         }
-        
+
         return '(' . implode(', ', $results) . ')';
     }
 
@@ -1280,7 +1286,7 @@ class epQueryBuilder extends epBase {
      * @throws epExceptionQueryBuilder
      */
     protected function buildSqlLimit(epQueryNode &$node) {
-        
+
         $sql = 'LIMIT ';
 
         // grab the start
@@ -1296,7 +1302,7 @@ class epQueryBuilder extends epBase {
 
             $sql .= $start;
         }
-        
+
         return $sql;
     }
 
@@ -1343,10 +1349,10 @@ class epQueryBuilder extends epBase {
             $this->orderby[] = array('path' => '', 'dir' => $dir);
             return 'RANDOM()';
         }
-        
+
         // get the variable node
         $var_node = $node->getChild('var');
-        
+
         // keep track of orderby
         if ($path = $var_node->getParam('path')) {
             // remove the first piece
@@ -1354,7 +1360,7 @@ class epQueryBuilder extends epBase {
             array_shift($pieces);
             $this->orderby[] = array('path' => implode('.', $pieces), 'dir' => $dir);
         }
-        
+
         // make sql for this orderby item
         $vars = $this->buildSql($var_node);
         $var = $vars[0];
@@ -1404,7 +1410,7 @@ class epQueryBuilder extends epBase {
     protected function buildSqlSelect(epQueryNode &$node) {
 
         // order matters!!
-        
+
         // build aggregate
         $aggregate = $this->pm->quoteId($this->primary_alias.'.*');
         if ($n = $node->getChild('aggregate')) {
@@ -1440,7 +1446,7 @@ class epQueryBuilder extends epBase {
         if ($limit) {
             $orderby_limit .= ' '.$limit;
         }
-        
+
         // get sql left-joins for primary/secondary roots
         $sql_parts = $this->pm->getRootSql();
 
@@ -1457,10 +1463,10 @@ class epQueryBuilder extends epBase {
 
         // quote id (primary alias)
         $p_alias = $this->pm->quoteId($this->primary_alias);
-        
+
         // loop through tables for primary root
         foreach($p_sql_parts as $p_table => $p_joins) {
-            
+
             // quote id
             $p_table = $this->pm->quoteId($p_table);
 
@@ -1513,16 +1519,16 @@ class epQueryBuilder extends epBase {
 
         // assemble from 'froms' and 'joins'
         for($i = 0; $i < count($froms); $i ++) {
-            
+
             // make from clause
             $from = implode(', ', $froms[$i]);
-            
+
             // make left join clauses
             $join = '';
             if ($joins[$i]) {
                 $join = implode('', $joins[$i]);
             }
-            
+
             // assemble a sql statement
             $stmts[] = $select . 'FROM ' . $from . ' ' . $join . $where;
         }
@@ -1534,7 +1540,7 @@ class epQueryBuilder extends epBase {
             // empty limit so no post-query limit operation
             $this->limit = false;
         }
- 
+
         return $stmts;
     }
 
@@ -1558,7 +1564,7 @@ class epQueryBuilder extends epBase {
      * @throws epExceptionQueryBuilder
      */
     protected function buildSqlVariable(epQueryNode &$node) {
-        
+
         // check if path is set on variable node
         if (!($path = trim($node->getParam('path')))) {
             throw new epExceptionQueryBuilder($this->_e("no path for varialbe", $node));
@@ -1594,7 +1600,7 @@ class epQueryBuilder extends epBase {
      * @throws epExceptionQueryBuilder
      */
     protected function buildSqlWhere(epQueryNode &$node) {
-        
+
         // array to collect where expressions
         $wheres = array();
 
@@ -1602,12 +1608,12 @@ class epQueryBuilder extends epBase {
         if ($where = trim($this->_buildSqlChildren($node))) {
             $wheres[] = $where;
         }
-        
+
         // check if where is empty
         if (!($where = implode(' AND ', $wheres))) {
             $where = '1=1';
         }
-        
+
         // prepend 'where '
         return 'WHERE ' . $where;
     }
@@ -1634,7 +1640,7 @@ class epQueryBuilder extends epBase {
                 $results[$k] = '(' . $result . ')';
             }
         }
-        
+
         return implode($seperator, $results);
     }
 
@@ -1674,7 +1680,7 @@ class epQueryBuilder extends epBase {
 
         return implode(' OR ', $op_exprs);
     }
-    
+
     /**
      * Quotes left and right hand primitive values according to node type
      * @param mixed $left_v the lhs value (will be modified)
@@ -1750,14 +1756,14 @@ class epQueryBuilder extends epBase {
      * @return epExceptionQueryBuilder
      */
     private function _e($msg, $node = false) {
-        
+
         if (!$node) {
             $node = $this->root;
         }
 
         $l = $node->getParam('line') - 1;
         $c = $node->getParam('char');
-        
+
         // find the right line
         $pos = 0;
         while ($l && false !== ($pos_ = strpos($this->query, "\n"))) {
@@ -1771,17 +1777,17 @@ class epQueryBuilder extends epBase {
         while ($start && $this->query[$start] != ' ') {
             $start --;
         }
-        
+
         $len = strlen($this->query);
 
         $end = $pos;
         while ($end < $len && $this->query[$end] != ' ') {
             $end ++;
         }
-        
+
         $s = substr($this->query, $start = max(0, $start - 10), $pos-1-$start);
         $s .= '###' . substr($this->query, $pos-1, min($end + 10, $len));
-        
+
         // append pointer
         $msg .= ' (near "... ' . $s . ' ...")';
 

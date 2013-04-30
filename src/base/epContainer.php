@@ -2,14 +2,15 @@
 
 /**
  * $Id: epContainer.php 970 2006-05-19 12:46:10Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 970 $ $Date: 2006-05-19 08:46:10 -0400 (Fri, 19 May 2006) $
  * @package ezpdo
- * @subpackage ezpdo.base 
+ * @subpackage ezpdo.base
  */
+namespace ezpdo\base;
 
 /**
  * need epBase
@@ -18,15 +19,15 @@ include_once(EP_SRC_BASE.'/epBase.php');
 
 /**
  * Class of epContainer
- * 
- * A container is a composite object. It can have 
+ *
+ * A container is a composite object. It can have
  * its parent (if not root) and children. The class
  * is useful in constructing tree/graph structures.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 970 $ $Date: 2006-05-19 08:46:10 -0400 (Fri, 19 May 2006) $
  * @package ezpdo
- * @subpackage ezpdo.base 
+ * @subpackage ezpdo.base
  */
 class epContainer extends epBase {
 
@@ -37,7 +38,7 @@ class epContainer extends epBase {
     protected $parent = null;
 
     /**
-     * The key (name) used for the children array 
+     * The key (name) used for the children array
      * @var string
      */
     protected $children_key;
@@ -45,7 +46,7 @@ class epContainer extends epBase {
     /**
      * Contained objects (children)
      * An associative arry using children_key
-     * @var array 
+     * @var array
      */
     protected $children = array();
 
@@ -106,7 +107,7 @@ class epContainer extends epBase {
     }
 
     /**
-     * Get the children contained 
+     * Get the children contained
      * @param bool get all children if recusive
      * @param bool sort by weight or by the order inserted
      * @return array (ref)
@@ -136,7 +137,7 @@ class epContainer extends epBase {
     /**
      * Get sub child by id
      * @name string id of the child
-     * @return epBase 
+     * @return epBase
      */
     public function &getChild($id, $recursive = false) {
 
@@ -169,7 +170,7 @@ class epContainer extends epBase {
      * @return bool true if successful
      */
     public function addChild(epBase &$child, $replace = true) {
-        
+
         // get the key from object
         eval('$id = $child->get' . $this->getChildrenKey() . '();');
         if ( empty($id) ) {
@@ -215,16 +216,16 @@ class epContainer extends epBase {
     public function removeAllChildren() {
         $this->children = array();
     }
-    
+
     /**
-     * Check if a given object is an ancestor 
+     * Check if a given object is an ancestor
      * @param object
      * @return bool
      * @todo To be implemented
      */
     public function isAncestor($o) {
     }
-    
+
     /**
      * Sort an array of show columns (by defualt sort by weight)
      * @return integer -1 (a is lighter), 0 (tie), or +1 (b is lighter)
@@ -234,13 +235,13 @@ class epContainer extends epBase {
 
         // get the children key
         $key = $this->getChildrenKey();
-        
+
         // check if key is empty
         if ( empty($key) ) {
             // should not happen
             return 0; // treated as tie
         }
-        
+
         eval('$id_a = $a->get' . $key . '();');
         eval('$id_b = $b->get' . $key . '();');
 

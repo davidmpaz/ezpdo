@@ -2,21 +2,22 @@
 
 /**
  * $Id: epCache.php 872 2006-03-22 14:05:54Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @author Trevan Richins <developer@ckiweb.com>
  * @version $Revision: 872 $ $Date: 2006-03-22 09:05:54 -0500 (Wed, 22 Mar 2006) $
  * @package ezpdo
  * @subpackage ezpdo.cache
  */
+namespace ezpdo\cache;
 
 /**
  * The interface of EZPDO cache
- * 
+ *
  * To plug in a third-party external cache, all you need to do is
- * to write a wrapper around that cache that implements this interface 
+ * to write a wrapper around that cache that implements this interface
  * and register it to the EZPDO runtime manager ({@link epManager}):
  * <code>
  *   // get manager
@@ -24,15 +25,15 @@
  *   // plug in cache
  *   $m->setCache($cache);
  * </code>
- * 
+ *
  * So far we have three built-in cache wrappers for
  * + APC: {@link epCacheApc}
  * + Cache_Lite: {@link epCachelite}
  * + Memcache: {@link epCacheMemcache}
- * 
+ *
  * You can use the above classes as examples if you'd want to write
  * your own wrapper.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 872 $ $Date: 2006-03-22 09:05:54 -0500 (Wed, 22 Mar 2006) $
  * @package ezpdo
@@ -48,13 +49,13 @@ interface epCache {
     public function get($key);
 
     /**
-     * Stores a variable into the cache with a key. 
-     * 
-     * A time-to-live (TTL) parameter (in seconds) can also be passed 
-     * so that the stored value will be removed from the cache if TTL 
-     * has expired. This is normally done on the next request but the 
-     * actual behavior may depend on the cache implementation. 
-     * 
+     * Stores a variable into the cache with a key.
+     *
+     * A time-to-live (TTL) parameter (in seconds) can also be passed
+     * so that the stored value will be removed from the cache if TTL
+     * has expired. This is normally done on the next request but the
+     * actual behavior may depend on the cache implementation.
+     *
      * @param string $key The key used to store the value
      * @param mixed $value The value (variable) to be cached
      * @param false|integer $ttl The time-to-live in seconds
@@ -84,7 +85,7 @@ if (!class_exists('epConfigurableWithLog')) {
 
 /**
  * Exception class for {@link epCacheObject}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 872 $ $Date: 2006-03-22 09:05:54 -0500 (Wed, 22 Mar 2006) $
  * @package ezpdo
@@ -95,15 +96,15 @@ class epExceptionCacheObject extends epException {
 
 /**
  * Class of EZPDO object cache
- * 
- * This class delegates EZPDO object caching tasks to the underlying 
+ *
+ * This class delegates EZPDO object caching tasks to the underlying
  * caching mechanism, which implements the {@link epCache} interface.
- * 
+ *
  * One note on the locking mechanism. Since caching mechnisms such as
  * memcache strives to implement non-blocking read, read lock is not
  * used in {@link epCacheObject} so far as it may offset the benefit
  * of caching, although read lock is also implemented in the class.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @author Trevan Richins <developer@ckiweb.com>
  * @version $Revision: 872 $ $Date: 2006-03-22 09:05:54 -0500 (Wed, 22 Mar 2006) $
@@ -113,7 +114,7 @@ class epExceptionCacheObject extends epException {
 class epCacheObject extends epConfigurableWithLog {
 
     /**#@+
-     * Constants for locking 
+     * Constants for locking
      * Should be binary exclusive. So one can have (Lock_READ | LOCK_WRITE).
      */
     const LOCK_READ  = 1;
@@ -126,22 +127,22 @@ class epCacheObject extends epConfigurableWithLog {
      * @var array
      */
     static protected $builtin_caches = array(
-        
+
         "apc" => array(
             "cache_ttl"
-            ), 
-        
+            ),
+
         "cachelite" => array(
-            "cache_dir", 
+            "cache_dir",
             "cache_ttl"
-            ), 
-        
+            ),
+
         "memcache" => array(
-            "cache_server", 
-            "cache_port", 
-            "cache_compress", 
+            "cache_server",
+            "cache_port",
+            "cache_compress",
             "cache_ttl"
-            ), 
+            ),
         );
 
     /**
@@ -159,23 +160,23 @@ class epCacheObject extends epConfigurableWithLog {
     /**
      * Constructor
      * @param string|epCache & $cache The cache to be plugged in
-     * @param array|epConfig $config The configuration 
+     * @param array|epConfig $config The configuration
      */
     public function __construct($cache, $config = null) {
 
         // call parent to set configuration
         parent::__construct($config);
-        
+
         // is input a string?
         if (is_string($cache)) {
             $this->cache = & $this->_cache();
         }
-        
+
         // or is it an epCache?
         else if ($cache instanceof epCache) {
             $this->cache = & $cache;
         }
-        
+
         // unrecognized parameter
         else {
             throw new epExceptionCacheObject("Unrecognized parameter");
@@ -191,10 +192,10 @@ class epCacheObject extends epConfigurableWithLog {
      */
     public function defConfig() {
         return array_merge(
-            parent::defConfig(), 
+            parent::defConfig(),
             array(
-                "cache_server" => "localhost", // Default cache server 
-                "cache_port" => 11211, // Default port number 
+                "cache_server" => "localhost", // Default cache server
+                "cache_port" => 11211, // Default port number
                 "cache_compress" => true, // Whether to turn on compression (default to true)
                 "cache_ttl" => 360, // Default time-to-live: 360 seconds
                 "cache_dir" => '/tmp', // Default cache directory
@@ -209,7 +210,7 @@ class epCacheObject extends epConfigurableWithLog {
      * @return boolean
      */
     public function add(epObject &$o, $force = false) {
-        
+
         // don't cache objects that haven't been committed
         if (!($oid = $o->epGetObjectId())) {
             return false;
@@ -219,7 +220,7 @@ class epCacheObject extends epConfigurableWithLog {
         if (!($class = $o->epGetClass())) {
             return false;
         }
-        
+
         // generate key
         $key = $this->_key($class);
 
@@ -227,12 +228,12 @@ class epCacheObject extends epConfigurableWithLog {
         if (!($os = $this->cache->get($key))) {
             $os = array();
         }
-        
+
         // done if not forced -and- oid already in cache
         if (!$force && in_array($o->oid, array_keys($os))) {
             return true;
-        } 
-        
+        }
+
         // put object into array
         $os[$o->oid] = $o;
 
@@ -241,33 +242,33 @@ class epCacheObject extends epConfigurableWithLog {
             return false;
         }
 
-        // lock write 
+        // lock write
         $this->_lock($class, self::LOCK_WRITE);
 
-        // cache array 
+        // cache array
         $status = $this->cache->set($key, $os);
-        
-        // unlock write 
+
+        // unlock write
         $this->_unlock($class, self::LOCK_WRITE);
 
         return $status;
     }
-    
+
     /**
      * Retrieves an object from cache by oid or all objects of a class
      * if oid is not specified.
-     * 
-     * @param string $class The class name 
+     *
+     * @param string $class The class name
      * @param integer $oid The object id for the object to be retrieved
      * @return false|epObject|array
      */
     public function get($class, $oid = false) {
-        
+
         // sanity check
         if (!$class) {
             return false;
         }
-    
+
         // generate key
         $key = $this->_key($class);
 
@@ -290,22 +291,22 @@ class epCacheObject extends epConfigurableWithLog {
         // o.w. return object with oid
         return $os[$oid];
     }
-    
+
     /**
      * Removes an object by class and oid. If oid is not given, remove
      * all objects of a class.
-     * 
-     * @param string $class The class name 
+     *
+     * @param string $class The class name
      * @param integer $oid The object id for the object to be retrieved
-     * @return boolean 
+     * @return boolean
      */
     public function delete($class, $oid = false) {
-        
+
         // sanity check
         if (!$class) {
             return false;
         }
-    
+
         // generate key
         $key = $this->_key($class);
 
@@ -317,13 +318,13 @@ class epCacheObject extends epConfigurableWithLog {
         // is oid specified?
         if (!$oid) {
 
-            // lock write 
+            // lock write
             $this->_lock($class, self::LOCK_WRITE);
 
             // remove all objects in class
             $status = $this->cached->remove($key);
 
-            // unlock write 
+            // unlock write
             $this->_unlock($class, self::LOCK_WRITE);
 
             return $status;
@@ -337,13 +338,13 @@ class epCacheObject extends epConfigurableWithLog {
         // unset oid in array
         unset($os[$oid]);
 
-        // lock write 
+        // lock write
         $this->_lock($class, self::LOCK_WRITE);
 
         // cache the array again
         $status = $this->cache->set($key, $os);
 
-        // unlock write 
+        // unlock write
         $this->_unlock($class, self::LOCK_WRITE);
 
         return $status;
@@ -352,11 +353,11 @@ class epCacheObject extends epConfigurableWithLog {
     /**
      * Checks if a class is locked
      * @param string $class The class name
-     * @param integer $type The lock type 
+     * @param integer $type The lock type
      * @return boolean
      */
     protected function _isLocked($class, $type) {
-    
+
         $locked = true;
 
         // lock read?
@@ -385,10 +386,10 @@ class epCacheObject extends epConfigurableWithLog {
      * @return boolean
      */
     protected function _lock($class, $type) {
-        
+
         // return status
         $status = true;
-        
+
         // lock read?
         if ($type & self::LOCK_READ) {
             $key = $this->_key($class, 'lock' . self::LOCK_READ);
@@ -410,10 +411,10 @@ class epCacheObject extends epConfigurableWithLog {
      * @return boolean
      */
     protected function _unlock($class, $type) {
-        
+
         // return status
         $status = true;
-        
+
         // lock read?
         if ($type & self::LOCK_READ) {
             $key = $this->_key($class, 'lock' . self::LOCK_READ);
@@ -430,18 +431,18 @@ class epCacheObject extends epConfigurableWithLog {
     }
 
     /**
-     * Makes a cache key for a class 
-     * 
-     * Since EZPDO allows a user to change database (DSN) at runtime (see 
-     * {@link epManager::setDsn()}), it is important to use the current 
+     * Makes a cache key for a class
+     *
+     * Since EZPDO allows a user to change database (DSN) at runtime (see
+     * {@link epManager::setDsn()}), it is important to use the current
      * DSN of the class in generating the cache key.
-     * 
+     *
      * @param string $class The class name
      * @param string $extra The extra string (mostly for locking type)
      * @return false|string
      */
     protected function _key($class, $extra = '') {
-        
+
         if (!($cm = & self::$em->getClassMap($class))) {
             return false;
         }
@@ -455,21 +456,21 @@ class epCacheObject extends epConfigurableWithLog {
 
     /**
      * Instantiates built-in cache by name
-     * @param string $cache 
+     * @param string $cache
      * @return false|epCache
      * @throws epExceptionCacheObject
      */
     protected function & _getCache($name = 'apc') {
-        
+
         // normalize cache name
         $name = strtolower($name);
-        
+
         // check if it is one of the built-in caches
         if (!in_array($name, array_keys(self::$builtin_caches))) {
             throw new epExceptionCacheObject("Unrecognized built-in cache: $cache");
             return false;
         }
-        
+
         // collect all arguments for cache constructor
         $args = array();
         foreach(self::$builtin_caches[$name] as $option) {

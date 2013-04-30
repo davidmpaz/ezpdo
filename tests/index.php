@@ -2,14 +2,17 @@
 
 /**
  * $Id: index.php 1012 2006-07-31 01:21:46Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1012 $ $Date: 2006-07-30 21:21:46 -0400 (Sun, 30 Jul 2006) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.base
  */
+
+use ezpdo\base as Base;
+use ezpdo\tests\src\epCliReporter;
 
 /**
  * Set exec time to 300 seconds (allow slow machine to finish)
@@ -59,19 +62,19 @@ if (EP_COVERAGE_TEST) {
 $t = new GroupTest('All ezpdo tests');
 
 // get all epTestXxxx files
-$files = epFilesInDir();
+$files = Base\epFilesInDir();
 
 // add each test file into group
 foreach($files as $file) {
-    
+
     // get file base name
     $filename = basename($file);
-    
+
     // exclude this script
     if ($filename == basename(__FILE__)) {
         continue;
     }
-    
+
     // exclude epTestCase.php
     if ($filename == 'epTestCase.php') {
         continue;
@@ -91,45 +94,45 @@ foreach($files as $file) {
     if (!preg_match('/^epTest\w+\.php$/', $filename)) {
         continue;
     }
-    
+
     // add this test file into group
     $t->addTestFile($file);
 }
 
-// start coverage 
+// start coverage
 if (EP_COVERAGE_TEST) {
     startCoverage($c_recorder, $c_reporter);
 }
 
 $status = false;
-if (epIsWebRun()) {
-    
+if (Base\epIsWebRun()) {
+
     // start timer
     $tm = microtime(true);
-    
+
     // use the web reporter
     $status = $t->run(new HtmlReporter());
-    
+
     // stop timer
     $elapsed = microtime(true) - $tm;
-    
+
     // output timing
-    echo epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds';
+    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds';
 
 } else {
-    
+
     // use the cli reporter from Rephlux
     include_once(EP_TESTS . '/src/epCliReporter.php');
-    
+
     $status = $t->run(new epCliReporter());
 }
 
-// end coverage 
+// end coverage
 if (EP_COVERAGE_TEST) {
-    
+
     // suppress undefined token warning
     error_reporting(E_ALL ^ E_NOTICE);
-    
+
     // generate coverage reports
     endCoverage($c_recorder, $c_reporter);
 }

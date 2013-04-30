@@ -10,6 +10,14 @@
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.runtime
  */
+namespace ezpdo\tests\runtime;
+
+use ezpdo\base as Base;
+use ezpdo\runtime\epArray;
+use ezpdo\runtime\epObject;
+use ezpdo\runtime\epManager;
+use ezpdo\runtime\epManagerBase;
+use ezpdo\runtime\epTransaction;
 
 /**
  * need epTestCase
@@ -46,7 +54,7 @@ class epTestManager extends epTestRuntime {
      * remove output dir in teardown
      */
     function tearDown() {
-        epRmDir(dirname(__FILE__) . '/output');
+        Base\epRmDir(dirname(__FILE__) . '/output');
     }
 
     /**
@@ -2008,6 +2016,7 @@ class epTestManager extends epTestRuntime {
 
         // use manager to create one object
         include_once(EP_TESTS.'/classes/bookstore/src/eptAuthor.php');
+        include_once(EP_TESTS.'/classes/bookstore/src/eptContact.php');
 
         // delete all authors and its contacts
         $m->deleteAll('eptAuthor');
@@ -2061,7 +2070,7 @@ class epTestManager extends epTestRuntime {
             // this will fail and one spare contact is in db due to bug #217
 
             $m->commit_t();
-        }catch (Exception $e){
+        }catch (\Exception $e){
             $cs = $m->get('eptContact');
             //no more than one contact must exist
             $this->assertTrue(count($cs) == 0);
@@ -2078,77 +2087,77 @@ class epTestManager extends epTestRuntime {
      */
     function _allTests($dbal, $dbtype) {
 
-        echo "tests for $dbal/$dbtype started.. " . epNewLine();
+        echo "tests for $dbal/$dbtype started.. " . Base\epNewLine();
 
         echo "  setup..";
         $this->_setUp($dbal, $dbtype);
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  single object..";
         $this->_testSingleObject();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  multiple objects..";
         $this->_testMultiObjects();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  array sort by..";
         $this->_testArraySortBy();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  array to object..";
         $this->_testCreateFromArray();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  data typess..";
         $this->_testDataTypes();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  find objects..";
         $this->_testObjectFind();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  find objects by child..";
         $this->_testObjectFindByChild();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  object query primitive..";
         $this->_testObjectQueryPrimitive();
-        echo "done " . epNewLine();
+        echo "done " .Base\ epNewLine();
 
         echo "  object query relationship..";
         $this->_testObjectQueryRelationship();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  object relationship..";
         $this->_testObjectRelation();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  object relationship deletion..";
         $this->_testRelationsDeletes();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  composed delete..";
         $this->_testComposedOfDelete();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  object transaction..";
         $this->_testTransactionObject();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  transaction: commit..";
         $this->_testTransactionStartCommit();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  transaction: rollback..";
         $this->_testTransactionStartRollback();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  transaction: rollback surplus..";
         $this->_testTransactionEndRollback();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
-        echo "  complete!" . epNewLine();
+        echo "  complete!" . Base\epNewLine();
     }
 
     /**
@@ -2302,15 +2311,15 @@ if (!defined('EP_GROUP_TEST')) {
     $tm = microtime(true);
 
     $t = new epTestManager;
-    if ( epIsWebRun() ) {
-        $t->run(new HtmlReporter());
+    if ( Base\epIsWebRun() ) {
+        $t->run(new \HtmlReporter());
     } else {
-        $t->run(new TextReporter());
+        $t->run(new \TextReporter());
     }
 
     $elapsed = microtime(true) - $tm;
 
-    echo epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds';
+    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds';
 }
 
 ?>

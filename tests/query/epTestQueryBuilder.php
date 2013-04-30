@@ -2,17 +2,23 @@
 
 /**
  * $Id: epTestQueryBuilder.php 1048 2007-04-13 02:31:17Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1048 $ $Date: 2007-04-12 22:31:17 -0400 (Thu, 12 Apr 2007) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.query
  */
+namespace ezpdo\tests\query;
+
+use ezpdo\base as Base;
+use ezpdo\query\epQueryParser;
+use ezpdo\query\epQueryBuilder;
+use ezpdo\tests\runtime\epTestRuntime;
 
 /**#@+
- * need runtime testcase (under ../runtime) and epQueryBuilder 
+ * need runtime testcase (under ../runtime) and epQueryBuilder
  */
 include_once(dirname(__FILE__).'/../runtime/epTestRuntime.php');
 include_once(EP_SRC_QUERY.'/epQueryBuilder.php');
@@ -20,7 +26,7 @@ include_once(EP_SRC_QUERY.'/epQueryBuilder.php');
 
 /**
  * The unit test class for {@link epQueryBuilder}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1048 $
  * @package ezpdo.tests
@@ -53,7 +59,7 @@ class epTestQueryBuilder extends epTestRuntime {
         $root = $p->parse();
         $t = microtime(true) - $t0;
         $this->assertTrue($root);
-        
+
         // debug
         if ($debug) {
             echo 'Parser : ' . $t . ' s' . "\n";
@@ -73,11 +79,11 @@ class epTestQueryBuilder extends epTestRuntime {
         }
 
         $r = true;
-        
+
         //print_r($sql);
 
         if (is_string($expect)) {
-            
+
             // debug
             if ($debug) {
                 echo "SQL Expected : $expect\n";
@@ -87,25 +93,25 @@ class epTestQueryBuilder extends epTestRuntime {
             $this->assertTrue($r = ($sql[0] === $expect));
 
         } else {
-            
+
             for ($i = 0; $i < count($expect); $i++) {
-                
+
                 // debug
                 if ($debug) {
                     echo "SQL Expected [$i] : " . $expect[$i] . "\n";
                     echo "SQL Actual   [$i] : " . $sql[$i] . "\n";
                 }
-                
+
                 $this->assertTrue($r_ = ($sql[$i] === $expect[$i]));
-                
+
                 if ($r_ == false) {
                     $r = false;
                 }
             }
         }
-        
+
         echo "done\n";
-        
+
         // return whether result matches expected
         return $r;
     }
@@ -160,7 +166,7 @@ class epTestQueryBuilder extends epTestRuntime {
         $e = "SELECT DISTINCT `book`.* FROM `eptBook` AS `book` WHERE `book`.`pages`<0";
         $this->assertTrue($this->_testBuilder($q, $args, $e));
     }
-    
+
     function testBuilder6() {
         $q = "from eptBook as book where book.title LIKE 'title%'";
         $args = array();
@@ -206,14 +212,14 @@ class epTestQueryBuilder extends epTestRuntime {
         $e = "SELECT DISTINCT `a`.* FROM `eptAuthor` AS `a`, `eptBook` AS `b` LEFT JOIN `_ez_relation_eptauthor_eptcontact` AS `_1` ON `_1`.var_a = 'contact' AND (`_1`.class_a = 'eptAuthor' AND `_1`.oid_a = `a`.`eoid`) LEFT JOIN `eptContact` AS `_2` ON `_1`.base_b = 'eptContact' AND `_1`.class_b = 'eptContact' AND `_1`.oid_b = `_2`.`eoid` WHERE `_2`.`phone` LIKE '%478%'";
         $this->assertTrue($this->_testBuilder($q, $args, $e));
     }
-    
+
     function testBuilder12() {
         $q = "from eptAuthor as a where a.contact.phone = a.name";
         $args = array();
         $e = "SELECT DISTINCT `a`.* FROM `eptAuthor` AS `a` LEFT JOIN `_ez_relation_eptauthor_eptcontact` AS `_1` ON `_1`.var_a = 'contact' AND (`_1`.class_a = 'eptAuthor' AND `_1`.oid_a = `a`.`eoid`) LEFT JOIN `eptContact` AS `_2` ON `_1`.base_b = 'eptContact' AND `_1`.class_b = 'eptContact' AND `_1`.oid_b = `_2`.`eoid` WHERE `_2`.`phone`=`a`.`name`";
         $this->assertTrue($this->_testBuilder($q, $args, $e));
     }
-    
+
     function testBuilder13() {
         $q = "from eptAuthor as a where a.contact.phone between ? and ?";
         $args = array(30, 40);
@@ -338,7 +344,7 @@ class epTestQueryBuilder extends epTestRuntime {
             5 => "SELECT DISTINCT `i`.* FROM `eptItemRecordingTape` AS `i` LEFT JOIN `_ez_relation_eptitem_eptsale` AS `_1` ON `_1`.var_a = 'sale' AND (`_1`.class_a = 'eptItemRecordingTape' AND `_1`.oid_a = `i`.`eoid`) LEFT JOIN `eptSale` AS `_2` ON `_1`.base_b = 'eptSale' AND `_1`.class_b = 'eptSale' AND `_1`.oid_b = `_2`.`eoid` LEFT JOIN `eptSaleBook` AS `_3` ON `_1`.base_b = 'eptSale' AND `_1`.class_b = 'eptSaleBook' AND `_1`.oid_b = `_3`.`eoid` LEFT JOIN `eptSaleMultimedia` AS `_4` ON `_1`.base_b = 'eptSale' AND `_1`.class_b = 'eptSaleMultimedia' AND `_1`.oid_b = `_4`.`eoid` LEFT JOIN `eptSaleMultimediaDownload` AS `_5` ON `_1`.base_b = 'eptSale' AND `_1`.class_b = 'eptSaleMultimediaDownload' AND `_1`.oid_b = `_5`.`eoid` WHERE (`_2`.`type`=0 OR `_3`.`type`=0 OR `_4`.`type`=0 OR `_5`.`type`=0) AND (`i`.`cost`='0.00')",
             6 => "SELECT DISTINCT `i`.* FROM `eptItemVideoDVD` AS `i` LEFT JOIN `_ez_relation_eptitem_eptsale` AS `_1` ON `_1`.var_a = 'sale' AND (`_1`.class_a = 'eptItemVideoDVD' AND `_1`.oid_a = `i`.`eoid`) LEFT JOIN `eptSale` AS `_2` ON `_1`.base_b = 'eptSale' AND `_1`.class_b = 'eptSale' AND `_1`.oid_b = `_2`.`eoid` LEFT JOIN `eptSaleBook` AS `_3` ON `_1`.base_b = 'eptSale' AND `_1`.class_b = 'eptSaleBook' AND `_1`.oid_b = `_3`.`eoid` LEFT JOIN `eptSaleMultimedia` AS `_4` ON `_1`.base_b = 'eptSale' AND `_1`.class_b = 'eptSaleMultimedia' AND `_1`.oid_b = `_4`.`eoid` LEFT JOIN `eptSaleMultimediaDownload` AS `_5` ON `_1`.base_b = 'eptSale' AND `_1`.class_b = 'eptSaleMultimediaDownload' AND `_1`.oid_b = `_5`.`eoid` WHERE (`_2`.`type`=0 OR `_3`.`type`=0 OR `_4`.`type`=0 OR `_5`.`type`=0) AND (`i`.`cost`='0.00')",
             7 => "SELECT DISTINCT `i`.* FROM `eptItemVideoVHS` AS `i` LEFT JOIN `_ez_relation_eptitem_eptsale` AS `_1` ON `_1`.var_a = 'sale' AND (`_1`.class_a = 'eptItemVideoVHS' AND `_1`.oid_a = `i`.`eoid`) LEFT JOIN `eptSale` AS `_2` ON `_1`.base_b = 'eptSale' AND `_1`.class_b = 'eptSale' AND `_1`.oid_b = `_2`.`eoid` LEFT JOIN `eptSaleBook` AS `_3` ON `_1`.base_b = 'eptSale' AND `_1`.class_b = 'eptSaleBook' AND `_1`.oid_b = `_3`.`eoid` LEFT JOIN `eptSaleMultimedia` AS `_4` ON `_1`.base_b = 'eptSale' AND `_1`.class_b = 'eptSaleMultimedia' AND `_1`.oid_b = `_4`.`eoid` LEFT JOIN `eptSaleMultimediaDownload` AS `_5` ON `_1`.base_b = 'eptSale' AND `_1`.class_b = 'eptSaleMultimediaDownload' AND `_1`.oid_b = `_5`.`eoid` WHERE (`_2`.`type`=0 OR `_3`.`type`=0 OR `_4`.`type`=0 OR `_5`.`type`=0) AND (`i`.`cost`='0.00')",
-        ); 
+        );
         $this->assertTrue($this->_testBuilder($q, $args, $e));
     }
 
@@ -518,13 +524,13 @@ class epTestQueryBuilder extends epTestRuntime {
 if (!defined('EP_GROUP_TEST')) {
     $tm = microtime(true);
     $t = new epTestQueryBuilder;
-    if ( epIsWebRun() ) {
-        $t->run(new HtmlReporter());
+    if ( Base\epIsWebRun() ) {
+        $t->run(new \HtmlReporter());
     } else {
-        $t->run(new TextReporter());
+        $t->run(new \TextReporter());
     }
     $elapsed = microtime(true) - $tm;
-    echo epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
+    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
 }
 
 ?>

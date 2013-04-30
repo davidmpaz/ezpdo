@@ -10,11 +10,25 @@
  * @package ezpdo
  * @subpackage ezpdo.tools
  */
+namespace ezpdo\db;
+
+use ezpdo\base\epLog;
+use ezpdo\base as Base;
+use ezpdo\base\epSingleton;
+use ezpdo\base\epException;
+use ezpdo\base\epConfigurableWithLog;
+
+use ezpdo\orm\epClassMap;
+use ezpdo\orm\epFieldMap;
+use ezpdo\orm\epFieldMapFactory;
+
+use ezpdo\runtime\epManager;
 
 /**
  * Need {@link epConfigurableWithLog} as the superclass
  */
 include_once(EP_SRC_BASE.'/epConfigurableWithLog.php');
+include_once(EP_SRC_BASE.'/epUtils.php');
 
 /**
  * Need class map factory
@@ -142,10 +156,10 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
         // get outdated class map
         if($file = $this->getConfigOption('update_from')){
             // load it from specified file
-            $this->ocmf = epGetBackup($file);
+            $this->ocmf = Base\epGetBackup($file);
         }else{
             // load it from compile dir
-            $this->ocmf = epGetBackup($this->getConfigOption('compiled_dir'));
+            $this->ocmf = Base\epGetBackup($this->getConfigOption('compiled_dir'));
         }
 
         //strategy defined but no backup to work with
@@ -219,7 +233,7 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
                 array_push($content, "\n*/");
 
                 // write to file
-                epWriteToFile($this->getConfigOption('compiled_dir').
+                Base\epWriteToFile($this->getConfigOption('compiled_dir').
                     '/' . $ncm->getName() . '.sql', $content);
 
                 $this->log("Updating schema for class [" . $ncm->getName() . "] - end",

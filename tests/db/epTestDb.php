@@ -2,14 +2,23 @@
 
 /**
  * $Id: epTestDb.php 969 2006-05-19 12:20:19Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 969 $ $Date: 2006-05-19 08:20:19 -0400 (Fri, 19 May 2006) $
  * @package ezpdo.tests
- * @subpackage ezpdo.tests.orm
+ * @subpackage ezpdo.tests.db
  */
+namespace ezpdo\tests\db;
+
+use ezpdo\base as Base;
+use ezpdo\base\epConfig;
+use ezpdo\tests\src\epTestCase;
+
+use ezpdo\db\epDbAdodb;
+use ezpdo\db\epDbPeardb;
+use ezpdo\db\epDbAdodbPdo;
 
 /**
  * need epTestCase
@@ -28,14 +37,14 @@ include_once(EP_SRC_BASE.'/epUtils.php');
 
 /**
  * Unit test class for {@link epDbAdodb}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 969 $ $Date: 2006-05-19 08:20:19 -0400 (Fri, 19 May 2006) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.orm
  */
 class epTestDb extends epTestCase {
-    
+
     protected $cfg = false;
 
     /**
@@ -43,29 +52,29 @@ class epTestDb extends epTestCase {
      * @return string
      */
     function _getDsn($dbtype) {
-        
+
         // load the config file
         if (!$this->cfg) {
             // load config.xml
             $this->cfg = & epConfig::load(dirname(__FILE__)."/config.xml");
             $this->assertTrue(!empty($this->cfg));
-        } 
+        }
 
         $this->assertTrue($dsn = $this->cfg->get('dbs/'.strtolower($dbtype)));
 
         return $dsn;
     }
-    
+
     /**
      * test {@link epDb}
      * @param string db library
      * @return void
      */
     function _testMysql($db) {
-        
+
         // create a test table
         $table = "test_" . date('Y_m_d_g_i_s');
-        
+
         // create -only- if not exists
         // note: must have oid column for peardb lastInsertId() to work!!!
         $sql = ' CREATE TABLE IF NOT EXISTS ' . $table . ' ('
@@ -148,7 +157,7 @@ class epTestDb extends epTestCase {
         $db = new epDbAdodb($dsn);
         $this->assertTrue(!is_null($db));
         $this->_testMysql($db);
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
     }
 
     /**
@@ -162,7 +171,7 @@ class epTestDb extends epTestCase {
         }
 
         // skip test if no PEAR DB installed
-        if (!epFileExistsIncPath('DB.php')) {
+        if (!Base\epFileExistsIncPath('DB.php')) {
             return;
         }
 
@@ -172,7 +181,7 @@ class epTestDb extends epTestCase {
         $db = new epDbPeardb($dsn);
         $this->assertTrue(!is_null($db));
         $this->_testMysql($db);
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
     }
 
     /**
@@ -195,7 +204,7 @@ class epTestDb extends epTestCase {
                 . ' col_char CHAR(64) NOT NULL,'
                 . ' col_int INT NOT NULL'
                 //. ' col_timestamp TIMESTAMP NOT NULL'
-                . ' )'; 
+                . ' )';
 
             $this->assertTrue($rs = $db->execute($sql));
 
@@ -372,13 +381,13 @@ class epTestDb extends epTestCase {
         $this->assertTrue($dsn = $this->_getDsn('sqlite_adodb'));
         $this->assertTrue($db = new epDbAdodb($dsn));
         $this->_testSqlite($db);
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "test adodb sqlite v3..";
         $this->assertTrue($dsn = $this->_getDsn('sqlite3_adodb'));
         $this->assertTrue($db = new epDbAdodb($dsn));
         $this->_testSqlite3($db);
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
     }
 
     /**
@@ -392,7 +401,7 @@ class epTestDb extends epTestCase {
         }
 
         // skip test if no PEAR DB installed
-        if (!epFileExistsIncPath('DB.php')) {
+        if (!Base\epFileExistsIncPath('DB.php')) {
             return;
         }
 
@@ -401,7 +410,7 @@ class epTestDb extends epTestCase {
         $this->assertTrue($dsn = $this->_getDsn('sqlite_peardb'));
         $this->assertTrue($db = new epDbPeardb($dsn));
         $this->_testSqlite($db);
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         // peardb doesnt seems to support sqlite3, looking forward to MDB2
     }
@@ -410,10 +419,10 @@ class epTestDb extends epTestCase {
 
 if (!defined('EP_GROUP_TEST')) {
     $t = new epTestDb;
-    if ( epIsWebRun() ) {
-        $t->run(new HtmlReporter());
+    if ( Base\epIsWebRun() ) {
+        $t->run(new \HtmlReporter());
     } else {
-        $t->run(new TextReporter());
+        $t->run(new \TextReporter());
     }
 }
 

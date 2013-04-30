@@ -2,14 +2,17 @@
 
 /**
  * $Id: epTestCase.php 812 2006-02-13 23:59:15Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 812 $ $Date: 2006-02-13 18:59:15 -0500 (Mon, 13 Feb 2006) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.src
  */
+namespace ezpdo\tests\src;
+
+use ezpdo\base as Base;
 
 /**
  * need ezpdo.php
@@ -25,26 +28,26 @@ include_once(EP_LIBS_SIMPLETEST . '/reporter.php');
 
 /**
  * The base class for EZPDO test cases
- * 
- * The class extends the SimpleTest UnitTestCase class to allow easy 
+ *
+ * The class extends the SimpleTest UnitTestCase class to allow easy
  * configuration for test cases.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 812 $ $Date: 2006-02-13 18:59:15 -0500 (Mon, 13 Feb 2006) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.src
  */
-class epTestCase extends UnitTestCase {
-    
+class epTestCase extends \UnitTestCase {
+
     /**
-     * Whether to allow Adodb tests 
+     * Whether to allow Adodb tests
      * @var boolean
      * @static
      */
     public static $allow_test_adodb = true;
 
     /**
-     * Whether to allow Peardb tests 
+     * Whether to allow Peardb tests
      * @var boolean
      * @static
      */
@@ -56,16 +59,16 @@ class epTestCase extends UnitTestCase {
      * @var boolean
      */
     public static $allow_test_pdo = false;
-    
+
     /**
-     * Whether to allow mysql tests 
+     * Whether to allow mysql tests
      * @var boolean
      * @static
      */
     public static $allow_test_mysql = true;
 
     /**
-     * Whether to allow pgsql tests 
+     * Whether to allow pgsql tests
      * @var boolean
      * @static
      */
@@ -107,7 +110,7 @@ class epTestCase extends UnitTestCase {
     }
 
     /**
-     * If no param, returns if we allow Peardb tests. 
+     * If no param, returns if we allow Peardb tests.
      * If param is boolean, set whehter we allow Peardb tests.
      * @param null|boolean $v
      * @return boolean
@@ -130,14 +133,14 @@ class epTestCase extends UnitTestCase {
             return false;
         }
         // skip test if no PEAR DB installed
-        if (!epFileExistsIncPath('DB.php')) {
+        if (!Base\epFileExistsIncPath('DB.php')) {
             return false;
         }
         return true;
     }
 
     /**
-     * If no param, returns if we allow Pdo tests. 
+     * If no param, returns if we allow Pdo tests.
      * If param is boolean, set whehter we allow Peardb tests.
      * @param null|boolean $v
      * @return boolean
@@ -168,7 +171,7 @@ class epTestCase extends UnitTestCase {
     }
 
     /**
-     * If no param, returns if we allow mysql tests. 
+     * If no param, returns if we allow mysql tests.
      * If param is boolean, set whehter we allow mysql tests.
      * @param null|boolean $v
      * @return boolean
@@ -183,11 +186,11 @@ class epTestCase extends UnitTestCase {
 
     /**
      * Checks if mysql database for testing is ready
-     * @var string $dsn 
+     * @var string $dsn
      * @return boolean
      */
     function canTestMysql($dsn = 'mysql://ezpdo:pdoiseasy@localhost/ezpdo') {
-        
+
         // return false if mysql tests are not allowed
         if (!$this->allowTestMySql()) {
             return false;
@@ -196,23 +199,23 @@ class epTestCase extends UnitTestCase {
         // need adodb and exceptions
         include_once(EP_LIBS_ADODB.'/adodb-exceptions.inc.php');
         require_once(EP_LIBS_ADODB.'/adodb.inc.php');
-        
+
         // try to connect db now
         $okay = false;
-        try { 
+        try {
             if ($db = @ADONewConnection($dsn)) {
                 $okay = true;
                 $db->Close();
             }
         } catch(Exception $e) {
-            // simply catch the exception 
+            // simply catch the exception
         }
-        
+
         return $okay;
     }
 
     /**
-     * If no param, returns if we allow pgsql tests. 
+     * If no param, returns if we allow pgsql tests.
      * If param is boolean, set whehter we allow pgsql tests.
      * @param null|boolean $v
      * @return boolean
@@ -227,11 +230,11 @@ class epTestCase extends UnitTestCase {
 
     /**
      * Checks if pgsql database for testing is ready
-     * @var string $dsn 
+     * @var string $dsn
      * @return boolean
      */
     function canTestPgsql($dsn = 'pgsql://ezpdo:pdoiseasy@localhost/ezpdo') {
-        
+
         // return false if mysql tests are not allowed
         if (!$this->allowTestPgSql()) {
             return false;
@@ -240,23 +243,23 @@ class epTestCase extends UnitTestCase {
         // need adodb and exceptions
         include_once(EP_LIBS_ADODB.'/adodb-exceptions.inc.php');
         require_once(EP_LIBS_ADODB.'/adodb.inc.php');
-        
+
         // try to connect db now
         $okay = false;
-        try { 
+        try {
             if ($db = @ADONewConnection($dsn)) {
                 $okay = true;
                 $db->Close();
             }
         } catch(Exception $e) {
-            // simply catch the exception 
+            // simply catch the exception
         }
-        
+
         return $okay;
     }
 
     /**
-     * If no param, returns if we allow sqlite tests. 
+     * If no param, returns if we allow sqlite tests.
      * If param is boolean, set whehter we allow sqlite tests.
      * @param null|boolean $v
      * @return boolean
@@ -271,7 +274,7 @@ class epTestCase extends UnitTestCase {
 
     /**
      * Checks if we can test sqite database
-     * @var string $dsn 
+     * @var string $dsn
      * @return boolean
      * @todo db file checking for pdo
      */
@@ -307,14 +310,14 @@ class epTestCase extends UnitTestCase {
      * Setup output dir
      */
     public function setUp() {
-        epMkDir('output');
+        Base\epMkDir('output');
     }
 
     /**
      * tearDown: rmove output dir
      */
     public function tearDown() {
-        epRmDir('output');
+        Base\epRmDir('output');
     }
 }
 

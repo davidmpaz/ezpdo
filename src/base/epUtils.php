@@ -10,6 +10,7 @@
  * @package ezpdo
  * @subpackage ezpdo.base
  */
+namespace ezpdo\base;
 
 /**
  * define EP_CLI_RUN
@@ -403,7 +404,7 @@ function epArrayGet($array, $key) {
     $null = null;
 
     // sanity check
-    if (!is_array($array) && !($array instanceof ArrayAccess)) {
+    if (!is_array($array) && !($array instanceof \ArrayAccess)) {
         return $null;
     }
 
@@ -833,11 +834,11 @@ function epIsMethodStatic($class, $method) {
 
     // use PHP5 ReflectionMethod
     try {
-        if (!$m = new ReflectionMethod($class, $method)) {
+        if (!$m = new \ReflectionMethod($class, $method)) {
             return false;
         }
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
         return false;
     }
 

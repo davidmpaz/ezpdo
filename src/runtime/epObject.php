@@ -10,6 +10,13 @@
  * @package ezpdo
  * @subpackage ezpdo.runtime
  */
+namespace ezpdo\runtime;
+
+use ezpdo\base as Base;
+use ezpdo\base\epOverload;
+use ezpdo\base\epException;
+
+use ezpdo\orm\epFieldMapRelationship;
 
 /**#@+
  * Needs {@link epBase} and {@link epOverload}
@@ -17,23 +24,6 @@
 include_once(EP_SRC_BASE.'/epBase.php');
 include_once(EP_SRC_BASE.'/epOverload.php');
 /**#@-*/
-
-/**
- * The Countable interface is introduced in PHP 5.1.0. For PHP versions
- * earlier than 5.1.0, we need to declare the interface.
- */
-if (!interface_exists('Countable', false)) {
-    /**
-     * Interface Countable
-     */
-    interface Countable {
-        /**
-         * Returns the number of items
-         * @return integer
-         */
-        public function count();
-    }
-}
 
 /**
  * Array sort order flag: asending
@@ -71,7 +61,7 @@ class epExceptionArray extends epException {
  * @package ezpdo
  * @subpackage ezpdo.runtime
  */
-class epArray implements IteratorAggregate, ArrayAccess, Countable {
+class epArray implements \IteratorAggregate, \ArrayAccess, \Countable {
 
     /**
      * The internal array
@@ -344,7 +334,7 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
         }
 
         // return the array iterator
-        return new ArrayIterator($this->array);
+        return new \ArrayIterator($this->array);
     }
 
     /**
@@ -863,8 +853,8 @@ class epArray implements IteratorAggregate, ArrayAccess, Countable {
 
             // get values from a and b
             $path = $orderby['path'];
-            $va = epArrayGet($a, $path);
-            $vb = epArrayGet($b, $path);
+            $va = Base\epArrayGet($a, $path);
+            $vb = Base\epArrayGet($b, $path);
 
             // numeric
             if (is_numeric($va)) {
@@ -989,7 +979,7 @@ class epExceptionObject extends epException {
  * @package ezpdo
  * @subpackage ezpdo.runtime
  */
-class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess, Countable {
+class epObjectBase extends epOverload implements \IteratorAggregate, \ArrayAccess, \Countable {
 
     /**#@+
      * Primitive or relationship vars (binary exclusive)
@@ -2354,7 +2344,7 @@ class epObjectBase extends epOverload implements IteratorAggregate, ArrayAccess,
         }
 
         // return the array iterator
-        return new ArrayIterator($vars);
+        return new \ArrayIterator($vars);
     }
 
     /**

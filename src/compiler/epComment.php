@@ -2,46 +2,52 @@
 
 /**
  * $Id: epComment.php 1013 2006-09-27 01:55:43Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1013 $ $Date: 2006-09-26 21:55:43 -0400 (Tue, 26 Sep 2006) $
  * @package ezpdo
  * @subpackage ezpdo.compiler
  */
+namespace ezpdo\compiler;
+
+use ezpdo\base as Base;
+use ezpdo\orm\epFieldMap;
+use ezpdo\base\parser\epLexer as epLexer;
+use ezpdo\base\parser\epParser as epParser;
 
 /**
  * Class of a ezpdo comment block
- * 
- * The class takes comments in source code as the input and 
+ *
+ * The class takes comments in source code as the input and
  * parses it into tag-value pairs. Usage:
  * <pre>
  * $c = new epComment($comment);
  * $c->getTagValue('var');
  * </pre>
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1013 $ $Date: 2006-09-26 21:55:43 -0400 (Tue, 26 Sep 2006) $
  * @package ezpdo
  * @subpackage ezpdo.compiler
  */
 class epComment {
-    
+
     /**
      * The array that holds tag-values
      * @var array
      */
     protected $tag_values = array();
-    
+
     /**
      * Constructor
      * @param string
      */
-    public function __construct($comment) { 
+    public function __construct($comment) {
         $this->parse($comment);
     }
-    
+
     /**
      * Check if comment has a particular tag
      * @param string tag name
@@ -53,15 +59,15 @@ class epComment {
         }
         return false;
     }
-    
+
     /**
      * Returns all tags
-     * @return array (tag-value pairs) 
+     * @return array (tag-value pairs)
      */
     public function getTags() {
         return $this->tag_values;
     }
-    
+
     /**
      * Returns the value of a tag
      * @param string tag name
@@ -73,17 +79,17 @@ class epComment {
         }
         return $this->tag_values[$tag_name];
     }
-    
+
     /**
      * Preprocess comment (remove excessive space, comment boarder)
      * @param string the original comment
-     * @return string the processed comment 
+     * @return string the processed comment
      */
     private function preproc($comment) {
-    
+
         // remove comment boarders
         $comment = preg_replace(
-    
+
             // patterns
             array(
                 "/\n/",                // save our newlines, as they're considered part of '\s' in regex
@@ -96,36 +102,36 @@ class epComment {
             // replacement
             array(
                 "____ezpdonl____",
-                " ", 
-                " ", 
-                "", 
+                " ",
+                " ",
+                "",
                 "\n"
-                ), 
-            
+                ),
+
             $comment
             );
-        
+
         return $comment;
     }
-    
+
     /**
      * Parse the comment into tag-value array
-     * @param string  
+     * @param string
      * @return bool
      */
     private function parse($comment) {
-        
+
         // check if comment is empty
         if (!$comment) {
             return false;
         }
-        
+
         // preproc the comment
         $preproced = $this->preproc($comment);
 
         // split comments by line for processing
         $preproced = explode("\n", $preproced);
-        
+
         foreach ($preproced as $line) {
 
             /**
@@ -142,25 +148,25 @@ class epComment {
             reset($pieces);
             $piece = next($pieces);
             do {
-                
+
                 // trim piece
                 $piece = trim($piece);
-                
+
                 // is it a tag
                 if (!$piece || !isset($piece[0]) || $piece[0] !== '@') {
                     $piece = next($pieces);
                     continue;
                 }
-                
+
                 // process tag
                 $tag = substr($piece, 1);
-                
+
                 // check if next piece is value
                 $piece = next($pieces);
-                
+
                 // trim piece
                 $piece = trim($piece);
-                
+
                 if (!$piece || $piece[0] === '@') {
                     // if the next value is a tag, no value for this tag
                     $this->tag_values[$tag] = null;
@@ -168,22 +174,22 @@ class epComment {
                     $this->tag_values[$tag] = $piece;
                     $piece = next($pieces);
                 }
-                
+
             } while ($piece !== false);
-        
+
         }
-        
+
         return true;
     }
 
 }
 
 /**
- * Class to parse an ezpdo orm tag value 
- * 
- * The class takes the tag value as the input and dissects it 
- * into orm attributes. To get the attribute value, use {@link get()}. 
- * 
+ * Class to parse an ezpdo orm tag value
+ *
+ * The class takes the tag value as the input and dissects it
+ * into orm attributes. To get the attribute value, use {@link get()}.
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1013 $ $Date: 2006-09-26 21:55:43 -0400 (Tue, 26 Sep 2006) $
  * @package ezpdo
@@ -191,21 +197,21 @@ class epComment {
  * @abstract
  */
 abstract class epTag {
-    
+
     /**
      * Attribute and values
      * @var array (keyed by attribute name)
      */
     protected $attrs;
-    
+
     /**
      * Returnrs all orm attributes
-     * @return array (of string) 
+     * @return array (of string)
      */
     public function getAll() {
          return array_keys($this->attrs);
     }
-    
+
     /**
      * Returns the value of an attribute
      * @param string attribute name
@@ -226,52 +232,52 @@ abstract class epTag {
 }
 
 /**
- * Class used to parse the value of an orm tag for a class 
- * 
+ * Class used to parse the value of an orm tag for a class
+ *
  * Available attributes after parsing the tag value
  * <ol>
  * <li>
  * table: the table name for the class to be mapped to (can be null if not specified)
  * </li>
  * <li>
- * dsn: the dsn ({@link http://pear.php.net/manual/en/package.database.db.intro-dsn.php}) 
- * to the database that the table can be accessed. This attribute can also 
- * be null, if so the parser ({@link epClassParser}) tries to use the default_dsn 
+ * dsn: the dsn ({@link http://pear.php.net/manual/en/package.database.db.intro-dsn.php})
+ * to the database that the table can be accessed. This attribute can also
+ * be null, if so the parser ({@link epClassParser}) tries to use the default_dsn
  * specified in config.
  * </li>
  * </ol>
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1013 $ $Date: 2006-09-26 21:55:43 -0400 (Tue, 26 Sep 2006) $
  * @package ezpdo
  * @subpackage ezpdo.compiler
  */
 class epClassTag extends epTag {
-    
+
     /**
      * Impelment abstract method in {@link epTag}
      * Parse the tag value string
      * @return bool
      */
     public  function parse($value) {
-        
+
         // sanity check
         if (!$value || !is_string($value)) {
             return false;
         }
-        
+
         // break value into pieces
         $pieces = preg_split('/[\s,]+/', $value, -1, PREG_SPLIT_NO_EMPTY);
         if (!$pieces) {
             return true;
         }
-        
+
         $table_found = false;
         foreach($pieces as $piece) {
             $piece = trim($piece);
             if (preg_match('/[\w\(\)]+:\/\//i', $piece)) {
                 $this->attrs['dsn'] = $piece;
-            } 
+            }
             else if (preg_match('/oid\((.*)\)/i', $piece, $matches)) {
                 $this->attrs['oid'] = trim($matches[1]);
             }
@@ -281,34 +287,34 @@ class epClassTag extends epTag {
                     $table_found = true;
                 }
             }
-        } 
-        
+        }
+
         return true;
     }
-    
+
 }
 
 /**
  * Class to parse an orm tag value of a variable
- * 
+ *
  * Three attributes for an orm tag for a variable
  * <ol>
  * <li>
  * name: the name of column the variable to be mapped to which can
- * be returned as null. if empty, the parser ({@link epClassParser}) 
- * uses the variable name as the column name. 
+ * be returned as null. if empty, the parser ({@link epClassParser})
+ * uses the variable name as the column name.
  * </li>
  * <li>
  * type: the type of column (see {@link epFieldMap::getSupportedTypes()}),
- * can be empty as well. If empty, the parser ({@link epClassParser}) 
+ * can be empty as well. If empty, the parser ({@link epClassParser})
  * tries to figure out the type by looking at other usual docblock tags.
- * The last resort is to treat it as a string. 
+ * The last resort is to treat it as a string.
  * </li>
  * <li>
- * params: the params for the column type (can be empty) 
+ * params: the params for the column type (can be empty)
  * </li>
  * </ol>
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1013 $ $Date: 2006-09-26 21:55:43 -0400 (Tue, 26 Sep 2006) $
  * @package ezpdo
@@ -322,7 +328,7 @@ class epVarTag extends epTag {
      * @return bool|array Error if array
      */
     public  function parse($value) {
-        
+
         // sanity check
         if (!$value || !is_string($value)) {
             return false;
@@ -334,12 +340,12 @@ class epVarTag extends epTag {
             $errors = $p->errors();
             return $errors[0]->__toString();
         }
-        
+
         return true;
     }
 }
 
-/** 
+/**
  * Need {@link epLexer} and {@link epParser} for epTagParser
  */
 include_once(EP_SRC_BASE_PARSER.'/epParser.php');
@@ -347,20 +353,20 @@ include_once(EP_SRC_BASE_PARSER.'/epParser.php');
 /**#@+
  * Predefined tokens for the base lexer ({@link epLexer})
  */
-epDefine('EPL_T_HAS');
-epDefine('EPL_T_COMPOSED_OF');
-epDefine('EPL_T_DATA_TYPE');
-epDefine('EPL_T_OID');
-epDefine('EPL_T_ONE');
-epDefine('EPL_T_MANY');
-epDefine('EPL_T_INDEX');
-epDefine('EPL_T_INVERSE');
-epDefine('EPL_T_UNIQUE');
+Base\epDefine('EPL_T_HAS');
+Base\epDefine('EPL_T_COMPOSED_OF');
+Base\epDefine('EPL_T_DATA_TYPE');
+Base\epDefine('EPL_T_OID');
+Base\epDefine('EPL_T_ONE');
+Base\epDefine('EPL_T_MANY');
+Base\epDefine('EPL_T_INDEX');
+Base\epDefine('EPL_T_INVERSE');
+Base\epDefine('EPL_T_UNIQUE');
 /**#@-*/
 
 /**
  * The lexer for ORM tag value
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1013 $ $Date: 2006-09-26 21:55:43 -0400 (Tue, 26 Sep 2006) $
  * @package ezpdo
@@ -369,7 +375,7 @@ epDefine('EPL_T_UNIQUE');
 class epTagLexer extends epLexer {
 
     /**
-     * The keywords for ORM tag 
+     * The keywords for ORM tag
      */
     static protected $tag_keywords = array(
         'has'          => EPL_T_HAS,
@@ -384,72 +390,72 @@ class epTagLexer extends epLexer {
 
     /**
      * Constructor
-     * @param string $s 
+     * @param string $s
      */
     public function __construct($s = '') {
-        
+
         // add data types into keywords
         foreach(epFieldMap::getSupportedTypes() as $dt) {
             if ($dt != epFieldMap::DT_HAS && $dt != epFieldMap::DT_COMPOSED_OF) {
                 self::$tag_keywords[$dt] = EPL_T_DATA_TYPE;
             }
         }
-        
+
         // set keywords to lexer
         parent::__construct($s, self::$tag_keywords);
     }
 
     /**
      * Toggles the token type of data types between EPL_T_DATA_TYPE
-     * and EPL_T_IDENTIFIER. This is to allow data types to be 
-     * used for class names. 
+     * and EPL_T_IDENTIFIER. This is to allow data types to be
+     * used for class names.
      */
     public function toggleDataTypeTokens() {
-        
+
         // get data types (including 'has' and 'composed_of')
         $dtypes = epFieldMap::getSupportedTypes();
-        
+
         // go through all keywords
         foreach($this->keywords as $keyword => $token) {
-            
+
             if (!in_array($keyword, $dtypes)) {
                 continue;
             }
 
             // has
             if ($keyword == epFieldMap::DT_HAS) {
-                $this->keywords[$keyword] = 
-                    ($token == EPL_T_HAS) ? 
-                    EPL_T_IDENTIFIER : EPL_T_HAS;  
+                $this->keywords[$keyword] =
+                    ($token == EPL_T_HAS) ?
+                    EPL_T_IDENTIFIER : EPL_T_HAS;
                 continue;
             }
-            
+
             // composed of
             if ($keyword == epFieldMap::DT_COMPOSED_OF) {
-                $this->keywords[$keyword] = 
-                    ($token == EPL_T_COMPOSED_OF) ? 
-                    EPL_T_IDENTIFIER : EPL_T_COMPOSED_OF;  
+                $this->keywords[$keyword] =
+                    ($token == EPL_T_COMPOSED_OF) ?
+                    EPL_T_IDENTIFIER : EPL_T_COMPOSED_OF;
                 continue;
             }
-            
+
             // primitive types
-            $this->keywords[$keyword] = 
-                ($token == EPL_T_DATA_TYPE) ? 
-                EPL_T_IDENTIFIER : EPL_T_DATA_TYPE;  
+            $this->keywords[$keyword] =
+                ($token == EPL_T_DATA_TYPE) ?
+                EPL_T_IDENTIFIER : EPL_T_DATA_TYPE;
         }
     }
 }
 
 /**
  * The parser for ORM tag value
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1013 $ $Date: 2006-09-26 21:55:43 -0400 (Tue, 26 Sep 2006) $
  * @package ezpdo
  * @subpackage ezpdo.compiler
  */
 class epTagParser extends epParser {
-    
+
     /**
      * The current field map params
      * @var array
@@ -469,19 +475,19 @@ class epTagParser extends epParser {
 
     /**
      * Parses the stream and return the root node
-     * @param bool is_class Whether parsing a class map or not 
+     * @param bool is_class Whether parsing a class map or not
      * @return false
      */
     public function parse($is_class = false) {
         $this->message(__METHOD__);
-        
+
         // is query empty?
         if ($this->peek() === false) {
             $this->error('Empty input');
             $this->message('parsing done');
             return false;
         }
-        
+
         // parse and build field map
         $status = $this->fieldmap();
         $this->message('parsing done');
@@ -498,7 +504,7 @@ class epTagParser extends epParser {
      * @return bool
      */
     protected function fieldmap() {
-        
+
         $this->message(__METHOD__);
 
         // column name?
@@ -529,9 +535,9 @@ class epTagParser extends epParser {
      * @return bool
      */
     protected function primitive() {
-        
+
         $this->message(__METHOD__);
-        
+
         // expect an identifier
         if (EPL_T_DATA_TYPE != ($t = $this->peek())) {
             $this->syntax_error("Supported data type expected");
@@ -556,10 +562,10 @@ class epTagParser extends epParser {
         // index or unique?
         $t = $this->peek();
         if ($t == EPL_T_INDEX || $t == EPL_T_UNIQUE) {
-            
+
             // consume index or unique
             $this->next();
-            
+
             // get key type
             $this->map['keytype'] = $keytype = $this->t->value;
 
@@ -586,7 +592,7 @@ class epTagParser extends epParser {
      * Parse a relatinship definition
      */
     protected function relationship() {
-        
+
         $this->message(__METHOD__);
 
         $t = $this->peek();
@@ -613,7 +619,7 @@ class epTagParser extends epParser {
         $this->map['params']['is_many'] = false;
         if ($this->peek() == EPL_T_ONE) {
             $this->next();
-        } 
+        }
         // many?
         else if ($this->peek() == EPL_T_MANY) {
             $this->next();
@@ -629,17 +635,17 @@ class epTagParser extends epParser {
             $this->syntax_error("Class name is expected");
             return false;
         }
-        
+
         // toggle data types back
         $this->_lexer->toggleDataTypeTokens();
 
         // inverse
         $this->map['params']['inverse'] = false;
         if ($this->peek() == EPL_T_INVERSE) {
-            
+
             // consume inverse
             $this->next();
-            
+
             // get inverse parameters
             $params = $this->params();
             if (!$params || count($params) != 1) {
@@ -656,20 +662,20 @@ class epTagParser extends epParser {
      * Reads params within parenthesis
      * @return array
      */
-    protected function params() { 
-        
+    protected function params() {
+
         $this->message(__METHOD__);
-        
+
         if ('(' != $this->peek()) {
             $this->syntax_error("'(' expected");
             return false;
         }
         $t = $this->next();
-        
+
         // get all params
         $params = array();
         do {
-            
+
             // eat ','
             if ($t == ',') {
                 $this->next();
@@ -687,7 +693,7 @@ class epTagParser extends epParser {
 
             // get this param (string)
             $params[] = $this->t->value;
-            
+
         } while (($t = $this->peek()) == ',');
 
         // consume the closing ')'

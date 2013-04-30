@@ -2,14 +2,22 @@
 
 /**
  * $Id: epQuery.php 1035 2007-01-31 11:46:48Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1035 $ $Date: 2007-01-31 06:46:48 -0500 (Wed, 31 Jan 2007) $
  * @package ezpdo
  * @subpackage ezpdo.runtime
  */
+namespace ezpdo\runtime;
+
+use ezpdo\base\epException;
+
+use ezpdo\query\epQueryError;
+use ezpdo\query\epQueryLexer;
+use ezpdo\query\epQueryParser;
+use ezpdo\query\epQueryBuilder;
 
 /**
  * need query builder
@@ -18,7 +26,7 @@ include_once(EP_SRC_QUERY.'/epQueryBuilder.php');
 
 /**
  * Exception class for {@link epQuery}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1035 $ $Date: 2007-01-31 06:46:48 -0500 (Wed, 31 Jan 2007) $
  * @package ezpdo
@@ -29,44 +37,44 @@ class epExceptionQuery extends epException {
 
 /**
  * The EZPDO query class
- * 
- * This class interprets EZOQL (the EZPDO Object Query Language) query 
- * strings and outputs SQL statement. EZOQL is a simple object query 
- * lanaguage, a variant of standard SQL. 
- * 
- * The syntax EZOQL in the BNF (Backus Normal Form) can be found in 
- * src/query/bnf.txt. You can safely skip it if you know enough about 
- * the SQL SELECT statement. The syntax is very similar.  
- * 
- * During a query, both in-memory objects and those in database tables 
- * should be searched. The presence of in-memory objects actually presents 
- * a problem for us. We can safely pass the query string to the 
- * database to do the query if there is no loaded objects. When there are 
- * objects loaded and their variables have been altered, the database 
- * query won't be aware of the inconsistency and the results can be invalid. 
- * 
+ *
+ * This class interprets EZOQL (the EZPDO Object Query Language) query
+ * strings and outputs SQL statement. EZOQL is a simple object query
+ * lanaguage, a variant of standard SQL.
+ *
+ * The syntax EZOQL in the BNF (Backus Normal Form) can be found in
+ * src/query/bnf.txt. You can safely skip it if you know enough about
+ * the SQL SELECT statement. The syntax is very similar.
+ *
+ * During a query, both in-memory objects and those in database tables
+ * should be searched. The presence of in-memory objects actually presents
+ * a problem for us. We can safely pass the query string to the
+ * database to do the query if there is no loaded objects. When there are
+ * objects loaded and their variables have been altered, the database
+ * query won't be aware of the inconsistency and the results can be invalid.
+ *
  * Two solutions to this:
  * <ol>
  * <li>
  * It would be ideal to do the same query on the in-memory objects, but
- * this apparently requires the "deep" parsing of the query string and 
- * applying the where clause on all objects. Potentially a lot of 
- * work on the parser. Plus, whether in-memory query can always outperform 
+ * this apparently requires the "deep" parsing of the query string and
+ * applying the where clause on all objects. Potentially a lot of
+ * work on the parser. Plus, whether in-memory query can always outperform
  * an all-database query is also very questionable in PHP.
  * </li>
  * <li>
- * A simple solution. Before the query, we <b>commit</b> all in-memory 
- * objects that are related to the database query. The overhead is the 
- * commiting before query. So it is important to commit only the objects 
+ * A simple solution. Before the query, we <b>commit</b> all in-memory
+ * objects that are related to the database query. The overhead is the
+ * commiting before query. So it is important to commit only the objects
  * of the <b>related</b> classes.
  * </li>
  * </ol>
- * 
- * Currently we implement the second option, for which we can simply 
+ *
+ * Currently we implement the second option, for which we can simply
  * process the string with class/table name replacement and pass it
- * to the database layer to execute the query. This is by any means a 
- * rudimentary implementation. 
- * 
+ * to the database layer to execute the query. This is by any means a
+ * rudimentary implementation.
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1035 $ $Date: 2007-01-31 06:46:48 -0500 (Wed, 31 Jan 2007) $
  * @package ezpdo
@@ -108,9 +116,9 @@ class epQuery {
             $this->parse($oql_stmt, $args);
         }
     }
-    
+
     /**
-     * Return the EZOQL statement 
+     * Return the EZOQL statement
      * @return string
      */
     public function getOqlStatement() {
@@ -150,16 +158,16 @@ class epQuery {
     }
 
     /**
-     * Parse the EZOQL statement and translate it into equivalent 
+     * Parse the EZOQL statement and translate it into equivalent
      * SQL statement
-     * 
+     *
      * @param string $q (the EZOQL query string)
      * @param array $args arguments for the query
      * @return false|string
      * @throws epExceptionQuery, epQueryExceptionBuilder
      */
     public function parse($oql_stmt, $args = array()) {
-        
+
         // reset aggregation function
         $this->aggr_func = false;
 
@@ -170,7 +178,7 @@ class epQuery {
 
         // check if query empty
         if (!$this->oq_stmt) {
-            throw new epExceptionQuery('Empty EZOQL query'); 
+            throw new epExceptionQuery('Empty EZOQL query');
             return false;
         }
 
@@ -179,7 +187,7 @@ class epQuery {
 
 		// check if any cached parsed syntax tree
 		if (!isset($this->parsed[$oql_stmt])) {
-			
+
 			// instantiate a query parser if not already
 			if (!$this->p) {
 				if (!($this->p = new epQueryParser())) {
@@ -190,10 +198,10 @@ class epQuery {
 			// parse query and get syntax tree
 			$this->parsed[$oql_stmt] = $this->p->parse($oql_stmt);
 		}
-		
+
 		// get syntax tree from cache
 		$root = $this->parsed[$oql_stmt];
-		
+
         // check if there is any errors
         if (!$root || $errors = $this->p->errors()) {
             $emsg = 'EZOQL parsing error';
@@ -205,7 +213,7 @@ class epQuery {
             } else {
                 $emsg .= " (unknown)";
             }
-            throw new epExceptionQuery($emsg); 
+            throw new epExceptionQuery($emsg);
             return false;
         }
 

@@ -2,14 +2,18 @@
 
 /**
  * $Id: epDbDsn.php 857 2006-03-13 13:27:36Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 857 $ $Date: 2006-03-13 08:27:36 -0500 (Mon, 13 Mar 2006) $
  * @package ezpdo
  * @subpackage ezpdo.db
  */
+namespace ezpdo\db;
+
+use ezpdo\base as Base;
+use ezpdo\base\epBase as epBase;
 
 /**
  * need epBase
@@ -18,27 +22,27 @@ include_once(EP_SRC_BASE.'/epBase.php');
 
 /**
  * Exception class for {@link epDbDsn}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 857 $ $Date: 2006-03-13 08:27:36 -0500 (Mon, 13 Mar 2006) $
  * @package ezpdo
- * @subpackage ezpdo.db 
+ * @subpackage ezpdo.db
  */
-class epExceptionDbDsn extends epException {
+class epExceptionDbDsn extends Base\epException {
 }
 
 /**
  * Class to parse data soure name (DSN)
- * 
- * See more on PEAR DSN at {@link 
+ *
+ * See more on PEAR DSN at {@link
  * http://pear.php.net/manual/en/package.database.db.intro-dsn.php}.
- * 
- * The class implements the SPL ArrayAccess and IteratorAggregate 
- * interfaces, which means you can access parsed DSN components just 
- * like an ordinary array. For example, use $dsn['username'] to 
- * get the parsed username from the DSN string, or 
+ *
+ * The class implements the SPL ArrayAccess and IteratorAggregate
+ * interfaces, which means you can access parsed DSN components just
+ * like an ordinary array. For example, use $dsn['username'] to
+ * get the parsed username from the DSN string, or
  * foreach($dsn as $k => $v) to iterate through all the components.
- * 
+ *
  * The following is a list of components in a DSN.
  * + dsn: The original DSN string
  * + phptype:  Database backend used in PHP (mysql, odbc etc.)
@@ -48,14 +52,14 @@ class epExceptionDbDsn extends epException {
  * + database: Database to use on the DBMS server
  * + username: User name for login
  * + password: Password for login
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 857 $ $Date: 2006-03-13 08:27:36 -0500 (Mon, 13 Mar 2006) $
  * @package ezpdo
  * @subpackage ezpdo.db
  */
-class epDbDsn extends epBase implements IteratorAggregate, ArrayAccess {
-    
+class epDbDsn extends epBase implements \IteratorAggregate, \ArrayAccess {
+
     /**
      * The original DSN string
      * @var string
@@ -101,17 +105,17 @@ class epDbDsn extends epBase implements IteratorAggregate, ArrayAccess {
     public function getDsn() {
         return $this->_dsn;
     }
-    
+
     /**
      * Set the DSN string and parse the string
      * @param string $dsn
      * @return bool
      */
     public function setDsn($dsn) {
-        
+
         // keep a record of the DSN string
         $this->_dsn = $dsn;
-        
+
         // parse non-empty DSN string
         $this->_parsed = self::parsePearDsn($this->_dsn);
 
@@ -120,18 +124,18 @@ class epDbDsn extends epBase implements IteratorAggregate, ArrayAccess {
 
     /**
      * Converts PEAR DSN into PDO DSN
-     * 
+     *
      * The method returns a string of PDO DSN string and put username/password
      * into arguments (reference)
-     * 
+     *
      * @param string $username
      * @param string $password
      * @return false|string
      * @see http://us3.php.net/manual/en/ref.pdo-sqlite.connection.php
-     * @see 
+     * @see
      */
     public function toPdoDsn(&$username, &$password) {
-        
+
         // check if DSN is valid (driver)
         if (!isset($this->_parsed['phptype'])) {
             throw new epExceptionDbDsn('Invalid DSN: phptype missing.');
@@ -146,7 +150,7 @@ class epDbDsn extends epBase implements IteratorAggregate, ArrayAccess {
 
         // convert PEAR DSN into PDO DSN
         switch ($this->_parsed['phptype']) {
-            
+
             // special format for sqlite
             case 'sqlite':
                 $pdo_dsn = 'sqlite:' . $this->_parsed['database'];
@@ -164,7 +168,7 @@ class epDbDsn extends epBase implements IteratorAggregate, ArrayAccess {
                     $pdo_dsn .= ';host=' . $this->_parsed['hostspec'];
                 }
         }
-        
+
 
         // set username and password
         $username = '';
@@ -177,13 +181,13 @@ class epDbDsn extends epBase implements IteratorAggregate, ArrayAccess {
             $password = $this->_parsed['password'];
         }
 
-        // return the PDO DSN 
+        // return the PDO DSN
         return $pdo_dsn;
     }
 
     /**
      * This method is copied from PEAR DB::parseDSN().
-     * 
+     *
      * Parse a data source name
      *
      * Additional keys can be added by appending a URI query string to the
@@ -218,7 +222,7 @@ class epDbDsn extends epBase implements IteratorAggregate, ArrayAccess {
      *  + password: Password for login
      */
     static public function parsePearDsn($dsn) {
-        
+
         $parsed = array(
             'phptype'  => false,
             'dbsyntax' => false,
@@ -344,7 +348,7 @@ class epDbDsn extends epBase implements IteratorAggregate, ArrayAccess {
      * @return ArrayIterator
      */
     public function getIterator() {
-        
+
         // put 'dsn' into components
         $components = $this->_parsed;
         $components['dsn'] = $this->_dsn;
@@ -352,7 +356,7 @@ class epDbDsn extends epBase implements IteratorAggregate, ArrayAccess {
         // return the array iterator
         return new ArrayIterator($components);
     }
-     
+
     /**
      * Implements ArrayAccess::offsetExists()
      * @return boolean
@@ -360,14 +364,14 @@ class epDbDsn extends epBase implements IteratorAggregate, ArrayAccess {
     public function offsetExists($index) {
         return $index == 'dsn' || isset($this->_parsed[$index]);
     }
-    
+
     /**
      * Implements ArrayAccess::offsetGet()
      * @return mixed
      * @throws epExceptionDbDsn
      */
     public function offsetGet($index) {
-        
+
         // dsn string?
         if ($index == 'dsn') {
             return $this->_dsn;
@@ -380,13 +384,13 @@ class epDbDsn extends epBase implements IteratorAggregate, ArrayAccess {
 
         throw new epExceptionDbDsn('[' . $index . '] is not a valid component in DSN');
     }
-     
+
     /**
      * Implements ArrayAccess::offsetSet()
      * @return void
      */
     public function offsetSet($index, $newval) {
-        
+
         // dsn string?
         if ($index == 'dsn') {
             $this->setDsn($newval);
@@ -397,7 +401,7 @@ class epDbDsn extends epBase implements IteratorAggregate, ArrayAccess {
         if (array_key_exists($index)) {
             $this->_parsed[$index] = $newval;
         }
-        
+
         throw new epExceptionDbDsn('[' . $index . '] is not a valid component in DSN');
     }
 

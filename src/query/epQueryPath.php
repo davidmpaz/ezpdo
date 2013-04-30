@@ -10,6 +10,16 @@
  * @package ezpdo
  * @subpackage ezpdo.query
  */
+namespace ezpdo\query;
+
+use ezpdo\base\epBase;
+use ezpdo\base\epContainer;
+use ezpdo\base\epException;
+
+use ezpdo\orm\epFieldMap;
+use ezpdo\orm\epFieldMapPrimitive;
+
+use ezpdo\runtime\epManager;
 
 /**
  * need epContainer

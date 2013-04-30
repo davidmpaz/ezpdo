@@ -2,14 +2,18 @@
 
 /**
  * $Id: epDb.php 1044 2007-03-08 02:25:07Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1044 $ $Date: 2007-03-07 21:25:07 -0500 (Wed, 07 Mar 2007) $
  * @package ezpdo
  * @subpackage ezpdo.db
  */
+namespace ezpdo\db;
+
+use ezpdo\base as Base;
+use ezpdo\base\epException;
 
 /**
  * need epBase
@@ -18,47 +22,47 @@ include_once(EP_SRC_BASE.'/epBase.php');
 
 /**
  * Exception class for {@link epDb}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1044 $ $Date: 2007-03-07 21:25:07 -0500 (Wed, 07 Mar 2007) $
  * @package ezpdo
- * @subpackage ezpdo.db 
+ * @subpackage ezpdo.db
  */
 class epExceptionDb extends epException {
 }
 
 /**
  * Class for a database connection
- * 
- * This abstract class provides a unified layer for using different 
+ *
+ * This abstract class provides a unified layer for using different
  * database abstract libraries. Subclasses should implement abstract
- * method defined here. 
- * 
- * Note that this layer does not concern any object persistence 
- * issues, all of which are taken care of by {@link epDbObject} (a 
- * wrapper around this class). Also note that we DO NOT deal with 
- * portability issues in this class. Portabilty issues are dealt 
+ * method defined here.
+ *
+ * Note that this layer does not concern any object persistence
+ * issues, all of which are taken care of by {@link epDbObject} (a
+ * wrapper around this class). Also note that we DO NOT deal with
+ * portability issues in this class. Portabilty issues are dealt
  * with in {@link epDbPort}.
- * 
+ *
  * This class provides a generic interface only for establishing/
- * tearing down connection, executing standard SQL queries, tracking 
- * insert ids, quoting values/identifiers, etc. 
- * 
- * For now, we support both ADODB ({@link epDbAdodb}) and PEAR::DB 
- * ({@link epDbPeardb}). Experimentally, we now also support PDO 
- * ({@link http://www.php.net/manual/en/ref.pdo.php}) either through 
- * the PDO driver in ADODB (see {@link epDbAdodbPdo}) or directly 
- * (see {@link epDbPdo}). 
- * 
+ * tearing down connection, executing standard SQL queries, tracking
+ * insert ids, quoting values/identifiers, etc.
+ *
+ * For now, we support both ADODB ({@link epDbAdodb}) and PEAR::DB
+ * ({@link epDbPeardb}). Experimentally, we now also support PDO
+ * ({@link http://www.php.net/manual/en/ref.pdo.php}) either through
+ * the PDO driver in ADODB (see {@link epDbAdodbPdo}) or directly
+ * (see {@link epDbPdo}).
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1044 $ $Date: 2007-03-07 21:25:07 -0500 (Wed, 07 Mar 2007) $
  * @package ezpdo
  * @subpackage ezpdo.db
  */
 abstract class epDb {
-    
+
     /**#@+
-     * Types of databases 
+     * Types of databases
      */
     const EP_DBT_ACCESS   = 'Access';
     const EP_DBT_DB2      = 'DB2';
@@ -79,14 +83,14 @@ abstract class epDb {
      * @var array
      */
     static protected $nameQuotes = array(
-        epDb::EP_DBT_MYSQL    => '`', 
-        epDb::EP_DBT_POSTGRES => '"', 
-        epDb::EP_DBT_SQLITE   => '"', 
+        epDb::EP_DBT_MYSQL    => '`',
+        epDb::EP_DBT_POSTGRES => '"',
+        epDb::EP_DBT_SQLITE   => '"',
         );
-    
+
     /**
-     * The PEAR-style DSN for the database 
-     * @var string 
+     * The PEAR-style DSN for the database
+     * @var string
      * @see http://pear.php.net/manual/en/package.database.db.intro-dsn.php
      */
     protected $dsn = false;
@@ -102,7 +106,7 @@ abstract class epDb {
      * @var bool
      */
     public $in_transaction = false;
-    
+
     /**
      * Whether to debug db or not
      * If true, queries will be collected
@@ -115,50 +119,50 @@ abstract class epDb {
      * @var boolean
      */
     protected $queries = array();
-    
+
     /**
      * The db type (EP_DBT_XXX consts below)
      * @var string
      */
     public $dbtype = false;
-    
+
     /**
      * The name quote for the current db type
      */
     protected $nameQuote = false;
-    
+
     /**
      * Array of tables exist
      */
     protected $tables_exist = array();
 
     /**
-     * Constructor 
+     * Constructor
      * @param string $dsn the foreign class name
      * @param boolean $log_queries whether to log queries (for debugging purpose)
      * @see epOverload::__construct()
      */
     public function __construct($dsn, $log_queries = false) {
-        
+
         // check dsn
         if (empty($dsn)) {
             throw new epExceptionDb('DSN empty');
         }
-        
+
         $this->dsn = $dsn;
         $this->log_queries = $log_queries;
     }
-    
+
     /**
      * Returns the database type for this connection
      * @return string
      * @throws epExceptionDb
      */
     public function dbType() {
-        
+
         if (!$this->dbtype) {
-            
-            // use epDbDsn to parse PEAR DSN 
+
+            // use epDbDsn to parse PEAR DSN
             include_once(EP_SRC_DB . '/epDbDsn.php');
             if (!($d = new epDbDsn($this->dsn))) {
                 throw new epExceptionDb('Error in parsing DSN');
@@ -167,7 +171,7 @@ abstract class epDb {
             // set db type
             $this->_setDbType($d['phptype'] . ':' . $d['dbsyntax']);
         }
-        
+
         return $this->dbtype;
     }
 
@@ -177,7 +181,7 @@ abstract class epDb {
      * @return bool
      */
     protected function _setDbType($t) {
-        
+
         if (stristr($t, 'access')) {
             $this->dbtype = self::EP_DBT_ACCESS;
         } else if (stristr($t, 'db2')) {
@@ -203,7 +207,7 @@ abstract class epDb {
         } else {
             return false;
         }
-        
+
         return true;
     }
 
@@ -220,7 +224,7 @@ abstract class epDb {
      * @return void
      */
     abstract public function close();
-    
+
     /**
      * Check if a table exists
      * @param string $table
@@ -245,9 +249,9 @@ abstract class epDb {
     public function logQueries($log_queries = true) {
         return $this->log_queries = $log_queries;
     }
-    
+
     /**
-     * Returns queries logged. If reset flag is set 
+     * Returns queries logged. If reset flag is set
      * (default), empty logged queries.
      * @param boolean $reset
      * @return array
@@ -269,8 +273,8 @@ abstract class epDb {
     }
 
     /**
-     * Turns off autocommit mode. While autocommit mode is turned off, 
-     * changes made to the database are not committed until you end 
+     * Turns off autocommit mode. While autocommit mode is turned off,
+     * changes made to the database are not committed until you end
      * the transaction by calling either {@link commit()}.
      * @return bool
      */
@@ -284,14 +288,14 @@ abstract class epDb {
     }
 
     /**
-     * Acutally start a transaction by calling the underlying 
+     * Acutally start a transaction by calling the underlying
      * database connection
      * @return bool
      */
     abstract protected function _beginTransaction();
 
     /**
-     * Commits a transaction, returning the database connection to 
+     * Commits a transaction, returning the database connection to
      * autocommit mode until the next call to {@link beginTransaction()}
      * starts a new transaction.
      * @return bool
@@ -304,20 +308,20 @@ abstract class epDb {
         $this->in_transaction = false;
         return (boolean)$status;
     }
-    
+
     /**
-     * Actually commit the current transaction by calling the underlying 
+     * Actually commit the current transaction by calling the underlying
      * database connection
      * @return bool
      */
     abstract protected function _commit();
 
     /**
-     * Rolls back the current transaction, as initiated by 
-     * {@link beginTransaction()}. It is an error to call this method if no 
-     * transaction is active. If the database was set to autocommit mode, 
-     * this function will restore autocommit mode after it has rolled 
-     * back the transaction. 
+     * Rolls back the current transaction, as initiated by
+     * {@link beginTransaction()}. It is an error to call this method if no
+     * transaction is active. If the database was set to autocommit mode,
+     * this function will restore autocommit mode after it has rolled
+     * back the transaction.
      * @return bool
      */
     public function rollback() {
@@ -330,12 +334,12 @@ abstract class epDb {
     }
 
     /**
-     * Acutally rollback the current transaction by calling the underlying 
+     * Acutally rollback the current transaction by calling the underlying
      * database connection
      * @return bol
      */
     abstract protected function _rollback();
-    
+
     /**
      * Executes SQL command
      * Subclass must override this method
@@ -344,13 +348,13 @@ abstract class epDb {
      * @access public
      */
     public function execute($query) {
-        
+
         if ($this->log_queries) {
             $t = microtime(true);
         }
 
         $r = $this->_execute($query);
-        
+
         if ($this->log_queries) {
             $t = microtime(true) - $t;
             $this->queries[] = '[' . $t . '] ' .  $query;
@@ -358,7 +362,7 @@ abstract class epDb {
 
         return $r;
     }
-    
+
     /**
      * Executes SQL command (only called by execute())
      * Subclass must override this method
@@ -382,27 +386,27 @@ abstract class epDb {
      * @return integer
      */
     abstract public function rsRows();
-    
+
     /**
      * Rewinds to the first row in the last result
      * @return bool
      */
     abstract public function rsRestart();
-    
+
     /**
      * Moves to the next row in the last result set
      * @return bool
      */
     abstract public function rsNext();
-    
+
     /**
      * Get the value for a column in the current row in the last result set
-     * @param string $col the name of the column 
+     * @param string $col the name of the column
      * @param string $col_alt the alternative name of the column (used only when $col fails)
      * @return false|mixed
      */
     abstract public function rsGetCol($col, $col_alt = false);
-    
+
     /**
      * Formats input so it can be safely used as a literal
      * @param mixed $input
@@ -419,7 +423,7 @@ abstract class epDb {
      * @return mixed
      */
     public function quoteBlob($input) {
-        return $this->quote(epStr2Hex($input));
+        return $this->quote(Base\epStr2Hex($input));
     }
 
     /**
@@ -432,7 +436,7 @@ abstract class epDb {
      * @return mixed
      */
     public function castBlob($input) {
-        return (string)epHex2Str($input);
+        return (string)Base\epHex2Str($input);
     }
 
     /**
@@ -454,23 +458,23 @@ abstract class epDb {
                 $quoted[] = $item;
             }
         }
-        
+
         // quote them into ('xx'.'yy'.'zz')
         return implode('.', $quoted);
     }
 
     /**
-     * Gets the data source name (DSN) of the database connection 
-     * @return string 
+     * Gets the data source name (DSN) of the database connection
+     * @return string
      * @access public
      */
     public function dsn() {
         return $this->dsn;
     }
-    
+
     /**
-     * Returns the db connection - an instance of db connection 
-     * that the underlying db library supports. Not supposed to 
+     * Returns the db connection - an instance of db connection
+     * that the underlying db library supports. Not supposed to
      * be called directly. Provided for testing only.
      * @return mixed
      */
@@ -491,7 +495,7 @@ abstract class epDb {
                 $this->nameQuote = self::$nameQuotes[$dbtype];
             }
         }
-        
+
         // return name quote
         return $this->nameQuote;
     }

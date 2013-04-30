@@ -10,6 +10,10 @@
  * @package ezpdo
  * @subpackage ezpdo.orm
  */
+namespace ezpdo\orm;
+
+use ezpdo\base\epBase;
+use ezpdo\base\epException;
 
 /**
  * Need epBase class (base class for epFieldMap)

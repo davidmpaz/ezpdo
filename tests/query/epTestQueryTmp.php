@@ -2,14 +2,18 @@
 
 /**
  * $Id: epTestQueryTmp.php 822 2006-02-14 22:08:48Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 822 $ $Date: 2006-02-14 17:08:48 -0500 (Tue, 14 Feb 2006) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.query
  */
+namespace ezpdo\tests\query;
+
+use ezpdo\base as Base;
+use ezpdo\tests\runtime\epTestRuntime;
 
 /**
  * need epTestCase
@@ -17,37 +21,37 @@
 include_once(dirname(__FILE__).'/../src/epTestCase.php');
 
 /**#@+
- * need runtime testcase (under ../runtime) and epQueryBuilder 
+ * need runtime testcase (under ../runtime) and epQueryBuilder
  */
 include_once(dirname(__FILE__).'/../runtime/epTestRuntime.php');
 include_once(EP_SRC_QUERY.'/epQueryBuilder.php');
 /**#@-*/
 
 /**
- * The unit test class for {@link epQueryParser}  
- * 
+ * The unit test class for {@link epQueryParser}
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 822 $ $Date: 2006-02-14 17:08:48 -0500 (Tue, 14 Feb 2006) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.query
  */
 class epTestQueryTmp extends epTestRuntime {
-    
+
     /**
      * Maximum number of items to insert to a table
      */
     const MAX_ITEMS = 10;
-    
+
     /**
      * Check if node and expected match (ignore spaces)
      * @param sjNode $node
      * @param string $expect
      */
     function _match($node, $expect) {
-        
+
         // get result from node
         $result = $node->__toString();
-        
+
         // remove \r and space
         $expect = str_replace(array("\n", "\r", ' '), '', $expect);
         $result = str_replace(array("\n", "\r", ' '), '', $result);
@@ -143,7 +147,7 @@ EXPECT;
         $root = $p->parse();
         $t = microtime(true) - $t0;
         $this->assertTrue($root);
-        
+
         // debug
         if ($debug) {
             echo 'Parser : ' . $t . ' s' . "\n";
@@ -163,11 +167,11 @@ EXPECT;
         }
 
         $r = true;
-        
+
         //print_r($sql);
 
         if (is_string($expect)) {
-            
+
             // debug
             if ($debug) {
                 echo "SQL Expected : $expect\n";
@@ -177,25 +181,25 @@ EXPECT;
             $this->assertTrue($r = ($sql[0] === $expect));
 
         } else {
-            
+
             for ($i = 0; $i < count($expect); $i++) {
-                
+
                 // debug
                 if ($debug) {
                     echo "SQL Expected [$i] : " . $expect[$i] . "\n";
                     echo "SQL Actual   [$i] : " . $sql[$i] . "\n";
                 }
-                
+
                 $this->assertTrue($r_ = ($sql[$i] === $expect[$i]));
-                
+
                 if ($r_ == false) {
                     $r = false;
                 }
             }
         }
-        
+
         echo "done\n";
-        
+
         // return whether result matches expected
         return $r;
     }
@@ -214,7 +218,7 @@ EXPECT;
         $e = "SELECT DISTINCT `bstr`.* FROM `eptBookstore` AS `bstr` WHERE `bstr`.`eoid`=1";
         $this->assertTrue($this->_testBuilder($q, $args, $e));
     }
-    
+
     function testBuilder3() {
         $q = "from eptBook as b where b.authors.contains(?)";
         $args = array(array('name' => 'Ralph Johnson'));
@@ -242,13 +246,13 @@ EXPECT;
 if (!defined('EP_GROUP_TEST')) {
     $tm = microtime(true);
     $t = new epTestQueryTmp;
-    if ( epIsWebRun() ) {
-        $t->run(new HtmlReporter());
+    if ( Base\epIsWebRun() ) {
+        $t->run(new \HtmlReporter());
     } else {
-        $t->run(new TextReporter());
+        $t->run(new \TextReporter());
     }
     $elapsed = microtime(true) - $tm;
-    echo epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
+    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
 }
 
 ?>

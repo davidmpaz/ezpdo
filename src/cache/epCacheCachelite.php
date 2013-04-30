@@ -2,22 +2,23 @@
 
 /**
  * $Id: epCacheCachelite.php 872 2006-03-22 14:05:54Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @author Trevan Richins <developer@ckiweb.com>
  * @version $Revision: 872 $ $Date: 2006-03-22 09:05:54 -0500 (Wed, 22 Mar 2006) $
  * @package ezpdo
  * @subpackage ezpdo.cache
  */
+namespace ezpdo\cache;
 
 // Needs epCache interface
 include_once(EP_SRC_CACHE . '/epCache.php');
 
 /**
  * Exception class for {@link epCacheCacheLite}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 872 $ $Date: 2006-03-22 09:05:54 -0500 (Wed, 22 Mar 2006) $
  * @package ezpdo
@@ -27,11 +28,11 @@ class epExceptionCacheCacheLite extends epException {
 }
 
 /**
- * Class of CacheLite client 
- * 
+ * Class of CacheLite client
+ *
  * Implementation of the {@link epCache} interface so CacheLite
  * can be easily plugged into EZPDO
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 872 $ $Date: 2006-03-22 09:05:54 -0500 (Wed, 22 Mar 2006) $
  * @package ezpdo
@@ -42,7 +43,7 @@ class epCacheCacheLite implements epCache {
 
     /**
      * The cache group used by EZPDO
-     * @var string  
+     * @var string
      */
     static protected $group = 'ezpdo';
 
@@ -58,17 +59,17 @@ class epCacheCacheLite implements epCache {
      * @param integer $ttl Time-to-live in seconds
      */
     public function __construct($cache_dir = '/tmp/', $ttl = 360) {
-        
+
         // include CacheLite (assuming in include paths)
         include_once('Cache/Lite.php');
-        
+
         // options
         $options = array(
             "automaticSerialization" => true,
             "cacheDir" => $cache_dir . '/',
-            "lifeTime" => $ttl, 
+            "lifeTime" => $ttl,
             );
-        
+
         // instantiate Cache_Lite
         if (!($this->cache = new Cache_Lite($options))) {
             throw new epExceptionCacheCacheLite(
@@ -87,13 +88,13 @@ class epCacheCacheLite implements epCache {
     }
 
     /**
-     * Stores a variable into the cache with a key. 
-     * 
-     * A time-to-live (TTL) parameter (in seconds) can also be passed 
-     * so that the stored value will be removed from the cache if TTL 
-     * has expired. This is normally done on the next request but the 
-     * actual behavior may depend on the cache implementation. 
-     * 
+     * Stores a variable into the cache with a key.
+     *
+     * A time-to-live (TTL) parameter (in seconds) can also be passed
+     * so that the stored value will be removed from the cache if TTL
+     * has expired. This is normally done on the next request but the
+     * actual behavior may depend on the cache implementation.
+     *
      * @param string $key The key used to store the value
      * @param mixed $value The value (variable) to be cached
      * @param integer $ttl The time-to-live in seconds
@@ -118,6 +119,6 @@ class epCacheCacheLite implements epCache {
     public function clear() {
         return $this->cache->clean(self::$group);
     }
-}   
+}
 
 ?>

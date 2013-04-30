@@ -1,24 +1,25 @@
 <?php
 // $Id: Log.php 1024 2006-12-13 00:50:08Z nauhygon $
 // $Horde: horde/lib/Log.php,v 1.15 2000/06/29 23:39:45 jon Exp $
+use ezpdo\base as Base;
 
-epDefine('PEAR_LOG_EMERG',    0);     /** System is unusable */
-epDefine('PEAR_LOG_ALERT',    1);     /** Immediately action */
-epDefine('PEAR_LOG_CRIT',     2);     /** Critical conditions */
-epDefine('PEAR_LOG_ERR',      3);     /** Error conditions */
-epDefine('PEAR_LOG_WARNING',  4);     /** Warning conditions */
-epDefine('PEAR_LOG_NOTICE',   5);     /** Normal but significant */
-epDefine('PEAR_LOG_INFO',     6);     /** Informational */
-epDefine('PEAR_LOG_DEBUG',    7);     /** Debug-level messages */
+Base\epDefine('PEAR_LOG_EMERG',    0);     /** System is unusable */
+Base\epDefine('PEAR_LOG_ALERT',    1);     /** Immediately action */
+Base\epDefine('PEAR_LOG_CRIT',     2);     /** Critical conditions */
+Base\epDefine('PEAR_LOG_ERR',      3);     /** Error conditions */
+Base\epDefine('PEAR_LOG_WARNING',  4);     /** Warning conditions */
+Base\epDefine('PEAR_LOG_NOTICE',   5);     /** Normal but significant */
+Base\epDefine('PEAR_LOG_INFO',     6);     /** Informational */
+Base\epDefine('PEAR_LOG_DEBUG',    7);     /** Debug-level messages */
 
-epDefine('PEAR_LOG_ALL',      bindec('11111111'));  /** All messages */
-epDefine('PEAR_LOG_NONE',     bindec('00000000'));  /** No message */
+Base\epDefine('PEAR_LOG_ALL',      bindec('11111111'));  /** All messages */
+Base\epDefine('PEAR_LOG_NONE',     bindec('00000000'));  /** No message */
 
 /* Log types for PHP's native error_log() function. */
-epDefine('PEAR_LOG_TYPE_SYSTEM',  0); /** Use PHP's system logger */
-epDefine('PEAR_LOG_TYPE_MAIL',    1); /** Use PHP's mail() function */
-epDefine('PEAR_LOG_TYPE_DEBUG',   2); /** Use PHP's debugging connection */
-epDefine('PEAR_LOG_TYPE_FILE',    3); /** Append to a file */
+Base\epDefine('PEAR_LOG_TYPE_SYSTEM',  0); /** Use PHP's system logger */
+Base\epDefine('PEAR_LOG_TYPE_MAIL',    1); /** Use PHP's mail() function */
+Base\epDefine('PEAR_LOG_TYPE_DEBUG',   2); /** Use PHP's debugging connection */
+Base\epDefine('PEAR_LOG_TYPE_FILE',    3); /** Append to a file */
 
 /**
  * The epLib_Log:: class implements both an abstraction for various logging

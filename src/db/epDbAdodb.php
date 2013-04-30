@@ -2,14 +2,15 @@
 
 /**
  * $Id: epDbAdodb.php 1030 2007-01-19 10:38:55Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1030 $ $Date: 2007-01-19 05:38:55 -0500 (Fri, 19 Jan 2007) $
  * @package ezpdo
  * @subpackage ezpdo.db
  */
+namespace ezpdo\db;
 
 /**
  * need base class epDb
@@ -18,7 +19,7 @@ include_once(EP_SRC_DB.'/epDb.php');
 
 /**
  * Exception class for {@link epDbAdodb}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1030 $ $Date: 2007-01-19 05:38:55 -0500 (Fri, 19 Jan 2007) $
  * @package ezpdo
@@ -29,20 +30,20 @@ class epExceptionDbAdodb extends epExceptionDb {
 
 /**
  * A wrapper class of ADODB
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1030 $ $Date: 2007-01-19 05:38:55 -0500 (Fri, 19 Jan 2007) $
  * @package ezpdo
  * @subpackage ezpdo.db
  */
 class epDbAdodb extends epDb {
-    
+
     /**
      * The last record set
      * @var mixed
      */
     public $last_rs = false;
-    
+
     /**
      * Constructor
      * @param string $dsn the DSN to access the database
@@ -74,7 +75,7 @@ class epDbAdodb extends epDb {
             $db = ADONewConnection($this->dsn);
             $this->db = & $db;
         }
-        catch (ADODB_Exception $e) {
+        catch (\ADODB_Exception $e) {
             throw new epExceptionDbAdodb('Cannot connect db: ' . $e->getMessage());
             return false;
         }
@@ -94,18 +95,18 @@ class epDbAdodb extends epDb {
             $this->db->Close();
         }
     }
-    
+
     /**
      * Check if a table exists
      * @param string $table
      * @return bool
      */
     public function tableExists($table) {
-        
+
         if (!$table) {
             return false;
         }
-        
+
         // check cached
         if (isset($this->tables_exist[$table])) {
             return true;
@@ -121,7 +122,7 @@ class epDbAdodb extends epDb {
             // execute a select statement on the table
             $rs = $this->db->Execute('SELECT COUNT(*) FROM ' . $this->quoteId($table) . ' WHERE 1=1');
         }
-        catch (Exception $e) {
+        catch (\ADODB_Exception $e) {
             // table does not exist if exception
             return false;
         }
@@ -137,8 +138,8 @@ class epDbAdodb extends epDb {
      * @return bool
      */
     public function _beginTransaction() {
-        
-        // open connection if not already 
+
+        // open connection if not already
         if (!$this->open()) {
             return false;
         }
@@ -173,24 +174,24 @@ class epDbAdodb extends epDb {
      * @throws epExceptionDbAdodb
      */
     protected function _execute($query) {
-        
+
         // check db connection
         if (!$this->open()) {
             return false;
         }
-        
-        // set fetch mode to assoc 
+
+        // set fetch mode to assoc
         $this->db->SetFetchMode(ADODB_FETCH_ASSOC);
-        
+
         // execute query and cache last record set
         try {
             $this->last_rs = $this->db->Execute($query);
         }
-        catch (ADODB_Exception $e) {
+        catch (\ADODB_Exception $e) {
             throw new epExceptionDbAdodb('Cannot execute query: ' . $e->getMessage());
             return false;
         }
-    
+
         return $this->last_rs;
     }
 
@@ -219,7 +220,7 @@ class epDbAdodb extends epDb {
         }
         return $this->last_rs->RecordCount();
     }
-    
+
     /**
      * Rewinds to the first row in the last result
      * @return void
@@ -231,7 +232,7 @@ class epDbAdodb extends epDb {
         $this->last_rs->MoveFirst();
         return (!$this->last_rs->EOF);
     }
-    
+
     /**
      * Moves to the next row in the last result set
      * @return bool
@@ -243,19 +244,19 @@ class epDbAdodb extends epDb {
         $this->last_rs->MoveNext();
         return (!$this->last_rs->EOF);
     }
-    
+
     /**
      * Get the value for a column in the current row in the last result set
-     * @param string the name of the column 
+     * @param string the name of the column
      * @return false|mixed
      */
     public function rsGetCol($col, $col_alt = false) {
-        
+
         if (!$this->last_rs) {
             throw new epExceptionDbAdodb('No last query result found');
             return false;
         }
-        
+
         // try $col first
         if (array_key_exists($col, $this->last_rs->fields)) {
             return $this->last_rs->fields[$col];
@@ -280,21 +281,21 @@ class epDbAdodb extends epDb {
         throw new epExceptionDbAdodb('Column [' . $col . '] not found');
         return false;
     }
-    
+
     /**
      * Formats input so it can be safely used as a literal
      * @param mixed $input
      * @return mixed
      */
     public function quote($input) {
-        
-        // open connection if not already 
+
+        // open connection if not already
         if (!$this->open()) {
             return false;
         }
 
         return $this->db->qstr($input);
-    } 
+    }
 
 }
 

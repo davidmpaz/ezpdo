@@ -2,14 +2,21 @@
 
 /**
  * $Id: epTestQueryRuntime.php 1038 2007-02-11 01:38:59Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1038 $ $Date: 2007-02-10 20:38:59 -0500 (Sat, 10 Feb 2007) $
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.query
  */
+namespace ezpdo\tests\query;
+
+use ezpdo\base as Base;
+use ezpdo\db\epDbFactory;
+use ezpdo\runtime\epManager;
+use ezpdo\tests\src\epTestCase;
+use ezpdo\orm\epClassMapFactory;
 
 /**#@+
  * need epTestCase and epUtils
@@ -19,8 +26,8 @@ include_once(EP_SRC_BASE.'/epUtils.php');
 /**#@-*/
 
 /**
- * The unit test class for {@link epQueryParser}  
- * 
+ * The unit test class for {@link epQueryParser}
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1038 $ $Date: 2007-02-10 20:38:59 -0500 (Sat, 10 Feb 2007) $
  * @package ezpdo.tests
@@ -64,7 +71,7 @@ class epTestQueryRuntime extends epTestCase {
                 'zipcode' => '04040',
                 ),
             ),
-        ); 
+        );
 
     /**
      * The 5 books
@@ -100,7 +107,7 @@ class epTestQueryRuntime extends epTestCase {
             'pages' => 172,
             'price' => 500.05,
             ),
-        ); 
+        );
 
     /**#@+
      * Array to keep track of oids
@@ -115,15 +122,15 @@ class epTestQueryRuntime extends epTestCase {
      * Destroy singletons to force reconstruction
      */
     function _destroy() {
-        
+
         // destroy class map factory
         include_once(EP_SRC_ORM.'/epClassMap.php');
         epClassMapFactory::destroy();
-        
+
         // destroy db connections
         include_once(EP_SRC_DB.'/epDbObject.php');
         epDbFactory::destroy();
-        
+
         // destroy manager
         include_once(EP_SRC_RUNTIME.'/epManager.php');
         epManager::destroy();
@@ -136,23 +143,23 @@ class epTestQueryRuntime extends epTestCase {
      * @return array
      */
     function _config($db_lib, $dbtype) {
-        
+
         // source directory
         $source_dirs = EP_TESTS . '/classes/';
-        
+
         // compiled file name
         $compiled_file = "compiled.ezpdo.$dbtype";
-        
+
         switch ($dbtype) {
-            case 'mysql': 
+            case 'mysql':
                 $default_dsn = "mysql://ezpdo:pdoiseasy@localhost/ezpdo";
                 break;
-            
-            case 'pgsql': 
+
+            case 'pgsql':
                 $default_dsn = "pgsql://ezpdo:pdoiseasy@localhost/ezpdo";
                 break;
 
-            case 'sqlite': 
+            case 'sqlite':
                 if ($db_lib == 'adodb') {
                     $default_dsn = "sqlite://books.db";
                 } else {
@@ -162,8 +169,8 @@ class epTestQueryRuntime extends epTestCase {
         }
 
         return array(
-            'source_dirs' => $source_dirs, 
-            'compiled_file' => $compiled_file, 
+            'source_dirs' => $source_dirs,
+            'compiled_file' => $compiled_file,
             'default_dsn' => $default_dsn,
             'db_lib' => $db_lib
             );
@@ -175,17 +182,17 @@ class epTestQueryRuntime extends epTestCase {
      * @param string $dbtype the type of the database to be tested
      */
     function _start($db_lib, $dbtype) {
-        
+
         // delete in-memory singletons (manages, factories)
         $this->_destroy();
-        
+
         // make the directory for compiled info
         @mkdir('compiled');
 
         // load runtime core and config
         include_once(EP_ROOT.'/ezpdo_runtime.php');
-        epLoadConfig(dirname(__FILE__).'/config.ini');
-        
+        \epLoadConfig(dirname(__FILE__).'/config.ini');
+
         // get manager
         $m = epManager::instance();
         foreach($this->_config($db_lib, $dbtype) as $option => $value) {
@@ -219,7 +226,7 @@ class epTestQueryRuntime extends epTestCase {
             }
             $authors[] = $a;
         }
-        
+
         // create authors
         $books = array();
         foreach(self::$books as $b_) {
@@ -229,7 +236,7 @@ class epTestQueryRuntime extends epTestCase {
             }
             $books[] = $b;
         }
-        
+
         // create object relationships
         $bookstore->books = $books;
         $bookstore->authors = $authors;
@@ -248,7 +255,7 @@ class epTestQueryRuntime extends epTestCase {
 
         // collect oids
         $this->oid_bookstore = $bookstore->oid;
-        
+
         $this->oid_books = array();
         foreach($books as $book) {
             $this->oid_books[] = $book->oid;
@@ -272,7 +279,7 @@ class epTestQueryRuntime extends epTestCase {
         $m->evictAll('eptBooks');
         $m->evictAll('eptAuthor');
         $m->evictAll('eptContact');
-        
+
         return true;
     }
 
@@ -286,25 +293,25 @@ class epTestQueryRuntime extends epTestCase {
         $m->deleteAll('eptBook');
         $m->deleteAll('eptBookstore');
         $m->deleteAll('eptContact');
-        @unlink(dirname(__FILE__).'/ezpdo.log');
-        @unlink('books.db');
-        @epRmDir(dirname(__FILE__).'/compiled');
+        if(file_exists($f = dirname(__FILE__).'/ezpdo.log')) unlink($f);
+        if(file_exists($f = 'books.db')) unlink($f);
+        Base\epRmDir(dirname(__FILE__).'/compiled');
         return true;
     }
 
     /**
-     * Run all tests 
+     * Run all tests
      * @param string $dbal (adodb, peardb)
      * @param string $dbtype (mysql, sqlite)
      */
     function _runTests($dbal, $dbtype) {
-        
-        echo "EZOQL tests for $dbal/$dbtype started.. " . epNewLine();
-        
+
+        echo "EZOQL tests for $dbal/$dbtype started.. " . Base\epNewLine();
+
         echo "  setting up..";
         $this->_start($dbal, $dbtype);
-        echo "done " . epNewLine();
-        
+        echo "done " . Base\epNewLine();
+
         if ($methods = get_class_methods(__CLASS__)) {
             // go through each _testXXX methods
             foreach($methods as $method) {
@@ -317,22 +324,22 @@ class epTestQueryRuntime extends epTestCase {
                 // run the test
                 echo "  $method..";
                 $this->assertTrue($this->$method());
-                echo "done " . epNewLine();
+                echo "done " . Base\epNewLine();
             }
         }
 
         echo "  tearing down.. ";
         $this->_end();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
-        echo "  complete!" . epNewLine();
+        echo "  complete!" . Base\epNewLine();
     }
 
     /**
      * Test adodb & mysql
      */
     function testAdodbMysql() {
-        
+
         // skip testing adodb + mysql if not allowed
         if (!$this->canTestAdodb() || !$this->canTestMysql()) {
             return;
@@ -345,7 +352,7 @@ class epTestQueryRuntime extends epTestCase {
      * Test peardb & mysql
      */
     function testPearMysql() {
-        
+
         // skip testing peardb + mysql if not allowed
         if (!$this->canTestPeardb() || !$this->canTestMysql()) {
             return;
@@ -358,7 +365,7 @@ class epTestQueryRuntime extends epTestCase {
      * Test pdo & mysql
      */
     function testPdoMysql() {
-        
+
         // skip testing pdo + mysql if not allowed
         if (!$this->canTestPdo('mysql') || !$this->canTestMysql()) {
             return;
@@ -371,7 +378,7 @@ class epTestQueryRuntime extends epTestCase {
      * Test adodb & pgsql
      */
     function testAdodbPgsql() {
-        
+
         // skip testing adodb + pgsql if not allowed
         if (!$this->canTestAdodb() || !$this->canTestPgsql()) {
             return;
@@ -384,7 +391,7 @@ class epTestQueryRuntime extends epTestCase {
      * Test peardb & pgsql
      */
     function testPearPgsql() {
-        
+
         // skip testing peardb + mysql if not allowed
         if (!$this->canTestPeardb() || !$this->canTestPgsql()) {
             return;
@@ -397,7 +404,7 @@ class epTestQueryRuntime extends epTestCase {
      * Test pdo & pgsql
      */
     function testPdoPgsql() {
-        
+
         // skip testing pgsql if not allowed
         if (!$this->canTestPdo('pgsql') || !$this->canTestPgsql()) {
             return;
@@ -423,7 +430,7 @@ class epTestQueryRuntime extends epTestCase {
      * Test peardb & mysql
      */
     function testPearSqlite() {
-        
+
         // skip testing sqlite if not allowed
         if (!$this->canTestPeardb() || !$this->canTestSqlite()) {
             return;
@@ -437,7 +444,7 @@ class epTestQueryRuntime extends epTestCase {
      * Test pdo & sqlite
      */
     function testPdoSqlite() {
-        
+
         // skip testing sqlite if not allowed
         if (!$this->canTestPdo('sqlite') || !$this->canTestSqlite()) {
             return;
@@ -453,7 +460,7 @@ class epTestQueryRuntime extends epTestCase {
     // test oid
     function _testQuery0() {
         $this->assertTrue($m = epManager::instance());
-        
+
         // bookstore
         $this->assertTrue($os = $m->query(
             "from eptBookstore as bstr where bstr.oid == ?", $this->oid_bookstore
@@ -588,7 +595,7 @@ class epTestQueryRuntime extends epTestCase {
     function _testQuery13() {
         $this->assertTrue($m = epManager::instance());
         $this->assertTrue($os = $m->query(
-            "from eptBookstore as bstr where " 
+            "from eptBookstore as bstr where "
             . "bstr.books.contains(bk1) and bk1.pages == 728"
             . "bstr.books.contains(bk2) and bk2.pages == 395"
             ));
@@ -599,7 +606,7 @@ class epTestQueryRuntime extends epTestCase {
     function _testQuery14() {
         $this->assertTrue($m = epManager::instance());
         $this->assertTrue($os = $m->query(
-            "from eptBookstore as bstr where " 
+            "from eptBookstore as bstr where "
             . "bstr.books.contains(bk) and bk.pages == 728"
             . "bstr.authors.contains(a) and a.name like '%Ralph%'"
             ));
@@ -610,7 +617,7 @@ class epTestQueryRuntime extends epTestCase {
     function _testQuery15() {
         $this->assertTrue($m = epManager::instance());
         $this->assertTrue($os = $m->query(
-            "from eptBookstore as bstr where " 
+            "from eptBookstore as bstr where "
             . "bstr.books.contains(bk) and bk.pages == 728"
             . "bstr.authors.contains(a) and a.name like '%Ralph%'"
             ));
@@ -621,7 +628,7 @@ class epTestQueryRuntime extends epTestCase {
     function _testQuery16() {
         $this->assertTrue($m = epManager::instance());
         $this->assertTrue($os = $m->query(
-            "from eptAuthor as a where " 
+            "from eptAuthor as a where "
             . "a.contact.phone = '4444444' and a.contact.zipcode = '04040'"
             ));
         $this->assertTrue(count($os) == 1);
@@ -680,7 +687,7 @@ class epTestQueryRuntime extends epTestCase {
         $this->assertTrue(count($os) == 2);
         return true;
     }
-    
+
     // avg
     function _testQuery23() {
         $this->assertTrue($m = epManager::instance());
@@ -691,7 +698,7 @@ class epTestQueryRuntime extends epTestCase {
         $this->assertTrue($r == (172 + 728) / 2);
         return true;
     }
-    
+
     // sum
     function _testQuery24() {
         $this->assertTrue($m = epManager::instance());
@@ -701,7 +708,7 @@ class epTestQueryRuntime extends epTestCase {
         $this->assertTrue($r == 172 + 728);
         return true;
     }
-    
+
     // min
     function _testQuery25() {
         $this->assertTrue($m = epManager::instance());
@@ -731,7 +738,7 @@ class epTestQueryRuntime extends epTestCase {
     function _testQuery28() {
         $this->assertTrue($m = epManager::instance());
         $this->assertTrue($r = $m->query(
-            "from eptBook as b where b.authors.contains(?)", 
+            "from eptBook as b where b.authors.contains(?)",
             array('name' => 'Ralph Johnson')
             ));
         $this->assertTrue(count($r) == 2);
@@ -742,7 +749,7 @@ class epTestQueryRuntime extends epTestCase {
     function _testQuery29() {
         $this->assertTrue($m = epManager::instance());
         $this->assertTrue($r = $m->query(
-            "from eptBook as b where b.authors.contains(?)", 
+            "from eptBook as b where b.authors.contains(?)",
             array('contact' => array(
                 'zipcode' => '03030',
                 ))
@@ -754,7 +761,7 @@ class epTestQueryRuntime extends epTestCase {
     // contains object
     function _testQuery30() {
         $this->assertTrue($m = epManager::instance());
-        
+
         // create an exmaple author object
         $author = $m->create('eptAuthor');
         foreach($author as $k => $v) {
@@ -773,7 +780,7 @@ class epTestQueryRuntime extends epTestCase {
     // contains object 2
     function _testQuery31() {
         $this->assertTrue($m = epManager::instance());
-        
+
         // create an exmaple contact object
         $author = $m->create('eptAuthor');
         foreach($author as $k => $v) {
@@ -792,7 +799,7 @@ class epTestQueryRuntime extends epTestCase {
         }
         $author->contact->zipcode = '03030';
         $author->contact->epSetCommittable(false); // false: prevented from being committed
-        
+
         $this->assertTrue($r = $m->query("from eptBook as b where b.authors.contains(?)", $author));
         $this->assertTrue(count($r) == 2);
         return true;
@@ -801,7 +808,7 @@ class epTestQueryRuntime extends epTestCase {
     // contains object 3 (committed)
     function _testQuery32() {
         $this->assertTrue($m = epManager::instance());
-        
+
         // create an exmaple contact object
         $author = $m->find('from eptAuthor where oid = ?', $this->oid_authors[2]);
 
@@ -815,7 +822,7 @@ class epTestQueryRuntime extends epTestCase {
     function _testQuery33() {
         $this->assertTrue($m = epManager::instance());
         $this->assertTrue($r = $m->query(
-            "from eptBook as b where b.authors.contains(a) and a.contact = ?", 
+            "from eptBook as b where b.authors.contains(a) and a.contact = ?",
             array('zipcode' => '01010')
             ));
         $this->assertTrue(count($r) == 2);
@@ -858,7 +865,7 @@ class epTestQueryRuntime extends epTestCase {
     function _testQuery36() {
         $this->assertTrue($m = epManager::instance());
         $this->assertTrue($r = $m->query("from eptBase where 1"));
-        // 4 authors, 4 contacts, 5 books 
+        // 4 authors, 4 contacts, 5 books
         // (note that bookstore is not based off eptBase)
         $this->assertTrue(count($r) == 13);
         return true;
@@ -868,7 +875,7 @@ class epTestQueryRuntime extends epTestCase {
     function _testQuery37() {
         $this->assertTrue($m = epManager::instance());
         $this->assertTrue($r = $m->query("count(*) from eptBase where 1"));
-        // 4 authors, 4 contacts, 5 books 
+        // 4 authors, 4 contacts, 5 books
         // (note that bookstore is not based off eptBase)
         $this->assertTrue($r == 13);
         return true;
@@ -907,7 +914,7 @@ class epTestQueryRuntime extends epTestCase {
         $this->assertTrue($r == $sum/$count);
         return true;
     }
-    
+
     // subclasses: limit
     function _testQuery42() {
         $this->assertTrue($m = epManager::instance());
@@ -915,7 +922,7 @@ class epTestQueryRuntime extends epTestCase {
         $this->assertTrue(count($r) == 5);
         return true;
     }
-    
+
     // subclasses: limit w/ offset
     function _testQuery43() {
         $this->assertTrue($m = epManager::instance());
@@ -938,7 +945,7 @@ class epTestQueryRuntime extends epTestCase {
          }
          return true;
     }
-    
+
     // subclasses: orderby desc
     function _testQuery45() {
         $this->assertTrue($m = epManager::instance());
@@ -953,7 +960,7 @@ class epTestQueryRuntime extends epTestCase {
         }
         return true;
     }
-    
+
     // subclasses: orderby asc limit
     function _testQuery46() {
          $this->assertTrue($m = epManager::instance());
@@ -985,7 +992,7 @@ class epTestQueryRuntime extends epTestCase {
         }
         return true;
     }
-    
+
     // subclasses: orderby desc limit
     function _testQuery48() {
         $this->assertTrue($m = epManager::instance());
@@ -1001,7 +1008,7 @@ class epTestQueryRuntime extends epTestCase {
         }
         return true;
     }
-    
+
     // subclasses: orderby asc limit offset
     function _testQuery49() {
         $this->assertTrue($m = epManager::instance());
@@ -1020,14 +1027,14 @@ class epTestQueryRuntime extends epTestCase {
 
     // order by random()
     function _testQuery50() {
-        
+
         $n = 3; // limit length
 
         $this->assertTrue($m = epManager::instance());
         $this->assertTrue($r = $m->query("from eptAuthor where 1 order by random() limit " . $n));
         $this->assertTrue(count($r) == $n);
 
-        // don't want to check randomness, but let's make sure objects are distinct 
+        // don't want to check randomness, but let's make sure objects are distinct
         for($i = 0; $i < $n; $i ++) {
             for($j = $i + 1; $j < $n; $j ++) {
                 $this->assertTrue($r[$i]->oid != $r[$j]->oid);
@@ -1039,14 +1046,14 @@ class epTestQueryRuntime extends epTestCase {
 
     // order by random() - 2
     function _testQuery51() {
-        
+
         $n = 3; // limit length
 
         $this->assertTrue($m = epManager::instance());
         $this->assertTrue($r = $m->query("from eptBook as b where b.pages >= 172 order by random() limit " . $n));
         $this->assertTrue(count($r) == $n);
 
-        // don't want to check randomness, but let's make sure objects are distinct 
+        // don't want to check randomness, but let's make sure objects are distinct
         for($i = 0; $i < $n; $i ++) {
             for($j = $i + 1; $j < $n; $j ++) {
                 $this->assertTrue($r[$i]->oid != $r[$j]->oid);
@@ -1058,14 +1065,14 @@ class epTestQueryRuntime extends epTestCase {
 
     // order by random() - 3 - subclasses
     function _testQuery52() {
-        
+
         $n = 5; // limit length
 
         $this->assertTrue($m = epManager::instance());
         $this->assertTrue($r = $m->query("from eptBase where 1 order by random() limit 5, " . $n));
         $this->assertTrue(count($r) == $n);
 
-        // don't want to check randomness, but let's make sure objects are distinct 
+        // don't want to check randomness, but let's make sure objects are distinct
         for($i = 0; $i < $n; $i ++) {
             $this->assertTrue($eoid_i = $m->encodeUoid($r[$i]));
             for($j = $i + 1; $j < $n; $j ++) {
@@ -1117,13 +1124,13 @@ class epTestQueryRuntime extends epTestCase {
 if (!defined('EP_GROUP_TEST')) {
     $tm = microtime(true);
     $t = new epTestQueryRuntime;
-    if ( epIsWebRun() ) {
-        $t->run(new HtmlReporter());
+    if ( Base\epIsWebRun() ) {
+        $t->run(new \HtmlReporter());
     } else {
-        $t->run(new TextReporter());
+        $t->run(new \TextReporter());
     }
     $elapsed = microtime(true) - $tm;
-    echo epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
+    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
 }
 
 ?>

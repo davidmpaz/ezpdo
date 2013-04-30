@@ -2,14 +2,15 @@
 
 /**
  * $Id: epDbPdo.php 1030 2007-01-19 10:38:55Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1030 $ $Date: 2007-01-19 05:38:55 -0500 (Fri, 19 Jan 2007) $
  * @package ezpdo
  * @subpackage ezpdo.db
  */
+namespace ezpdo\db;
 
 /**
  * need epOverload
@@ -18,7 +19,7 @@ include_once(EP_SRC_DB.'/epDb.php');
 
 /**
  * Exception class for {@link epDbPdo}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1030 $ $Date: 2007-01-19 05:38:55 -0500 (Fri, 19 Jan 2007) $
  * @package ezpdo
@@ -28,22 +29,22 @@ class epExceptionDbPdo extends epExceptionDb {
 }
 
 /**
- * A wrapper class of PHP PDO 
+ * A wrapper class of PHP PDO
  * {@link http://us4.php.net/manual/en/ref.pdo.php}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1030 $ $Date: 2007-01-19 05:38:55 -0500 (Fri, 19 Jan 2007) $
  * @package ezpdo
  * @subpackage ezpdo.db
  */
 class epDbPdo extends epDb {
-    
+
     /**
      * The last record set
      * @var mixed
      */
     public $last_rs = false;
-    
+
     /**
      * The last row fetched in record set
      * @var record
@@ -59,19 +60,19 @@ class epDbPdo extends epDb {
     public function __construct($dsn) {
         parent::__construct($dsn);
     }
-    
+
     /**
      * Establishes a DB connection
      * @access public
      * @return bool
      */
     public function open() {
-        
+
         // check if connected already
         if ($this->db) {
             return true;
         }
-        
+
         // convert PEAR DSN into PDO DSN
         $dsn_pdo = $this->_convertDsn($this->dsn, $username, $password, $phptype);
 
@@ -80,13 +81,13 @@ class epDbPdo extends epDb {
 
         // connect db now
         try {
-            $this->db = new PDO($dsn_pdo, $username, $password);
-        } 
-        catch (Exception $e) {
+            $this->db = new \PDO($dsn_pdo, $username, $password);
+        }
+        catch (\Exception $e) {
             throw new epExceptionDbPdo('Cannot connect db [' . $dsn_pdo . ']: ' . $e->getMessage());
             return false;
         }
-        
+
         // double check if we have db connectcion
         if (!$this->db) {
             throw new epExceptionDbPdo('Cannot connect db [' . $dsn . ']');
@@ -94,8 +95,8 @@ class epDbPdo extends epDb {
         }
 
         // set column name case to upper
-        $this->db->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
-        
+        $this->db->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_UPPER);
+
         return true;
     }
 
@@ -105,18 +106,18 @@ class epDbPdo extends epDb {
      */
     public function close() {
     }
-    
+
     /**
      * Check if a table exists
      * @param string $table
      * @return bool
      */
     public function tableExists($table) {
-        
+
         if (!$table) {
             return false;
         }
-        
+
         // check cached
         if (isset($this->tables_exist[$table])) {
             return true;
@@ -126,27 +127,27 @@ class epDbPdo extends epDb {
         if (!$this->open()) {
             return false;
         }
-        
-        // check if table exists 
+
+        // check if table exists
         try {
-            
+
             // use a select stmt to test the existence of the table
             $sql = 'SELECT COUNT(*) FROM ' . $this->quoteId($table) . ' WHERE 1=1';
-            
+
             // prepare statement
             if (!($stmt = $this->db->prepare($sql))) {
                 return false;
             }
-            
+
             // execute statement
             if (!$stmt->execute()) {
                 return false;
             }
         }
-        catch (Exception $e) {
+        catch (\Exception $e) {
             return false;
         }
-        
+
         $this->tables_exist[$table] = $table;
         return true;
     }
@@ -156,8 +157,8 @@ class epDbPdo extends epDb {
      * @return bool
      */
     public function _beginTransaction() {
-        
-        // open connection if not already 
+
+        // open connection if not already
         if (!$this->open()) {
             return false;
         }
@@ -191,7 +192,7 @@ class epDbPdo extends epDb {
      * @return mixed
      */
     public function _execute($query) {
-        
+
         // check db connection
         if (!$this->open()) {
             return false;
@@ -205,7 +206,7 @@ class epDbPdo extends epDb {
      * Override {@link epDb::lastInsertId()}
      * Returns the last insert id
      * @param string table name (unquoted)
-     * @param string $oid the oid column 
+     * @param string $oid the oid column
      * @return integer
      * @access public
      */
@@ -226,7 +227,7 @@ class epDbPdo extends epDb {
         }
         return $this->last_rs->rowCount();
     }
-    
+
     /**
      * Rewinds to the first row in the last result
      * @return void
@@ -235,9 +236,9 @@ class epDbPdo extends epDb {
         if (!$this->last_rs) {
             return false;
         }
-        return $this->last_row = $this->last_rs->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT, 0);
+        return $this->last_row = $this->last_rs->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT, 0);
     }
-    
+
     /**
      * Moves to the next row in the last result set
      * @return bool
@@ -246,21 +247,21 @@ class epDbPdo extends epDb {
         if (!$this->last_rs) {
             return false;
         }
-        return $this->last_row = $this->last_rs->fetch(PDO::FETCH_ASSOC);
+        return $this->last_row = $this->last_rs->fetch(\PDO::FETCH_ASSOC);
     }
-    
+
     /**
      * Get the value for a column in the current row in the last result set
-     * @param string the name of the column 
+     * @param string the name of the column
      * @return false|mixed
      */
     public function rsGetCol($col, $col_alt = false) {
-        
+
         if (!$this->last_rs) {
             throw new epExceptionDbPdo('No last query result found');
             return false;
         }
-        
+
         // make columan capital (PDO::ATTR_CASE)
         $col = strtoupper($col);
 
@@ -268,15 +269,15 @@ class epDbPdo extends epDb {
         if (array_key_exists($col, $this->last_row)) {
             return $this->last_row[$col];
         }
-        
+
         // make columan capital (PDO::ATTR_CASE)
         $col_alt = strtoupper($col_alt);
-        
+
         // now try $col_alt
         if ($col_alt && array_key_exists($col_alt, $this->last_row)) {
             return $this->last_row[$col_alt];
         }
-        
+
         // last resort: partial match
         foreach($this->last_row as $col_ => $value) {
             $pieces = explode('.', $col_);
@@ -286,7 +287,7 @@ class epDbPdo extends epDb {
                 return $value;
             }
         }
-        
+
         // no matching column found
         throw new epExceptionDbPdo('Column [' . $col . '] not found');
         return false;
@@ -298,12 +299,12 @@ class epDbPdo extends epDb {
      * @return mixed
      */
     public function quote($s) {
-        // open connection if not already 
+        // open connection if not already
         if (!$this->open()) {
             return false;
         }
         return $this->db->quote($s);
-    } 
+    }
 
     /**
      * Convert the PEAR DSN into what PHP PDO can recognize
@@ -315,8 +316,8 @@ class epDbPdo extends epDb {
      * @throws epExceptionDbAdodbPdo
      */
     protected function _convertDsn($dsn, &$username, &$password, &$phptype) {
-        
-        // use epDbDsn to parse PEAR DSN 
+
+        // use epDbDsn to parse PEAR DSN
         include_once(EP_SRC_DB . '/epDbDsn.php');
         if (!($d = new epDbDsn($dsn))) {
             throw new epExceptionDbAdodbPdo('Error in converting PEAR DSN into PDO DSN');
@@ -326,10 +327,10 @@ class epDbPdo extends epDb {
         // set dbtype
         $phptype = $d['phptype'];
 
-        // convert PEAR DSN to PDO DSN 
+        // convert PEAR DSN to PDO DSN
         return $d->toPdoDsn($username, $password);
     }
-    
+
 }
 
 ?>

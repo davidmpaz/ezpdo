@@ -11,6 +11,19 @@
  * @subpackage ezpdo.tests.runtime
  * @since 1.1.6
  */
+namespace ezpdo\tests\runtime;
+
+use ezpdo\base as Base;
+use ezpdo\runtime\epManager;
+
+use ezpdo\db\epDb;
+use ezpdo\db\epDbUpdate;
+use ezpdo\db\epExceptionDbObject;
+
+use ezpdo\orm\epClassMap;
+use ezpdo\orm\epFieldMap;
+use ezpdo\orm\epFieldMapPrimitive;
+use ezpdo\orm\epFieldMapRelationship;
 
 /**
  * need epTestCase
@@ -44,7 +57,7 @@ class epTestUpdater extends epTestRuntime {
      * remove output dir in teardown
      */
     function tearDown() {
-        epRmDir(dirname(__FILE__) . '/output');
+        Base\epRmDir(dirname(__FILE__) . '/output');
         $this->u = null;
     }
 
@@ -273,25 +286,25 @@ protected function _assertPostgresUpdateSchema($queries){
      */
     function _allTests($dbal, $dbtype) {
 
-        echo "tests for $dbal/$dbtype started.. " . epNewLine();
+        echo "tests for $dbal/$dbtype started.. " . Base\epNewLine();
 
         echo "  setup..";
         $this->_setUp($dbal, $dbtype);
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  create updater..";
         $this->_testCreateUpdater();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  process class map..";
         $this->_testProcessClassMaps();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
         echo "  update schema..";
         $this->_testUpdateSchema();
-        echo "done " . epNewLine();
+        echo "done " . Base\epNewLine();
 
-        echo "  complete!" . epNewLine();
+        echo "  complete!" . Base\epNewLine();
     }
 
     /**
@@ -418,15 +431,15 @@ if (!defined('EP_GROUP_TEST')) {
     $tm = microtime(true);
 
     $t = new epTestUpdater();
-    if ( epIsWebRun() ) {
-        $t->run(new HtmlReporter());
+    if ( Base\epIsWebRun() ) {
+        $t->run(new \HtmlReporter());
     } else {
-        $t->run(new TextReporter());
+        $t->run(new \TextReporter());
     }
 
     $elapsed = microtime(true) - $tm;
 
-    echo epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . epNewLine();
+    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . Base\epNewLine();
 }
 
 ?>

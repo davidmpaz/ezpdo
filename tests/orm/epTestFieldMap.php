@@ -9,6 +9,11 @@
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.orm
  */
+namespace ezpdo\tests\orm;
+
+use ezpdo\base as Base;
+use ezpdo\tests\src\epTestCase;
+use ezpdo\orm\epFieldMapFactory;
 
 /**
  * need epTestCase
@@ -90,10 +95,10 @@ class epTestFieldMap extends epTestCase {
 
 if (!defined('EP_GROUP_TEST')) {
     $t = new epTestFieldMap();
-    if ( epIsWebRun() ) {
-        $t->run(new HtmlReporter());
+    if ( Base\epIsWebRun() ) {
+        $t->run(new \HtmlReporter());
     } else {
-        $t->run(new TextReporter());
+        $t->run(new \TextReporter());
     }
 }
 

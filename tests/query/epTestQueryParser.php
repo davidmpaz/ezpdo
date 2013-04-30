@@ -10,6 +10,11 @@
  * @package ezpdo.tests
  * @subpackage ezpdo.tests.query
  */
+namespace ezpdo\tests\query;
+
+use ezpdo\base as Base;
+use ezpdo\query\epQueryParser;
+use ezpdo\tests\src\epTestCase;
 
 /**
  * need epTestCase
@@ -31,17 +36,17 @@ include_once(EP_SRC_QUERY.'/epQueryParser.php');
  * @subpackage ezpdo.tests.query
  */
 class epTestQueryParser extends epTestCase {
-    
+
     /**
      * Check if node and expected match (ignore spaces)
      * @param sjNode $node
      * @param string $expect
      */
     function _match($node, $expect) {
-        
+
         // get result from node
         $result = $node->__invoke();
-        
+
         // remove \r and space
         $expect = str_replace(array("\n", "\r", ' '), '', $expect);
         $result = str_replace(array("\n", "\r", ' '), '', $result);
@@ -94,7 +99,7 @@ EPQ_N_SELECT []
 EXPECT;
         $this->assertTrue($this->_match($node, $expect));
     }
-    
+
     /**
      * test parsing from as
      */
@@ -831,13 +836,13 @@ EXPECT;
 if (!defined('EP_GROUP_TEST')) {
     $tm = microtime(true);
     $t = new epTestQueryParser;
-    if ( epIsWebRun() ) {
-        $t->run(new HtmlReporter());
+    if ( Base\epIsWebRun() ) {
+        $t->run(new \HtmlReporter());
     } else {
-        $t->run(new TextReporter());
+        $t->run(new \TextReporter());
     }
     $elapsed = microtime(true) - $tm;
-    echo epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
+    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
 }
 
 ?>

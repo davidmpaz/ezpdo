@@ -10,11 +10,22 @@
  * @package ezpdo
  * @subpackage ezpdo.runtime
  */
+namespace ezpdo\runtime;
+
+use ezpdo\db\epDb;
+use ezpdo\db\epDbObject;
+
+use ezpdo\base as Base;
+use ezpdo\base\epBase;
+use ezpdo\base\epException;
+
+use ezpdo\runtime\epObject;
 
 /**
  * Need {@link epBase} as the super class
  */
 include_once(EP_SRC_BASE.'/epBase.php');
+include_once(EP_SRC_BASE.'/epUtils.php');
 
 /**
  * Need {@link epDb}
@@ -129,7 +140,7 @@ class epTransaction extends epBase {
      */
     public function &getCommitedOjects(){
         //filter objects array
-        $commited = array_filter($this->objects, 'epFilterCommited');
+        $commited = array_filter($this->objects, "ezpdo\\base\\epFilterCommited");
         return $commited;
     }
 
@@ -205,7 +216,7 @@ class epTransaction extends epBase {
                 $status &= $db->commit();
             }
         }
-        catch (Exception $e) {
+        catch (\Exception $e) {
             $status = false;
         }
 
@@ -226,7 +237,7 @@ class epTransaction extends epBase {
                 $status &= $db->rollback();
             }
         }
-        catch (Exception $e) {
+        catch (\Exception $e) {
             $status = false;
         }
 

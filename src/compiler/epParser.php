@@ -10,6 +10,14 @@
  * @package ezpdo
  * @subpackage ezpdo.compiler
  */
+namespace ezpdo\compiler;
+
+use ezpdo\base\epLog;
+use ezpdo\base\epConfigurableWithLog;
+use ezpdo\base\epExceptionConfigurableWithLog;
+
+use ezpdo\orm\epFieldMapFactory;
+use ezpdo\orm\epClassMapFactory;
 
 /**
  * need epComment to parse DocBlocks
@@ -264,7 +272,8 @@ class epClassParser extends epConfigurableWithLog {
         //include_once('FSM.php');
         //$this->fsm = new FSM('PS_0', $this->fsm_payload);
         include_once(EP_LIBS_PEAR . '/FSM.php');
-        $this->fsm = new epLib_FSM('PS_0', $this->fsm_payload);
+        $this->fsm = new \epLib_FSM('PS_0', $this->fsm_payload);
+
         if (!$this->fsm) {
             throw new epExceptionParser('Internal error: cannot create FSM for parser');
             return false;

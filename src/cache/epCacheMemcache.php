@@ -2,22 +2,23 @@
 
 /**
  * $Id: epCacheMemcache.php 872 2006-03-22 14:05:54Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @author Trevan Richins <developer@ckiweb.com>
  * @version $Revision: 872 $ $Date: 2006-03-22 09:05:54 -0500 (Wed, 22 Mar 2006) $
  * @package ezpdo
  * @subpackage ezpdo.cache
  */
+namespace ezpdo\cache;
 
 // Needs epCache interface
 include_once(EP_SRC_CACHE . '/epCache.php');
 
 /**
  * Exception class for {@link epCacheMemcache}
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 872 $ $Date: 2006-03-22 09:05:54 -0500 (Wed, 22 Mar 2006) $
  * @package ezpdo
@@ -27,11 +28,11 @@ class epExceptionCacheMemcache extends epException {
 }
 
 /**
- * Class of memcache client 
- * 
+ * Class of memcache client
+ *
  * Implementation of the {@link epCache} interface so memcache
  * can be easily plugged into EZPDO
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 872 $ $Date: 2006-03-22 09:05:54 -0500 (Wed, 22 Mar 2006) $
  * @package ezpdo
@@ -45,7 +46,7 @@ class epCacheMemcache implements epCache {
      * @var Memcache
      */
     protected $con = false;
-    
+
     /**
      * Wether to compress value or not (uses zlib)
      * @var boolean
@@ -66,7 +67,7 @@ class epCacheMemcache implements epCache {
      * @param integer $ttl Time-to-live in seconds
      */
     public function __construct($server, $port, $compress = true, $ttl = 360) {
-        
+
         // check if Memcache exists
         if (!class_exists('Memcache')) {
             throw new epExceptionCacheMemcache(
@@ -110,13 +111,13 @@ class epCacheMemcache implements epCache {
     }
 
     /**
-     * Stores a variable into the cache with a key. 
-     * 
-     * A time-to-live (TTL) parameter (in seconds) can also be passed 
-     * so that the stored value will be removed from the cache if TTL 
-     * has expired. This is normally done on the next request but the 
-     * actual behavior may depend on the cache implementation. 
-     * 
+     * Stores a variable into the cache with a key.
+     *
+     * A time-to-live (TTL) parameter (in seconds) can also be passed
+     * so that the stored value will be removed from the cache if TTL
+     * has expired. This is normally done on the next request but the
+     * actual behavior may depend on the cache implementation.
+     *
      * @param string $key The key used to store the value
      * @param mixed $value The value (variable) to be cached
      * @param integer $ttl The time-to-live in seconds
