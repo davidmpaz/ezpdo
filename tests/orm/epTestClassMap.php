@@ -12,7 +12,7 @@
  */
 namespace ezpdo\tests\orm;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\tests\src\epTestCase;
 use ezpdo\orm\epClassMapFactory;
 
@@ -125,7 +125,7 @@ class epTestClassMap extends epTestCase {
 
 if (!defined('EP_GROUP_TEST')) {
     $t = new epTestClassMap;
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());

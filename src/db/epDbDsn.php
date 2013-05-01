@@ -12,7 +12,8 @@
  */
 namespace ezpdo\db;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
+use ezpdo\base\epException;
 use ezpdo\base\epBase as epBase;
 
 /**
@@ -28,7 +29,7 @@ include_once(EP_SRC_BASE.'/epBase.php');
  * @package ezpdo
  * @subpackage ezpdo.db
  */
-class epExceptionDbDsn extends Base\epException {
+class epExceptionDbDsn extends epException {
 }
 
 /**

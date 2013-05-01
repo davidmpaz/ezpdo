@@ -12,7 +12,7 @@
  */
 namespace ezpdo\base\parser;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epBase as epBase;
 
 /**#@+
@@ -25,12 +25,12 @@ include_once(EP_SRC_BASE.'/epUtils.php');
 /**#@+
  * Predefined tokens for the base lexer ({@link epLexer})
  */
-Base\epDefine('EPL_T_FLOAT');
-Base\epDefine('EPL_T_IDENTIFIER');
-Base\epDefine('EPL_T_INTEGER');
-Base\epDefine('EPL_T_NEWLINE');
-Base\epDefine('EPL_T_STRING');
-Base\epDefine('EPL_T_UNKNOWN');
+epUtils::epDefine('EPL_T_FLOAT');
+epUtils::epDefine('EPL_T_IDENTIFIER');
+epUtils::epDefine('EPL_T_INTEGER');
+epUtils::epDefine('EPL_T_NEWLINE');
+epUtils::epDefine('EPL_T_STRING');
+epUtils::epDefine('EPL_T_UNKNOWN');
 /**#@-*/
 
 /**

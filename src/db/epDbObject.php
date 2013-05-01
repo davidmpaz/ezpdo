@@ -14,7 +14,7 @@
  */
 namespace ezpdo\db;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epFactory;
 use ezpdo\base\epSingleton;
 use ezpdo\base\epException;
@@ -1099,8 +1099,8 @@ class epDbObject {
 
             // get values from a and b
             $path = $orderby['path'];
-            $va = Base\epArrayGet($a, $path);
-            $vb = Base\epArrayGet($b, $path);
+            $va = epUtils::epArrayGet($a, $path);
+            $vb = epUtils::epArrayGet($b, $path);
 
             // boolean or numeric
             if (is_bool($va) || is_numeric($va)) {

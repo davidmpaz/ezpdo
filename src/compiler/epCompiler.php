@@ -13,7 +13,7 @@
 namespace ezpdo\compiler;
 
 use ezpdo\base\epLog;
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epException;
 use ezpdo\base\epConfigurableWithLog;
 
@@ -298,7 +298,7 @@ class epClassCompiler extends epConfigurableWithLog {
             }
 
             // collect all files in dir
-            $files_in_dir = Base\epFilesInDir($input_dir, $recursive, true); // true: absolute path
+            $files_in_dir = epUtils::epFilesInDir($input_dir, $recursive, true); // true: absolute path
             if ($files_in_dir) {
                 $input_files = array_merge($input_files, $files_in_dir);
             }
@@ -439,7 +439,7 @@ class epClassCompiler extends epConfigurableWithLog {
 
         // check if output dir exists
         if (!file_exists($compiled_dir)) {
-            if (!Base\epMkDir($compiled_dir, 0700)) {
+            if (!epUtils::epMkDir($compiled_dir, 0700)) {
                 throw new epExceptionCompiler('Cannot create output directory [' . $compiled_dir . ']');
                 return false;
             }

@@ -14,7 +14,7 @@ namespace ezpdo\query;
 
 use ezpdo\runtime\epObject;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epBase as epBase;
 use ezpdo\base\parser\epParser as epParser;
 
@@ -28,37 +28,37 @@ include_once(EP_SRC_QUERY.'/epQueryLexer.php');
 /**#@+
  * Types of EZOQL syntax nodes
  */
-Base\epDefine('EPQ_N_AGGREGATE');
-Base\epDefine('EPQ_N_BOOLEAN');
-Base\epDefine('EPQ_N_EXPR_ADD');
-Base\epDefine('EPQ_N_EXPR_BETWEEN');
-Base\epDefine('EPQ_N_EXPR_COMPARISON');
-Base\epDefine('EPQ_N_EXPR_IS');
-Base\epDefine('EPQ_N_EXPR_LIKE');
-Base\epDefine('EPQ_N_EXPR_LOGIC');
-Base\epDefine('EPQ_N_EXPR_MUL');
-Base\epDefine('EPQ_N_EXPR_NOT');
-Base\epDefine('EPQ_N_EXPR_PAREN');
-Base\epDefine('EPQ_N_EXPR_UNARY');
-Base\epDefine('EPQ_N_FUNC_SOUNDEX');
-Base\epDefine('EPQ_N_FUNC_STRCMP');
-Base\epDefine('EPQ_N_CONTAINS');
-Base\epDefine('EPQ_N_FROM');
-Base\epDefine('EPQ_N_FROM_ITEM');
-Base\epDefine('EPQ_N_IDENTIFIER');
-Base\epDefine('EPQ_N_IN');
-Base\epDefine('EPQ_N_IN_ITEMS');
-Base\epDefine('EPQ_N_LIMIT');
-Base\epDefine('EPQ_N_NUMBER');
-Base\epDefine('EPQ_N_ORDERBY');
-Base\epDefine('EPQ_N_ORDERBY_ITEM');
-Base\epDefine('EPQ_N_PATTERN');
-Base\epDefine('EPQ_N_PLACEHOLDER');
-Base\epDefine('EPQ_N_SELECT');
-Base\epDefine('EPQ_N_STRING');
-Base\epDefine('EPQ_N_UNKNOWN');
-Base\epDefine('EPQ_N_VARIABLE');
-Base\epDefine('EPQ_N_WHERE');
+epUtils::epDefine('EPQ_N_AGGREGATE');
+epUtils::epDefine('EPQ_N_BOOLEAN');
+epUtils::epDefine('EPQ_N_EXPR_ADD');
+epUtils::epDefine('EPQ_N_EXPR_BETWEEN');
+epUtils::epDefine('EPQ_N_EXPR_COMPARISON');
+epUtils::epDefine('EPQ_N_EXPR_IS');
+epUtils::epDefine('EPQ_N_EXPR_LIKE');
+epUtils::epDefine('EPQ_N_EXPR_LOGIC');
+epUtils::epDefine('EPQ_N_EXPR_MUL');
+epUtils::epDefine('EPQ_N_EXPR_NOT');
+epUtils::epDefine('EPQ_N_EXPR_PAREN');
+epUtils::epDefine('EPQ_N_EXPR_UNARY');
+epUtils::epDefine('EPQ_N_FUNC_SOUNDEX');
+epUtils::epDefine('EPQ_N_FUNC_STRCMP');
+epUtils::epDefine('EPQ_N_CONTAINS');
+epUtils::epDefine('EPQ_N_FROM');
+epUtils::epDefine('EPQ_N_FROM_ITEM');
+epUtils::epDefine('EPQ_N_IDENTIFIER');
+epUtils::epDefine('EPQ_N_IN');
+epUtils::epDefine('EPQ_N_IN_ITEMS');
+epUtils::epDefine('EPQ_N_LIMIT');
+epUtils::epDefine('EPQ_N_NUMBER');
+epUtils::epDefine('EPQ_N_ORDERBY');
+epUtils::epDefine('EPQ_N_ORDERBY_ITEM');
+epUtils::epDefine('EPQ_N_PATTERN');
+epUtils::epDefine('EPQ_N_PLACEHOLDER');
+epUtils::epDefine('EPQ_N_SELECT');
+epUtils::epDefine('EPQ_N_STRING');
+epUtils::epDefine('EPQ_N_UNKNOWN');
+epUtils::epDefine('EPQ_N_VARIABLE');
+epUtils::epDefine('EPQ_N_WHERE');
 /**#@-*/
 
 /**

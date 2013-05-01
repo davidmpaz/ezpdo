@@ -13,7 +13,7 @@
 namespace ezpdo\tests\base\log;
 
 use ezpdo\base\epLog;
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epConfig;
 use ezpdo\tests\src\epTestCase;
 
@@ -46,15 +46,15 @@ class epTestLog extends epTestCase {
      * Setup output dir
      */
     public function setUp() {
-        Base\epRmDir('output');
-        Base\epMkDir('output');
+        epUtils::epRmDir('output');
+        epUtils::epMkDir('output');
     }
 
     /**
      * Teardown: remove output dir and its content
      */
     public function tearDown() {
-        Base\epRmDir('output');
+        epUtils::epRmDir('output');
     }
 
     /**
@@ -110,7 +110,7 @@ class epTestLog extends epTestCase {
 
 if (!defined('EP_GROUP_TEST')) {
     $t = new epTestLog;
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());

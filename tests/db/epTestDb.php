@@ -12,7 +12,7 @@
  */
 namespace ezpdo\tests\db;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epConfig;
 use ezpdo\tests\src\epTestCase;
 
@@ -157,7 +157,7 @@ class epTestDb extends epTestCase {
         $db = new epDbAdodb($dsn);
         $this->assertTrue(!is_null($db));
         $this->_testMysql($db);
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
     }
 
     /**
@@ -171,7 +171,7 @@ class epTestDb extends epTestCase {
         }
 
         // skip test if no PEAR DB installed
-        if (!Base\epFileExistsIncPath('DB.php')) {
+        if (!epUtils::epFileExistsIncPath('DB.php')) {
             return;
         }
 
@@ -181,7 +181,7 @@ class epTestDb extends epTestCase {
         $db = new epDbPeardb($dsn);
         $this->assertTrue(!is_null($db));
         $this->_testMysql($db);
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
     }
 
     /**
@@ -381,13 +381,13 @@ class epTestDb extends epTestCase {
         $this->assertTrue($dsn = $this->_getDsn('sqlite_adodb'));
         $this->assertTrue($db = new epDbAdodb($dsn));
         $this->_testSqlite($db);
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "test adodb sqlite v3..";
         $this->assertTrue($dsn = $this->_getDsn('sqlite3_adodb'));
         $this->assertTrue($db = new epDbAdodb($dsn));
         $this->_testSqlite3($db);
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
     }
 
     /**
@@ -401,7 +401,7 @@ class epTestDb extends epTestCase {
         }
 
         // skip test if no PEAR DB installed
-        if (!Base\epFileExistsIncPath('DB.php')) {
+        if (!epUtils::epFileExistsIncPath('DB.php')) {
             return;
         }
 
@@ -410,7 +410,7 @@ class epTestDb extends epTestCase {
         $this->assertTrue($dsn = $this->_getDsn('sqlite_peardb'));
         $this->assertTrue($db = new epDbPeardb($dsn));
         $this->_testSqlite($db);
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         // peardb doesnt seems to support sqlite3, looking forward to MDB2
     }
@@ -419,7 +419,7 @@ class epTestDb extends epTestCase {
 
 if (!defined('EP_GROUP_TEST')) {
     $t = new epTestDb;
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());

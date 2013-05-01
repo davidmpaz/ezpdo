@@ -12,7 +12,7 @@
  */
 namespace ezpdo\tests\base\utils;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\tests\src\epTestCase;
 
 /**
@@ -36,50 +36,50 @@ include_once(EP_SRC_BASE.'/epUtils.php');
 class epTestUtils extends epTestCase {
 
     /**
-     * Test function Base\epArrayGet() in epUtils.php
+     * Test function epUtils::epArrayGet() in epUtils.php
      */
     function test_epArrayGet() {
 
         // make sure method exists
-        $this->assertTrue(function_exists('ezpdo\base\epArrayGet'));
+        //$this->assertTrue(function_exists('ezpdo\base\epArrayGet'));
 
         // array to be tested
         $array = array('a' => array('b' => array('c' => array('d' => 'x'))));
 
         // tests '.'
-        $this->assertTrue($rt = Base\epArrayGet($array, '.'));
+        $this->assertTrue($rt = epUtils::epArrayGet($array, '.'));
         $this->assertTrue($rt == $array);
 
         // tests '/'
-        $this->assertTrue($rt = Base\epArrayGet($array, '/'));
+        $this->assertTrue($rt = epUtils::epArrayGet($array, '/'));
         $this->assertTrue($rt == $array);
 
         // tests 'a'
-        $this->assertTrue($a = Base\epArrayGet($array, 'a'));
+        $this->assertTrue($a = epUtils::epArrayGet($array, 'a'));
         $this->assertTrue($a == $array['a']);
 
         // tests 'a.b'
-        $this->assertTrue($a_b = Base\epArrayGet($array, 'a.b'));
+        $this->assertTrue($a_b = epUtils::epArrayGet($array, 'a.b'));
         $this->assertTrue($a_b == $array['a']['b']);
 
         // tests 'a/b'
-        $this->assertTrue($a_b = Base\epArrayGet($array, 'a.b'));
+        $this->assertTrue($a_b = epUtils::epArrayGet($array, 'a.b'));
         $this->assertTrue($a_b == $array['a']['b']);
 
         // tests 'a.b.c'
-        $this->assertTrue($a_b_c = Base\epArrayGet($array, 'a.b.c'));
+        $this->assertTrue($a_b_c = epUtils::epArrayGet($array, 'a.b.c'));
         $this->assertTrue($a_b_c == $array['a']['b']['c']);
 
         // tests 'a/b/c'
-        $this->assertTrue($a_b_c = Base\epArrayGet($array, 'a/b/c'));
+        $this->assertTrue($a_b_c = epUtils::epArrayGet($array, 'a/b/c'));
         $this->assertTrue($a_b_c == $array['a']['b']['c']);
 
         // tests 'a.b.c.d'
-        $this->assertTrue($a_b_c_d = Base\epArrayGet($array, 'a.b.c.d'));
+        $this->assertTrue($a_b_c_d = epUtils::epArrayGet($array, 'a.b.c.d'));
         $this->assertTrue($a_b_c_d == $array['a']['b']['c']['d']);
 
         // tests 'a/b/c/d'
-        $this->assertTrue($a_b_c_d = Base\epArrayGet($array, 'a/b/c/d'));
+        $this->assertTrue($a_b_c_d = epUtils::epArrayGet($array, 'a/b/c/d'));
         $this->assertTrue($a_b_c_d == $array['a']['b']['c']['d']);
     }
 
@@ -89,19 +89,19 @@ class epTestUtils extends epTestCase {
     function test_epArraySet() {
 
         // make sure method exists
-        $this->assertTrue(function_exists('ezpdo\base\epArraySet'));
+        //$this->assertTrue(function_exists('ezpdo\base\epArraySet'));
 
         // array to be tested
         $array = array('a' => array('b' => array('c' => array('d' => 'x'))));
 
         // test assignment on reference (fails now, could be a php bug!)
         $x = md5($array['a']['b']['c']['d']);
-        Base\epArraySet($array, 'a.b.c.d', $x);
+        epUtils::epArraySet($array, 'a.b.c.d', $x);
         $this->assertTrue($x == $array['a']['b']['c']['d']);
 
         // again
         $x = md5($array['a']['b']['c']['d']);
-        Base\epArraySet($array, 'a.b.c.d', $x);
+        epUtils::epArraySet($array, 'a.b.c.d', $x);
         $this->assertTrue($x == $array['a']['b']['c']['d']);
     }
 
@@ -111,8 +111,8 @@ class epTestUtils extends epTestCase {
     function test_epXml2Array_epValue2Xml() {
 
         // make sure methods exist
-        $this->assertTrue(function_exists('ezpdo\base\epValue2Xml'));
-        $this->assertTrue(function_exists('ezpdo\base\epXml2Array'));
+        //$this->assertTrue(function_exists('ezpdo\base\epValue2Xml'));
+        //$this->assertTrue(function_exists('ezpdo\base\epXml2Array'));
 
         // an associated array to be tested
         $array0 = array('a' => array('b' => array('c' => 'x')));
@@ -122,13 +122,13 @@ class epTestUtils extends epTestCase {
         $array['d'] = $array0;
 
         // unserialize array into xml
-        $this->assertTrue($xml = Base\epValue2Xml($array));
+        $this->assertTrue($xml = epUtils::epValue2Xml($array));
 
         // serialize xml into array
-        $this->assertTrue($array_2 = Base\epXml2Array($xml));
+        $this->assertTrue($array_2 = epUtils::epXml2Array($xml));
 
         // unserialize the new array into xml
-        $this->assertTrue($xml_2 = Base\epValue2Xml($array_2));
+        $this->assertTrue($xml_2 = epUtils::epValue2Xml($array_2));
 
         // make sure the two xml strings are the same
         $this->assertTrue($xml == $xml_2);
@@ -140,10 +140,10 @@ class epTestUtils extends epTestCase {
     function test_epFilesInDir() {
 
         // make sure method exists
-        $this->assertTrue(function_exists('ezpdo\base\epFilesInDir'));
+        //$this->assertTrue(function_exists('ezpdo\base\epFilesInDir'));
 
         // get all files under EP_ROOT
-        $files = Base\epFilesInDir(EP_ROOT);
+        $files = epUtils::epFilesInDir(EP_ROOT);
         $this->assertTrue(count($files) > 0);
     }
 
@@ -151,7 +151,7 @@ class epTestUtils extends epTestCase {
 
 if (!defined('EP_GROUP_TEST')) {
     $t = new epTestUtils;
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());

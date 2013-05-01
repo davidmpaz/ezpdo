@@ -12,6 +12,8 @@
  */
 namespace ezpdo\base;
 
+use ezpdo\base\epUtils;
+
 /**#@+
  * need epBase and epUtils
  */
@@ -194,7 +196,7 @@ class epConfig {
                 if (!empty($options)) {
                     // set loaded array
                     include_once(EP_SRC_BASE.'/epUtils.php');
-                    $this->options = epArrayStr2Bool($options);
+                    $this->options = epUtils::epArrayStr2Bool($options);
                     $this->setSource($cfg_file);
                 }
             }
@@ -233,7 +235,7 @@ class epConfig {
     public function get($name, $ret_wrapper = false) {
 
         // get option value
-        $value = epArrayGet($this->options, $name);
+        $value = epUtils::epArrayGet($this->options, $name);
 
         // return if non-array value or no epConfig wrapper required
         if (!is_array($value) || !$ret_wrapper) {
@@ -275,7 +277,7 @@ class epConfig {
         }
 
         // set name->value in array
-        if (!($this->options = epArraySet($this->options, $name, $value))) {
+        if (!($this->options = epUtils::epArraySet($this->options, $name, $value))) {
             return false;
         }
 
@@ -337,7 +339,7 @@ class epConfig {
         }
 
         // merge options
-        $this->options = epArrayMergeRecursive($this->options, epArrayStr2Bool($options));
+        $this->options = epUtils::epArrayMergeRecursive($this->options, epUtils::epArrayStr2Bool($options));
 
         // set source file
         $this->setSource($source);
@@ -369,7 +371,7 @@ class epConfig {
         }
 
         // load xml config file
-        switch(epFileExtension($cfg_file)) {
+        switch(epUtils::epFileExtension($cfg_file)) {
             case 'xml':
                 if (false === ($options = epConfig::_loadXml($cfg_file))) {
                     return false;
@@ -414,7 +416,7 @@ class epConfig {
         }
 
         // unserialize xml config using SimpleXml
-        if (false === ($options = epXml2Array($cfg_file))) {
+        if (false === ($options = epUtils::epXml2Array($cfg_file))) {
             throw new epExceptionConfig('Parsing config file failed');
             return self::$false;
         }
@@ -466,7 +468,7 @@ class epConfig {
      */
     public function store($cfg_file = DEF_CONFIG_FILE) {
 
-        if (!$data = epValue2Xml($this->options())) {
+        if (!$data = epUtils::epValue2Xml($this->options())) {
             throw new epExceptionConfig("Cannot unserialize options into XML");
             return false;
         }

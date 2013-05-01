@@ -12,7 +12,7 @@
  */
 namespace ezpdo\compiler;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\orm\epFieldMap;
 use ezpdo\base\parser\epLexer as epLexer;
 use ezpdo\base\parser\epParser as epParser;
@@ -353,15 +353,15 @@ include_once(EP_SRC_BASE_PARSER.'/epParser.php');
 /**#@+
  * Predefined tokens for the base lexer ({@link epLexer})
  */
-Base\epDefine('EPL_T_HAS');
-Base\epDefine('EPL_T_COMPOSED_OF');
-Base\epDefine('EPL_T_DATA_TYPE');
-Base\epDefine('EPL_T_OID');
-Base\epDefine('EPL_T_ONE');
-Base\epDefine('EPL_T_MANY');
-Base\epDefine('EPL_T_INDEX');
-Base\epDefine('EPL_T_INVERSE');
-Base\epDefine('EPL_T_UNIQUE');
+epUtils::epDefine('EPL_T_HAS');
+epUtils::epDefine('EPL_T_COMPOSED_OF');
+epUtils::epDefine('EPL_T_DATA_TYPE');
+epUtils::epDefine('EPL_T_OID');
+epUtils::epDefine('EPL_T_ONE');
+epUtils::epDefine('EPL_T_MANY');
+epUtils::epDefine('EPL_T_INDEX');
+epUtils::epDefine('EPL_T_INVERSE');
+epUtils::epDefine('EPL_T_UNIQUE');
 /**#@-*/
 
 /**

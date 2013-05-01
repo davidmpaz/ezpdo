@@ -12,7 +12,7 @@
  */
 namespace ezpdo\tests\base\config;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epConfig;
 use ezpdo\base\epConfigurable;
 use ezpdo\tests\src\epTestCase;
@@ -458,7 +458,7 @@ class epTestConfig extends epTestCase {
 
 if (!defined('EP_GROUP_TEST')) {
     $t = new epTestConfig;
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());

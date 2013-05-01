@@ -12,6 +12,8 @@
  */
 namespace ezpdo\base;
 
+use ezpdo\base\epUtils;
+
 /**
  * need epConfigurable, epUtils
  */
@@ -139,7 +141,7 @@ class epLog extends epConfigurable implements epSingleton {
         }
 
         // config the console hander (only on CLI)
-        if (epIsCliRun()) {
+        if (epUtils::epIsCliRun()) {
             if ($this->getConfigOption('log_console')) {
                 $this->console_handler = &\epLib_Log::singleton('console', '', 'ident', array('stream' => STDOUT));
                 if (!$this->console_handler) {

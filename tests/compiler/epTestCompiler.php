@@ -14,7 +14,7 @@ namespace ezpdo\tests\compiler;
 
 use ezpdo\tests\src\epTestCase;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epConfig;
 use ezpdo\orm\epClassMapFactory;
 use ezpdo\compiler\epClassCompiler;
@@ -70,7 +70,7 @@ class epTestCompiler extends epTestCase {
      * Erase output dir during teardown
      */
     function tearDown() {
-        Base\epRmDir(dirname(__FILE__) . '/output');
+        epUtils::epRmDir(dirname(__FILE__) . '/output');
     }
 
     /**
@@ -185,11 +185,11 @@ class epTestCompiler extends epTestCase {
         $cms = $cmf->allMade();
         ksort($cms);
         foreach($cms as $cm) {
-            $s .= 'class: ' . $cm->getName() . Base\epNewLine();
+            $s .= 'class: ' . $cm->getName() . epUtils::epNewLine();
             $fms = $cm->getAllFields();
             ksort($fms);
             foreach($fms as $fm) {
-                $s .= '  field: ' . $fm->getName() . Base\epNewLine();
+                $s .= '  field: ' . $fm->getName() . epUtils::epNewLine();
             }
         }
         return $s;
@@ -198,7 +198,7 @@ class epTestCompiler extends epTestCase {
 
 if (!defined('EP_GROUP_TEST')) {
     $t = new epTestCompiler;
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());

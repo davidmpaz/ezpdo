@@ -13,7 +13,7 @@
  */
 namespace ezpdo\tests\runtime;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\runtime\epManager;
 
 use ezpdo\db\epDb;
@@ -57,7 +57,7 @@ class epTestUpdater extends epTestRuntime {
      * remove output dir in teardown
      */
     function tearDown() {
-        Base\epRmDir(dirname(__FILE__) . '/output');
+        epUtils::epRmDir(dirname(__FILE__) . '/output');
         $this->u = null;
     }
 
@@ -286,25 +286,25 @@ protected function _assertPostgresUpdateSchema($queries){
      */
     function _allTests($dbal, $dbtype) {
 
-        echo "tests for $dbal/$dbtype started.. " . Base\epNewLine();
+        echo "tests for $dbal/$dbtype started.. " . epUtils::epNewLine();
 
         echo "  setup..";
         $this->_setUp($dbal, $dbtype);
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  create updater..";
         $this->_testCreateUpdater();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  process class map..";
         $this->_testProcessClassMaps();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  update schema..";
         $this->_testUpdateSchema();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
-        echo "  complete!" . Base\epNewLine();
+        echo "  complete!" . epUtils::epNewLine();
     }
 
     /**
@@ -431,7 +431,7 @@ if (!defined('EP_GROUP_TEST')) {
     $tm = microtime(true);
 
     $t = new epTestUpdater();
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());
@@ -439,7 +439,7 @@ if (!defined('EP_GROUP_TEST')) {
 
     $elapsed = microtime(true) - $tm;
 
-    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . Base\epNewLine();
+    echo epUtils::epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . epUtils::epNewLine();
 }
 
 ?>

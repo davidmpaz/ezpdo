@@ -12,7 +12,7 @@
  */
 namespace ezpdo\tests\cache;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 
 /**
  * need epTestCase
@@ -243,7 +243,7 @@ class epTestCache extends epTestCase {
 
 if (!defined('EP_GROUP_TEST')) {
     $t = new epTestCache;
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());

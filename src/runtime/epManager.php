@@ -12,7 +12,7 @@
  */
 namespace ezpdo\runtime;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epSingleton;
 use ezpdo\base\epConfigurableWithLog;
 use ezpdo\base\epExceptionConfigurableWithLog;
@@ -777,7 +777,7 @@ class epManagerBase extends epConfigurableWithLog {
         // in case the argument is not object, create it
         if (!$o) {
             // make a new instance
-            if (!($o = & Base\epNewObject($class, $args))) {
+            if (!($o = & epUtils::epNewObject($class, $args))) {
                 // throw if failed to create an object
                 throw new epExceptionManagerBase('Cannot create object for class [' . $class . ']');
                 return self::$null;
@@ -1911,7 +1911,7 @@ class epManagerBase extends epConfigurableWithLog {
         // bug #217 non transactional mysql need to delete objects by hand
         if(! $status){
             // if not rolled back in db, get already commited objects
-            $commited = &$this->t->getCommitedOjects();
+            $commited = &$this->t->getCommitedObjects();
             /*
              *  last chance to rollback, at least delete commited objects
              *  TODO optimize this operation, maybe deleteAll needs support
@@ -2203,7 +2203,7 @@ class epManagerBase extends epConfigurableWithLog {
             // check if method exists in object
             if ($obj_or_class->epMethodExists($event)) {
                 // static method
-                if (Base\epIsMethodStatic($class, $event)) {
+                if (epUtils::epIsMethodStatic($class, $event)) {
                     //$class::$event($params);
                     call_user_func_array(array($class, $event), $params);
                 }
@@ -2216,7 +2216,7 @@ class epManagerBase extends epConfigurableWithLog {
         // or if involved is a class
         else {
             // only static method can be called for a class event
-            if (Base\epIsMethodStatic($class, $event)) {
+            if (epUtils::epIsMethodStatic($class, $event)) {
                 //$class::$event($params);
                 call_user_func_array(array($class, $event), $params);
             }
@@ -2405,7 +2405,7 @@ class epManager extends epManagerBase implements epSingleton {
         // append overall table prefix
         $this->rel_tbl_prefix = $this->getConfigOption('relation_table');
         if ($prefix = $this->getConfigOption('table_prefix')) {
-            $this->rel_tbl_prefix = Base\epUnquote($prefix) . $this->rel_tbl_prefix;
+            $this->rel_tbl_prefix = epUtils::epUnquote($prefix) . $this->rel_tbl_prefix;
         }
 
         // set relation table name

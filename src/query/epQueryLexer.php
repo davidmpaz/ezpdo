@@ -12,7 +12,7 @@
  */
 namespace ezpdo\query;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\parser\epLexer as epLexer;
 use ezpdo\base\parser\epParser as epParser;
 use ezpdo\base\parser\epLexerError as epLexerError;
@@ -26,44 +26,44 @@ include_once(EP_SRC_BASE_PARSER.'/epLexer.php');
 /**#@+
  * EZOQL tokens
  */
-Base\epDefine('EPQ_T_AND');
-Base\epDefine('EPQ_T_AS');
-Base\epDefine('EPQ_T_ASC');
-Base\epDefine('EPQ_T_AVG');
-Base\epDefine('EPQ_T_BETWEEN');
-Base\epDefine('EPQ_T_BY');
-Base\epDefine('EPQ_T_CONTAINS');
-Base\epDefine('EPQ_T_COUNT');
-Base\epDefine('EPQ_T_DESC');
-Base\epDefine('EPQ_T_EQUAL');
-Base\epDefine('EPQ_T_FALSE');
-Base\epDefine('EPQ_T_FLOAT');
-Base\epDefine('EPQ_T_FROM');
-Base\epDefine('EPQ_T_IDENTIFIER');
-Base\epDefine('EPQ_T_IN');
-Base\epDefine('EPQ_T_INTEGER');
-Base\epDefine('EPQ_T_IS');
-Base\epDefine('EPQ_T_GE');
-Base\epDefine('EPQ_T_LE');
-Base\epDefine('EPQ_T_LIKE');
-Base\epDefine('EPQ_T_LIMIT');
-Base\epDefine('EPQ_T_MAX');
-Base\epDefine('EPQ_T_MIN');
-Base\epDefine('EPQ_T_NEQUAL');
-Base\epDefine('EPQ_T_NEWLINE');
-Base\epDefine('EPQ_T_NOT');
-Base\epDefine('EPQ_T_NULL');
-Base\epDefine('EPQ_T_OR');
-Base\epDefine('EPQ_T_ORDER');
-Base\epDefine('EPQ_T_RANDOM');
-Base\epDefine('EPQ_T_SELECT');
-Base\epDefine('EPQ_T_SOUNDEX');
-Base\epDefine('EPQ_T_STRCMP');
-Base\epDefine('EPQ_T_STRING');
-Base\epDefine('EPQ_T_SUM');
-Base\epDefine('EPQ_T_TRUE');
-Base\epDefine('EPQ_T_WHERE');
-Base\epDefine('EPQ_T_UNKNOWN');
+epUtils::epDefine('EPQ_T_AND');
+epUtils::epDefine('EPQ_T_AS');
+epUtils::epDefine('EPQ_T_ASC');
+epUtils::epDefine('EPQ_T_AVG');
+epUtils::epDefine('EPQ_T_BETWEEN');
+epUtils::epDefine('EPQ_T_BY');
+epUtils::epDefine('EPQ_T_CONTAINS');
+epUtils::epDefine('EPQ_T_COUNT');
+epUtils::epDefine('EPQ_T_DESC');
+epUtils::epDefine('EPQ_T_EQUAL');
+epUtils::epDefine('EPQ_T_FALSE');
+epUtils::epDefine('EPQ_T_FLOAT');
+epUtils::epDefine('EPQ_T_FROM');
+epUtils::epDefine('EPQ_T_IDENTIFIER');
+epUtils::epDefine('EPQ_T_IN');
+epUtils::epDefine('EPQ_T_INTEGER');
+epUtils::epDefine('EPQ_T_IS');
+epUtils::epDefine('EPQ_T_GE');
+epUtils::epDefine('EPQ_T_LE');
+epUtils::epDefine('EPQ_T_LIKE');
+epUtils::epDefine('EPQ_T_LIMIT');
+epUtils::epDefine('EPQ_T_MAX');
+epUtils::epDefine('EPQ_T_MIN');
+epUtils::epDefine('EPQ_T_NEQUAL');
+epUtils::epDefine('EPQ_T_NEWLINE');
+epUtils::epDefine('EPQ_T_NOT');
+epUtils::epDefine('EPQ_T_NULL');
+epUtils::epDefine('EPQ_T_OR');
+epUtils::epDefine('EPQ_T_ORDER');
+epUtils::epDefine('EPQ_T_RANDOM');
+epUtils::epDefine('EPQ_T_SELECT');
+epUtils::epDefine('EPQ_T_SOUNDEX');
+epUtils::epDefine('EPQ_T_STRCMP');
+epUtils::epDefine('EPQ_T_STRING');
+epUtils::epDefine('EPQ_T_SUM');
+epUtils::epDefine('EPQ_T_TRUE');
+epUtils::epDefine('EPQ_T_WHERE');
+epUtils::epDefine('EPQ_T_UNKNOWN');
 /**#@-*/
 
 /**

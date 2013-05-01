@@ -12,7 +12,7 @@
  */
 namespace ezpdo\runtime;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epOverload;
 use ezpdo\base\epException;
 
@@ -853,8 +853,8 @@ class epArray implements \IteratorAggregate, \ArrayAccess, \Countable {
 
             // get values from a and b
             $path = $orderby['path'];
-            $va = Base\epArrayGet($a, $path);
-            $vb = Base\epArrayGet($b, $path);
+            $va = epUtils::epArrayGet($a, $path);
+            $vb = epUtils::epArrayGet($b, $path);
 
             // numeric
             if (is_numeric($va)) {

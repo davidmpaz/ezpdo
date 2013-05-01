@@ -12,7 +12,7 @@
  */
 namespace ezpdo\tests\query;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\db\epDbFactory;
 use ezpdo\runtime\epManager;
 use ezpdo\tests\src\epTestCase;
@@ -295,7 +295,7 @@ class epTestQueryRuntime extends epTestCase {
         $m->deleteAll('eptContact');
         if(file_exists($f = dirname(__FILE__).'/ezpdo.log')) unlink($f);
         if(file_exists($f = 'books.db')) unlink($f);
-        Base\epRmDir(dirname(__FILE__).'/compiled');
+        epUtils::epRmDir(dirname(__FILE__).'/compiled');
         return true;
     }
 
@@ -306,11 +306,11 @@ class epTestQueryRuntime extends epTestCase {
      */
     function _runTests($dbal, $dbtype) {
 
-        echo "EZOQL tests for $dbal/$dbtype started.. " . Base\epNewLine();
+        echo "EZOQL tests for $dbal/$dbtype started.. " . epUtils::epNewLine();
 
         echo "  setting up..";
         $this->_start($dbal, $dbtype);
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         if ($methods = get_class_methods(__CLASS__)) {
             // go through each _testXXX methods
@@ -324,15 +324,15 @@ class epTestQueryRuntime extends epTestCase {
                 // run the test
                 echo "  $method..";
                 $this->assertTrue($this->$method());
-                echo "done " . Base\epNewLine();
+                echo "done " . epUtils::epNewLine();
             }
         }
 
         echo "  tearing down.. ";
         $this->_end();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
-        echo "  complete!" . Base\epNewLine();
+        echo "  complete!" . epUtils::epNewLine();
     }
 
     /**
@@ -1124,13 +1124,13 @@ class epTestQueryRuntime extends epTestCase {
 if (!defined('EP_GROUP_TEST')) {
     $tm = microtime(true);
     $t = new epTestQueryRuntime;
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());
     }
     $elapsed = microtime(true) - $tm;
-    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
+    echo epUtils::epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
 }
 
 ?>

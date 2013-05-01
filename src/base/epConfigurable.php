@@ -153,7 +153,7 @@ abstract class epConfigurable extends epBase {
         }
 
         // check if path is absolute
-        if (epIsAbsPath($path)) {
+        if (epUtils::epIsAbsPath($path)) {
             return $path;
         }
 

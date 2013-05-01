@@ -12,7 +12,7 @@
  */
 namespace ezpdo\db;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epException;
 
 /**
@@ -423,7 +423,7 @@ abstract class epDb {
      * @return mixed
      */
     public function quoteBlob($input) {
-        return $this->quote(Base\epStr2Hex($input));
+        return $this->quote(epUtils::epStr2Hex($input));
     }
 
     /**
@@ -436,7 +436,7 @@ abstract class epDb {
      * @return mixed
      */
     public function castBlob($input) {
-        return (string)Base\epHex2Str($input);
+        return (string)epUtils::epHex2Str($input);
     }
 
     /**

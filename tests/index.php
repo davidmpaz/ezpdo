@@ -11,7 +11,7 @@
  * @subpackage ezpdo.tests.base
  */
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\tests\src\epCliReporter;
 
 /**
@@ -62,7 +62,7 @@ if (EP_COVERAGE_TEST) {
 $t = new GroupTest('All ezpdo tests');
 
 // get all epTestXxxx files
-$files = Base\epFilesInDir();
+$files = epUtils::epFilesInDir();
 
 // add each test file into group
 foreach($files as $file) {
@@ -105,7 +105,7 @@ if (EP_COVERAGE_TEST) {
 }
 
 $status = false;
-if (Base\epIsWebRun()) {
+if (epUtils::epIsWebRun()) {
 
     // start timer
     $tm = microtime(true);
@@ -117,7 +117,7 @@ if (Base\epIsWebRun()) {
     $elapsed = microtime(true) - $tm;
 
     // output timing
-    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds';
+    echo epUtils::epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds';
 
 } else {
 

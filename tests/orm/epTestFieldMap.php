@@ -11,7 +11,7 @@
  */
 namespace ezpdo\tests\orm;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\tests\src\epTestCase;
 use ezpdo\orm\epFieldMapFactory;
 
@@ -95,7 +95,7 @@ class epTestFieldMap extends epTestCase {
 
 if (!defined('EP_GROUP_TEST')) {
     $t = new epTestFieldMap();
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());

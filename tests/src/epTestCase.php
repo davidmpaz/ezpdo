@@ -12,7 +12,7 @@
  */
 namespace ezpdo\tests\src;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 
 /**
  * need ezpdo.php
@@ -133,7 +133,7 @@ class epTestCase extends \UnitTestCase {
             return false;
         }
         // skip test if no PEAR DB installed
-        if (!Base\epFileExistsIncPath('DB.php')) {
+        if (!epUtils::epFileExistsIncPath('DB.php')) {
             return false;
         }
         return true;
@@ -310,14 +310,14 @@ class epTestCase extends \UnitTestCase {
      * Setup output dir
      */
     public function setUp() {
-        Base\epMkDir('output');
+        epUtils::epMkDir('output');
     }
 
     /**
      * tearDown: rmove output dir
      */
     public function tearDown() {
-        Base\epRmDir('output');
+        epUtils::epRmDir('output');
     }
 }
 

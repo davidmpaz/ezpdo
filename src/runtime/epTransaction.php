@@ -15,7 +15,7 @@ namespace ezpdo\runtime;
 use ezpdo\db\epDb;
 use ezpdo\db\epDbObject;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epBase;
 use ezpdo\base\epException;
 
@@ -138,9 +138,12 @@ class epTransaction extends epBase {
      * be objects commited that need to be rolled back (deleted) from db
      * @return null|array epObject
      */
-    public function &getCommitedOjects(){
+    public function &getCommitedObjects(){
         //filter objects array
-        $commited = array_filter($this->objects, "ezpdo\\base\\epFilterCommited");
+        $commited = array_filter($this->objects, function($obj){
+            // In transaction context this is if $obj->oid !== false
+            return $obj->epGetObjectId() !== false;
+        });
         return $commited;
     }
 

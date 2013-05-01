@@ -12,7 +12,7 @@
  */
 namespace ezpdo\db;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 
 /**
  * need epOverload
@@ -362,7 +362,7 @@ class epDbPeardb extends epDb {
             return "'$quoted'";
         }
 
-        return $this->db->quoteSmart(Base\epStr2Hex($input));
+        return $this->db->quoteSmart(epUtils::epStr2Hex($input));
     }
 
     /**
@@ -390,7 +390,7 @@ class epDbPeardb extends epDb {
             return (string)pg_unescape_bytea($input);
         }
 
-        return (string)Base\epHex2Str($input);
+        return (string)epUtils::epHex2Str($input);
     }
 
     /**

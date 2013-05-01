@@ -12,7 +12,7 @@
  */
 namespace ezpdo\tests\runtime;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\tests\src\epTestCase;
 
 use ezpdo\runtime\epObject;
@@ -398,7 +398,7 @@ class epTestObject extends epTestCase {
 
 if (!defined('EP_GROUP_TEST')) {
     $t = new epTestObject;
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());

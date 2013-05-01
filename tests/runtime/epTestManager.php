@@ -12,7 +12,7 @@
  */
 namespace ezpdo\tests\runtime;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\runtime\epArray;
 use ezpdo\runtime\epObject;
 use ezpdo\runtime\epManager;
@@ -54,7 +54,7 @@ class epTestManager extends epTestRuntime {
      * remove output dir in teardown
      */
     function tearDown() {
-        Base\epRmDir(dirname(__FILE__) . '/output');
+        epUtils::epRmDir(dirname(__FILE__) . '/output');
     }
 
     /**
@@ -2087,77 +2087,77 @@ class epTestManager extends epTestRuntime {
      */
     function _allTests($dbal, $dbtype) {
 
-        echo "tests for $dbal/$dbtype started.. " . Base\epNewLine();
+        echo "tests for $dbal/$dbtype started.. " . epUtils::epNewLine();
 
         echo "  setup..";
         $this->_setUp($dbal, $dbtype);
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  single object..";
         $this->_testSingleObject();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  multiple objects..";
         $this->_testMultiObjects();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  array sort by..";
         $this->_testArraySortBy();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  array to object..";
         $this->_testCreateFromArray();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  data typess..";
         $this->_testDataTypes();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  find objects..";
         $this->_testObjectFind();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  find objects by child..";
         $this->_testObjectFindByChild();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  object query primitive..";
         $this->_testObjectQueryPrimitive();
-        echo "done " .Base\ epNewLine();
+        echo "done " .epUtils:: epNewLine();
 
         echo "  object query relationship..";
         $this->_testObjectQueryRelationship();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  object relationship..";
         $this->_testObjectRelation();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  object relationship deletion..";
         $this->_testRelationsDeletes();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  composed delete..";
         $this->_testComposedOfDelete();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  object transaction..";
         $this->_testTransactionObject();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  transaction: commit..";
         $this->_testTransactionStartCommit();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  transaction: rollback..";
         $this->_testTransactionStartRollback();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
         echo "  transaction: rollback surplus..";
         $this->_testTransactionEndRollback();
-        echo "done " . Base\epNewLine();
+        echo "done " . epUtils::epNewLine();
 
-        echo "  complete!" . Base\epNewLine();
+        echo "  complete!" . epUtils::epNewLine();
     }
 
     /**
@@ -2311,7 +2311,7 @@ if (!defined('EP_GROUP_TEST')) {
     $tm = microtime(true);
 
     $t = new epTestManager;
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());
@@ -2319,7 +2319,7 @@ if (!defined('EP_GROUP_TEST')) {
 
     $elapsed = microtime(true) - $tm;
 
-    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds';
+    echo epUtils::epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds';
 }
 
 ?>

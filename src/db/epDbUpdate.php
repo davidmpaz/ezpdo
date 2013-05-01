@@ -13,7 +13,7 @@
 namespace ezpdo\db;
 
 use ezpdo\base\epLog;
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\base\epSingleton;
 use ezpdo\base\epException;
 use ezpdo\base\epConfigurableWithLog;
@@ -156,10 +156,10 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
         // get outdated class map
         if($file = $this->getConfigOption('update_from')){
             // load it from specified file
-            $this->ocmf = Base\epGetBackup($file);
+            $this->ocmf = epUtils::epGetBackup($file);
         }else{
             // load it from compile dir
-            $this->ocmf = Base\epGetBackup($this->getConfigOption('compiled_dir'));
+            $this->ocmf = epUtils::epGetBackup($this->getConfigOption('compiled_dir'));
         }
 
         //strategy defined but no backup to work with
@@ -233,7 +233,7 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
                 array_push($content, "\n*/");
 
                 // write to file
-                Base\epWriteToFile($this->getConfigOption('compiled_dir').
+                epUtils::epWriteToFile($this->getConfigOption('compiled_dir').
                     '/' . $ncm->getName() . '.sql', $content);
 
                 $this->log("Updating schema for class [" . $ncm->getName() . "] - end",

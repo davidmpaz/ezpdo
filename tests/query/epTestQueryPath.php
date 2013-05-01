@@ -12,7 +12,7 @@
  */
 namespace ezpdo\tests\query;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\query\epQueryPathManager;
 use ezpdo\tests\runtime\epTestRuntime;
 
@@ -343,13 +343,13 @@ class epTestQueryPath extends epTestRuntime {
 if (!defined('EP_GROUP_TEST')) {
     $tm = microtime(true);
     $t = new epTestQueryPath;
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());
     }
     $elapsed = microtime(true) - $tm;
-    echo Base\epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
+    echo epUtils::epNewLine() . 'Time elapsed: ' . $elapsed . ' seconds' . "\n";
 }
 
 ?>

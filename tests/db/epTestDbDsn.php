@@ -12,7 +12,7 @@
  */
 namespace ezpdo\tests\db;
 
-use ezpdo\base as Base;
+use ezpdo\base\epUtils;
 use ezpdo\db\epDbDsn;
 use ezpdo\tests\src\epTestCase;
 
@@ -147,7 +147,7 @@ class epTestDbDsn extends epTestCase {
 
 if (!defined('EP_GROUP_TEST')) {
     $t = new epTestDbDsn;
-    if ( Base\epIsWebRun() ) {
+    if ( epUtils::epIsWebRun() ) {
         $t->run(new \HtmlReporter());
     } else {
         $t->run(new \TextReporter());
