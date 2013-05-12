@@ -13,14 +13,13 @@
 namespace ezpdo\tests\query;
 
 use ezpdo\base\epUtils;
-use ezpdo\query\epQueryPathManager;
+use ezpdo\query\path\epQueryPathManager;
 use ezpdo\tests\runtime\epTestRuntime;
 
 /**#@+
  * need runtime testcase (under ../runtime) and epQueryBuilder
  */
 include_once(dirname(__FILE__).'/../runtime/epTestRuntime.php');
-include_once(EP_SRC_QUERY.'/epQueryPath.php');
 /**#@-*/
 
 /**

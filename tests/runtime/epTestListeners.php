@@ -13,7 +13,8 @@
 namespace ezpdo\tests\runtime;
 
 use ezpdo\base\epUtils;
-use ezpdo\base\epException;
+use ezpdo\base\exception\epException;
+
 use ezpdo\runtime\epManager;
 use ezpdo\runtime\epManagerBase;
 

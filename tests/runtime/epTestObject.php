@@ -17,7 +17,7 @@ use ezpdo\tests\src\epTestCase;
 
 use ezpdo\runtime\epObject;
 use ezpdo\runtime\epManager;
-use ezpdo\runtime\epExceptionObject;
+use ezpdo\runtime\exception\epExceptionObject;
 
 
 /**

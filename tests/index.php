@@ -12,7 +12,9 @@
  */
 
 use ezpdo\base\epUtils;
+
 use ezpdo\tests\src\epCliReporter;
+use ezpdo\tests\src\UniversalClassLoader;
 
 /**
  * Set exec time to 300 seconds (allow slow machine to finish)
@@ -40,11 +42,6 @@ define('EP_COVERAGE_TEST', false);
  */
 include_once(dirname(__FILE__).'/../ezpdo.php');
 
-/**
- * need ezpdo utils
- */
-include_once(EP_SRC_BASE.'/epUtils.php');
-
 /**#@+
  * need simpletest
  */
@@ -58,6 +55,21 @@ include_once(EP_LIBS_SIMPLETEST . '/reporter.php');
 if (EP_COVERAGE_TEST) {
     include_once(dirname(__FILE__) . '/coverage.php');
 }
+
+include_once(EP_TESTS_SRC . '/UniversalClassLoader.php');
+
+$loader = new UniversalClassLoader();
+
+// register classes with namespaces
+$loader->registerNamespaces(array(
+    'ezpdo' => EP_ROOT . '/src',
+));
+
+// to enable searching the include path (e.g. for PEAR packages)
+$loader->useIncludePath(true);
+
+// activate the autoloader
+$loader->register();
 
 $t = new GroupTest('All ezpdo tests');
 

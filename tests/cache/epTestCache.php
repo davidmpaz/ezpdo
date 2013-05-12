@@ -13,6 +13,11 @@
 namespace ezpdo\tests\cache;
 
 use ezpdo\base\epUtils;
+use ezpdo\cache\epCache;
+use ezpdo\cache\epCacheApc;
+use ezpdo\cache\epCacheObject;
+use ezpdo\cache\epCacheMemcache;
+use ezpdo\cache\epCacheCacheLite;
 
 /**
  * need epTestCase
@@ -170,7 +175,7 @@ class epTestCache extends epTestCase {
         $cache_dir = dirname(__FILE__) . '/tmp/';
         $ttl = 360;
 
-        epMkDir($cache_dir);
+        epUtils::epMkDir($cache_dir);
 
         // instantiate cache
         include_once(EP_SRC_CACHE . '/epCacheCachelite.php');
@@ -181,7 +186,7 @@ class epTestCache extends epTestCase {
         catch(\Exception $e) {
         }
 
-        epRmDir($cache_dir);
+        epUtils::epRmDir($cache_dir);
     }
 
     /**

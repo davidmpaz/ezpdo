@@ -13,9 +13,9 @@
 namespace ezpdo\tests\compiler;
 
 use ezpdo\base\epUtils;
-use ezpdo\compiler\epVarTag;
-use ezpdo\compiler\epComment;
-use ezpdo\compiler\epClassTag;
+use ezpdo\compiler\tag\epVarTag;
+use ezpdo\compiler\tag\epComment;
+use ezpdo\compiler\tag\epClassTag;
 
 use ezpdo\orm\epFieldMap;
 
@@ -30,11 +30,6 @@ include_once(dirname(__FILE__).'/../src/epTestCase.php');
  * need ezpdo utils
  */
 include_once(EP_SRC_BASE.'/epUtils.php');
-
-/**
- * need epClassCompiler to test
- */
-include_once(EP_SRC_COMPILER.'/epComment.php');
 
 /**
  * The unit test class for {@link epComment}

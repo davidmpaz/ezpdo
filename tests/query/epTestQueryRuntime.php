@@ -15,6 +15,7 @@ namespace ezpdo\tests\query;
 use ezpdo\base\epUtils;
 use ezpdo\db\epDbFactory;
 use ezpdo\runtime\epManager;
+use ezpdo\runtime\epManagerBase;
 use ezpdo\tests\src\epTestCase;
 use ezpdo\orm\epClassMapFactory;
 

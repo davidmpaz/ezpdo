@@ -2,9 +2,9 @@
 
 /**
  * $Id: ezpdo.php 944 2006-05-12 19:31:23Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 944 $ $Date: 2006-05-12 15:31:23 -0400 (Fri, 12 May 2006) $
  * @package ezpdo
@@ -18,7 +18,7 @@
 error_reporting(E_ALL);
 
 /**
- * The ezpdo root directory 
+ * The ezpdo root directory
  */
 if (!defined('EP_ROOT')) {
     define('EP_ROOT', dirname(__FILE__));
@@ -28,7 +28,7 @@ if (!defined('EP_ROOT')) {
  * The ezpdo src directory
  */
 if (!defined('EP_SRC')) {
-    define('EP_SRC', EP_ROOT.'/src');
+    define('EP_SRC', EP_ROOT.'/src/ezpdo');
 }
 
 /**

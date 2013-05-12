@@ -53,12 +53,10 @@ class epTestCompiler extends epTestCase {
         if (!$this->c) {
 
             // load config.xml for compiler
-            include_once(EP_SRC_BASE.'/epConfig.php');
             $this->assertTrue($cfg = epConfig::load(realpath(dirname(__FILE__))."/config.xml"));
             $this->assertTrue(!empty($cfg));
 
             // create a compiler object
-            include_once(EP_SRC_COMPILER.'/epCompiler.php');
             $this->assertTrue($this->c = new epClassCompiler($cfg));
 
             // no validation to suppress errors

@@ -18,7 +18,7 @@ use ezpdo\runtime\epManager;
 
 use ezpdo\db\epDb;
 use ezpdo\db\epDbUpdate;
-use ezpdo\db\epExceptionDbObject;
+use ezpdo\db\exception\epExceptionDbObject;
 
 use ezpdo\orm\epClassMap;
 use ezpdo\orm\epFieldMap;
