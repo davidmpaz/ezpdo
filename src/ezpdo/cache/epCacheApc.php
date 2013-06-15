@@ -14,9 +14,6 @@
  */
 namespace ezpdo\cache;
 
-// Needs epCache interface
-include_once(EP_SRC_CACHE . '/epCache.php');
-
 /**
  * Class of APC client
  *

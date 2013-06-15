@@ -26,11 +26,6 @@ use ezpdo\compiler\tag\epClassTag;
 use ezpdo\compiler\exception\epExceptionParser;
 
 /**
- * Need {@link epConfigurableWithLog} as the superclass
- */
-include_once(EP_SRC_BASE.'/epConfigurableWithLog.php');
-
-/**
  * Class of ezpdo parser
  *
  * The parser parses ({@link epClassParser::parse()}) a PHP source file
@@ -199,7 +194,6 @@ class epClassParser extends epConfigurableWithLog {
 
         // setup scanner
         if (!$this->scanner) {
-            include_once(EP_SRC_COMPILER.'/epScanner.php');
             $this->scanner = new epScanner;
         }
 

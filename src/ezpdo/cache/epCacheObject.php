@@ -15,13 +15,6 @@
 namespace ezpdo\cache;
 
 /**
- * Need epConfigurableWithLog as the superclass for epCacheObject
- */
-if (!class_exists('epConfigurableWithLog')) {
-    include_once(EP_SRC_BASE . '/epConfigurableWithLog.php');
-}
-
-/**
  * Class of EZPDO object cache
  *
  * This class delegates EZPDO object caching tasks to the underlying
@@ -405,10 +398,10 @@ class epCacheObject extends epConfigurableWithLog {
         }
 
         // class name for the built-in cache
-        $class = epCache . ucfirst($name);
+        $class = 'ezpdo\\cache\\epCache' . ucfirst($name);
 
         // include the class source file
-        include_once(EP_SRC_CACHE . '/' . $class . '.php');
+        //include_once(EP_SRC_CACHE . '/' . $class . '.php');
 
         // instantiate it
         return epNewObject($class, $args);

@@ -14,9 +14,6 @@
  */
 namespace ezpdo\cache;
 
-// Needs epCache interface
-include_once(EP_SRC_CACHE . '/epCache.php');
-
 /**
  * Class of CacheLite client
  *
@@ -51,7 +48,7 @@ class epCacheCacheLite implements epCache {
     public function __construct($cache_dir = '/tmp/', $ttl = 360) {
 
         // include CacheLite (assuming in include paths)
-        include_once('Cache/Lite.php');
+        //include_once('Cache/Lite.php');
 
         // options
         $options = array(

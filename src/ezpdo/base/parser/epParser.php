@@ -15,13 +15,6 @@ namespace ezpdo\base\parser;
 
 use ezpdo\base\epBase;
 
-/**#@+
- * need epLexer
- */
-include_once(EP_SRC_BASE_PARSER.'/epLexer.php');
-include_once(EP_SRC_BASE_PARSER.'/epToken.php');
-/**#@-*/
-
 /**
  * A base class for a recursive-descent parser (see
  * {@link http://en.wikipedia.org/wiki/Recursive_descent_parser}).

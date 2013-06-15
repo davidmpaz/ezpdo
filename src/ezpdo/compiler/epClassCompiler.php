@@ -24,16 +24,6 @@ use ezpdo\orm\epClassMapFactory;
 use ezpdo\compiler\epExceptionCompiler;
 
 /**
- * Need {@link epConfigurableWithLog} as the superclass
- */
-include_once(EP_SRC_BASE.'/epConfigurableWithLog.php');
-
-/**
- * Need class map factory
- */
-include_once(EP_SRC_ORM.'/epClassMap.php');
-
-/**
  * Class of EZPDO class compiler
  *
  * The compiler is responsible for parsing PHP source files and
@@ -601,7 +591,6 @@ class epClassCompiler extends epConfigurableWithLog {
     public function generateRuntimeConfig() {
 
         // create runtime config generator
-        include_once(EP_SRC_COMPILER.'/epGenerator.php');
         if (!($g = new epGenRuntimeConfig($this->getConfig()))) {
             throw new epExceptionCompiler('Cannot instantiate runtime config generator');
             return false;

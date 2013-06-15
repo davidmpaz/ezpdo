@@ -23,11 +23,6 @@ use ezpdo\orm\epFieldMapPrimitive;
 use ezpdo\runtime\epManager;
 
 /**
- * need epContainer
- */
-include_once(EP_SRC_BASE.'/epContainer.php');
-
-/**
  * The alias manager
  *
  * This class is a helper class for for {@link epQueryPath}. It generates

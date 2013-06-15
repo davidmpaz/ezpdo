@@ -16,16 +16,6 @@ namespace ezpdo\base;
 use ezpdo\base\exception\epException;
 
 /**
- * Need {@link epConfigurable} as the supper class
- */
-include_once(EP_SRC_BASE.'/epConfigurable.php');
-
-/**
- * Need the logging facility, {@link epLog}
- */
-include_once(EP_SRC_BASE.'/epLog.php');
-
-/**
  * Class of ezpdo configurable objects with logging facility
  *
  * Class of a configurable object that is also hooked up to the

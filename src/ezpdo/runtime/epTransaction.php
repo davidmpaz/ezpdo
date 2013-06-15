@@ -23,17 +23,6 @@ use ezpdo\base\exception\epException;
 use ezpdo\runtime\epObject;
 
 /**
- * Need {@link epBase} as the super class
- */
-include_once(EP_SRC_BASE.'/epBase.php');
-include_once(EP_SRC_BASE.'/epUtils.php');
-
-/**
- * Need {@link epDb}
- */
-include_once(EP_SRC_DB.'/epDb.php');
-
-/**
  * The transaction class
  *
  * When a transaction starts (meaning a transaction boundary is declared),

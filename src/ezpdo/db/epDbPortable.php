@@ -23,11 +23,6 @@ use ezpdo\db\port\epDbPortSqlite as epDbPortSqlite;
 use ezpdo\db\port\epDbPortPostgres as epDbPortPostgres;
 
 /**
- * Need field type definition
- */
-include_once(EP_SRC_ORM . '/epClassMap.php');
-
-/**
  * Class to handle database portability
  *
  * This class takes care of the database portability issues.

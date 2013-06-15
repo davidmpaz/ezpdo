@@ -179,7 +179,6 @@ class epConfig {
                 $options = & $this->load($cfg_file, true);
                 if (!empty($options)) {
                     // set loaded array
-                    include_once(EP_SRC_BASE.'/epUtils.php');
                     $this->options = epUtils::epArrayStr2Bool($options);
                     $this->setSource($cfg_file);
                 }

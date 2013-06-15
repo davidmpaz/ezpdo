@@ -19,11 +19,6 @@ use ezpdo\base\epConfigurableWithLog;
 use ezpdo\orm\epClassMapFactory;
 
 /**
- * Need {@link epConfigurableWithLog} as the superclass
- */
-include_once(EP_SRC_BASE.'/epConfigurableWithLog.php');
-
-/**
  * Class of ezpdo generator
  *
  * A generator is a configurable object that creates new files

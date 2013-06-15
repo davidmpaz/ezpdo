@@ -18,11 +18,6 @@ use ezpdo\base\epBase as epBase;
 use ezpdo\db\exception\epExceptionDbDsn;
 
 /**
- * need epBase
- */
-include_once(EP_SRC_BASE.'/epBase.php');
-
-/**
  * Class to parse data soure name (DSN)
  *
  * See more on PEAR DSN at {@link

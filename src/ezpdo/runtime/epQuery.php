@@ -21,11 +21,6 @@ use ezpdo\query\epQueryParser;
 use ezpdo\query\epQueryBuilder;
 
 /**
- * need query builder
- */
-include_once(EP_SRC_QUERY.'/epQueryBuilder.php');
-
-/**
  * The EZPDO query class
  *
  * This class interprets EZOQL (the EZPDO Object Query Language) query

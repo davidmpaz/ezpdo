@@ -14,16 +14,6 @@
 namespace ezpdo\base;
 
 /**
- * need epBase
- */
-include_once(EP_SRC_BASE.'/epBase.php');
-
-/**
- * need epConfig
- */
-include_once(EP_SRC_BASE.'/epConfig.php');
-
-/**
  * Class of configurable objects
  *
  * A configurable object is one whose internal behaviors can be

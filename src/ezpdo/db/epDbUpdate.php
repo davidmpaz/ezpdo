@@ -26,17 +26,6 @@ use ezpdo\runtime\epManager;
 use ezpdo\db\exception\epExceptionDbUpdate;
 
 /**
- * Need {@link epConfigurableWithLog} as the superclass
- */
-include_once(EP_SRC_BASE.'/epConfigurableWithLog.php');
-include_once(EP_SRC_BASE.'/epUtils.php');
-
-/**
- * Need class map factory
- */
-include_once(EP_SRC_ORM.'/epClassMap.php');
-
-/**
  *
  * Class epDbUpdate used in {@link epManager}
  * <b>Incrementally</b> updates the schema
@@ -258,7 +247,6 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
         }
 
         //if not found a match, drop it is requested!
-        include_once(EP_SRC_DB.'/epDbObject.php');
         $this->log('Cleaning schema - start', epLog::LOG_INFO);
 
         foreach ($outdated as $ocm) {
@@ -409,7 +397,6 @@ class epDbUpdate extends epConfigurableWithLog implements epSingleton {
         $acm = $this->processClassMaps($found, $ccm, $force);
 
         // get db object
-        include_once(EP_SRC_DB.'/epDbObject.php');
         $dbo = epDbFactory::instance()->make($ccm->getDsn());
         if( !($dbo)){
             throw new epExceptionDbUpdate("Can not create db object.");

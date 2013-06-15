@@ -17,11 +17,6 @@ use ezpdo\base\epUtils;
 use ezpdo\db\exception\epExceptionDbPeardb;
 
 /**
- * need epOverload
- */
-include_once(EP_SRC_DB.'/epDb.php');
-
-/**
  * A wrapper class for the PEAR DB. See
  * {@link http://pear.php.net/manual/en/package.database.db.php}.
  *
@@ -88,7 +83,7 @@ class epDbPeardb extends epDb {
         }
 
         // make db connection
-        include_once('DB.php');
+        //include_once('DB.php');
         $this->db = & \DB::connect($this->dsn);
         if (\PEAR::isError($this->db)) {
             throw new epExceptionDbPeardb('Cannot connect db (error: ' . $this->db->getMessage() . ')');

@@ -87,7 +87,6 @@ class epDbAdodbPdo extends epDbAdodb {
     protected function _convertDsn($dsn, &$username, &$password, &$phptype) {
 
         // use epDbDsn to parse PEAR DSN
-        include_once(EP_SRC_DB . '/epDbDsn.php');
         if (!($d = new epDbDsn($dsn))) {
             throw new epExceptionDbAdodbPdo('Error in DSN parsing');
             return false;

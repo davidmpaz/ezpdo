@@ -14,11 +14,6 @@
 namespace ezpdo\base;
 
 /**
- * need epBase
- */
-include_once(EP_SRC_BASE.'/epBase.php');
-
-/**
  * Class of epContainer
  *
  * A container is a composite object. It can have

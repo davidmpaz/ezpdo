@@ -233,7 +233,6 @@ class epManagerBase extends epConfigurableWithLog {
         }
 
         // get the db factory
-        include_once(EP_SRC_DB.'/epDbObject.php');
         if (!($this->dbf = & epDbFactory::instance())) {
             throw new epExceptionManagerBase('Cannot get db factory instance');
             return false;
@@ -510,7 +509,6 @@ class epManagerBase extends epConfigurableWithLog {
 
         // get the new query object
         if (!$this->q) {
-            include_once(EP_SRC_RUNTIME . '/epQuery.php');
             $this->q = new epQuery;
         }
 
@@ -1653,7 +1651,6 @@ class epManagerBase extends epConfigurableWithLog {
             // recompiled?... check if we want to auto update schemas
             if ($this->getConfigOption('auto_update')){
                 // touch updater to fire its execution later
-                include_once (EP_SRC_DB.'/epDbUpdate.php');
                 $this->su = epDbUpdate::instance();
             }
         }
@@ -1665,7 +1662,6 @@ class epManagerBase extends epConfigurableWithLog {
         }
 
         // unserializing compiled info into class map factory
-        include_once(EP_SRC_ORM.'/epClassMap.php');
         if ($compiled_info) {
 
             // unserialize class map info
@@ -1702,7 +1698,6 @@ class epManagerBase extends epConfigurableWithLog {
             // recompiled?... check if we want to auto update schemas
             if ($this->getConfigOption('auto_update')){
                 // touch updater to fire its execution later
-                include_once (EP_SRC_DB.'/epDbUpdate.php');
                 $this->su = epDbUpdate::instance();
             }
         }
@@ -1797,7 +1792,6 @@ class epManagerBase extends epConfigurableWithLog {
         }
 
         // backup current object states and dbs
-        include_once(EP_SRC_RUNTIME . '/epTransaction.php');
         if (!($this->t = new epTransaction(array_values($this->dbs)))) {
             throw new epExceptionManagerBase('Cannot start transaction');
             return false;

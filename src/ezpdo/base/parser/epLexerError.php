@@ -16,12 +16,6 @@ namespace ezpdo\base\parser;
 use ezpdo\base\epUtils;
 use ezpdo\base\epBase as epBase;
 
-/**#@+
- * need epBase and epUtil
- */
-include_once(EP_SRC_BASE.'/epBase.php');
-include_once(EP_SRC_BASE.'/epUtils.php');
-/**#@-*/
 /**
  * The error class for the lexer. It contains:
  * + msg, the error message

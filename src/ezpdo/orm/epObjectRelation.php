@@ -16,13 +16,6 @@ namespace ezpdo\orm;
 use ezpdo\base\epValidateable;
 
 /**
- * Need {@link epValidateable} interface (in epBase.php)
- */
-if (interface_exists('epValidateable')) {
-    include_once(EP_SRC_BASE.'/epBase.php');
-}
-
-/**
  * Class of object relationship
  *
  * The class makes association between two objects:

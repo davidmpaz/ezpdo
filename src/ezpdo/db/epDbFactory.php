@@ -159,22 +159,18 @@ class epDbFactory implements epFactory, epSingleton  {
         switch($this->dbl) {
 
             case self::DBL_ADODB:
-                include_once(EP_SRC_DB.'/epDbAdodb.php');
                 $this->dbs[$dsn] = new epDbObject(new epDbAdodb($dsn));
                 break;
 
             case self::DBL_ADODB_PDO:
-                include_once(EP_SRC_DB.'/epDbAdodbPdo.php');
                 $this->dbs[$dsn] = new epDbObject(new epDbAdodbPdo($dsn));
                 break;
 
             case self::DBL_PEARDB:
-                include_once(EP_SRC_DB.'/epDbPeardb.php');
                 $this->dbs[$dsn] = new epDbObject(new epDbPeardb($dsn));
                 break;
 
             case self::DBL_PDO:
-                include_once(EP_SRC_DB.'/epDbPdo.php');
                 $this->dbs[$dsn] = new epDbObject(new epDbPdo($dsn));
                 break;
         }

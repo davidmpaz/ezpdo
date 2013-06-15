@@ -97,7 +97,6 @@ class epManager extends epManagerBase implements epSingleton {
         }
 
         // check if epObjectRelation has been compiled
-        include_once(EP_SRC_ORM . '/epObjectRelation.php');
         if (!($this->cm_obj_rel = & $this->_getMap('ezpdo\\orm\\epObjectRelation'))) {
             if (!($this->cm_obj_rel = & $this->_compileClass('ezpdo\\orm\\epObjectRelation'))) {
                 throw new epExceptionManager('Failed in compiling class ezpdo\\orm\\epObjectRelation');
@@ -1153,7 +1152,6 @@ class epManager extends epManagerBase implements epSingleton {
 
         // not initialized the updater
         if (!$this->su){
-            include_once (EP_SRC_DB.'/epDbUpdate.php');
             $this->su = epDbUpdate::instance();
         }
 

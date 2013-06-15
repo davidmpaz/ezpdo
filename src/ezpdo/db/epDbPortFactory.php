@@ -107,9 +107,8 @@ class epDbPortFactory implements epFactory, epSingleton  {
         $port_class = 'epDbPort' . $dbtype;
         if (!file_exists($port_class_file = EP_SRC_DB . '/port/' . $port_class . '.php')) {
             // in case we don't have a special portability class, use the default
-            $dbp = new epDbPortable;
+            $dbp = new epDbPortable();
         } else {
-            include_once($port_class_file);
             $port_class = "ezpdo\\db\\port\\$port_class";
             $dbp = new $port_class;
         }

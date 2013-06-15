@@ -16,11 +16,6 @@ namespace ezpdo\db;
 use ezpdo\db\exception\epExceptionDbPdo;
 
 /**
- * need epOverload
- */
-include_once(EP_SRC_DB.'/epDb.php');
-
-/**
  * A wrapper class of PHP PDO
  * {@link http://us4.php.net/manual/en/ref.pdo.php}
  *
@@ -310,7 +305,6 @@ class epDbPdo extends epDb {
     protected function _convertDsn($dsn, &$username, &$password, &$phptype) {
 
         // use epDbDsn to parse PEAR DSN
-        include_once(EP_SRC_DB . '/epDbDsn.php');
         if (!($d = new epDbDsn($dsn))) {
             throw new epExceptionDbAdodbPdo('Error in converting PEAR DSN into PDO DSN');
             return false;

@@ -18,11 +18,6 @@ use ezpdo\orm\epFieldMap;
 use ezpdo\base\parser\epLexer as epLexer;
 use ezpdo\base\parser\epParser as epParser;
 
-/**
- * Need {@link epLexer} and {@link epParser} for epTagParser
- */
-include_once(EP_SRC_BASE_PARSER.'/epParser.php');
-
 /**#@+
  * Predefined tokens for the base lexer ({@link epLexer})
  */

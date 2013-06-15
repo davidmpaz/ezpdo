@@ -16,14 +16,6 @@ namespace ezpdo\base;
 use ezpdo\base\epUtils;
 use ezpdo\base\exception\epException;
 
-/**
- * need epConfigurable, epUtils
- */
-include_once(EP_SRC_BASE.'/epConfigurable.php');
-
-/**
- * also need PEAR::Log (modified)
- */
 include_once(EP_LIBS_PEAR . '/Log.php');
 
 /**

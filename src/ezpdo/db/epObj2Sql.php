@@ -21,11 +21,6 @@ use ezpdo\runtime\epObject;
 use ezpdo\runtime\epManager;
 
 /**
- * need epClassMap class
- */
-include_once(EP_SRC_ORM.'/epClassMap.php');
-
-/**
  * Class of SQL statement generator
  *
  * This class is responsible for converting class map info
@@ -62,7 +57,6 @@ class epObj2Sql {
 
         // check if we have portability factory cached already
         if (!epObj2Sql::$dbpf) {
-            include_once(EP_SRC_DB."/epDbPortable.php");
             epObj2Sql::$dbpf = epDbPortFactory::instance();
         }
 

@@ -17,13 +17,6 @@ use ezpdo\base\epUtils;
 use ezpdo\base\epBase as epBase;
 
 /**#@+
- * need epBase and epUtil
- */
-include_once(EP_SRC_BASE.'/epBase.php');
-include_once(EP_SRC_BASE.'/epUtils.php');
-/**#@-*/
-
-/**#@+
  * Predefined tokens for the base lexer ({@link epLexer})
  */
 epUtils::epDefine('EPL_T_FLOAT');

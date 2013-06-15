@@ -17,11 +17,6 @@ use ezpdo\base\epUtils;
 use ezpdo\db\exception\epExceptionDb;
 
 /**
- * need epBase
- */
-include_once(EP_SRC_BASE.'/epBase.php');
-
-/**
  * Class for a database connection
  *
  * This abstract class provides a unified layer for using different
@@ -153,7 +148,6 @@ abstract class epDb {
         if (!$this->dbtype) {
 
             // use epDbDsn to parse PEAR DSN
-            include_once(EP_SRC_DB . '/epDbDsn.php');
             if (!($d = new epDbDsn($this->dsn))) {
                 throw new epExceptionDb('Error in parsing DSN');
             }

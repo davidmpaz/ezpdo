@@ -17,16 +17,6 @@ use ezpdo\base\epContainer;
 use ezpdo\orm\exception\epExceptionClassMap;
 
 /**
- * need epContainer class
- */
-include_once(EP_SRC_BASE.'/epContainer.php');
-
-/**
- * need epFieldMap class
- */
-include_once(EP_SRC_ORM.'/epFieldMap.php');
-
-/**
  * Class of ezpdo class mapping info
  *
  * The class keeps the ORM info for a class. It associates a class
