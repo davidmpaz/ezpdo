@@ -14,6 +14,7 @@
 namespace ezpdo\compiler;
 
 use ezpdo\base\epLog;
+use ezpdo\base\epUtils;
 use ezpdo\base\epConfigurableWithLog;
 use ezpdo\base\exception\epExceptionConfigurableWithLog;
 
@@ -335,7 +336,7 @@ class epClassParser extends epConfigurableWithLog {
 
         // append prefix if specified to table name
         if ($prefix = $this->getConfigOption('table_prefix')) {
-            $table = epUnquote($prefix) . $table;
+            $table = epUtils::epUnquote($prefix) . $table;
         }
 
         // set default table name

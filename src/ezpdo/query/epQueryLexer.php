@@ -14,6 +14,7 @@
 namespace ezpdo\query;
 
 use ezpdo\base\epUtils;
+use ezpdo\base\parser\epToken;
 use ezpdo\base\parser\epLexer as epLexer;
 use ezpdo\base\parser\epParser as epParser;
 

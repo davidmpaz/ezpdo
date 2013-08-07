@@ -2,14 +2,15 @@
 
 /**
  * $Id: timing.php 326 2005-07-15 13:34:38Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 326 $ $Date: 2005-07-15 09:34:38 -0400 (Fri, 15 Jul 2005) $
  * @package ezpdo_ex
  * @subpackage ezpdo_ex.bookstore
  */
+use ezpdo\runtime\epManager;
 
 // profiling
 //apd_set_pprof_trace();

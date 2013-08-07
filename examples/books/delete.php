@@ -2,14 +2,15 @@
 
 /**
  * $Id: delete.php 855 2006-03-13 13:12:05Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 855 $ $Date: 2006-03-13 08:12:05 -0500 (Mon, 13 Mar 2006) $
  * @package ezpdo_ex
  * @subpackage ezpdo_ex.bookstore
  */
+use ezpdo\runtime\epManager;
 
 /**
  * Need EZPDO runtime API

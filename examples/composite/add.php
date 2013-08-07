@@ -2,14 +2,15 @@
 
 /**
  * $Id: add.php 252 2005-06-17 17:42:43Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 252 $ $Date: 2005-06-17 13:42:43 -0400 (Fri, 17 Jun 2005) $
  * @package ezpdo_ex
  * @subpackage ezpdo_ex.composite
  */
+use ezpdo\runtime\epManager;
 
 /**
  * Need EZPDO runtime API

@@ -15,18 +15,19 @@
  * Need Base class
  */
 include_once(dirname(__FILE__) . '/Graphic.php');
+include_once(dirname(__FILE__) . '/Point.php');
 
 /**
- * A line is a graphic object that has a starting 
+ * A line is a graphic object that has a starting
  * point and an ending point.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 256 $ $Date: 2005-06-17 14:36:53 -0400 (Fri, 17 Jun 2005) $
  * @package ezpdo_ex
  * @subpackage ezpdo_ex.composite
  */
 class Line extends Graphic {
-    
+
     /**
      * Start point
      * @var Point

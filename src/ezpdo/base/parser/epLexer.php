@@ -16,6 +16,17 @@ namespace ezpdo\base\parser;
 use ezpdo\base\epUtils;
 use ezpdo\base\epBase as epBase;
 
+/**#@+
+ * Predefined tokens for the base lexer ({@link epLexer})
+ */
+epUtils::epDefine('EPL_T_FLOAT');
+epUtils::epDefine('EPL_T_IDENTIFIER');
+epUtils::epDefine('EPL_T_INTEGER');
+epUtils::epDefine('EPL_T_NEWLINE');
+epUtils::epDefine('EPL_T_STRING');
+epUtils::epDefine('EPL_T_UNKNOWN');
+/**#@-*/
+
 /**
  * Lexer that breaks a string into tokens.
  *

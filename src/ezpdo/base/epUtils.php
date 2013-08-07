@@ -13,6 +13,8 @@
  */
 namespace ezpdo\base;
 
+use ezpdo\runtime\epManager;
+
 /**
  * define EP_CLI_RUN
  */
@@ -785,6 +787,9 @@ class epUtils {
         }
 
         $eval_str .= ";";
+
+        // ensure we have the class reachable
+        epManager::instance()->autoload($class);
 
         eval($eval_str);
 

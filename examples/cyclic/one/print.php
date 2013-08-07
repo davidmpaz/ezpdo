@@ -2,14 +2,15 @@
 
 /**
  * $Id: print.php 295 2005-06-30 16:29:13Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 295 $ $Date: 2005-06-30 12:29:13 -0400 (Thu, 30 Jun 2005) $
  * @package ezpdo_ex
  * @subpackage ezpdo_ex.cyclic.one
  */
+use ezpdo\runtime\epManager;
 
 /**
  * Need EZPDO runtime API

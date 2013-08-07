@@ -2,14 +2,15 @@
 
 /**
  * $Id: print.php 991 2006-05-31 19:24:19Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 991 $ $Date: 2006-05-31 15:24:19 -0400 (Wed, 31 May 2006) $
  * @package ezpdo_ex
  * @subpackage ezpdo_ex.bookstore
  */
+use ezpdo\runtime\epManager;
 
 /**
  * Need EZPDO runtime API

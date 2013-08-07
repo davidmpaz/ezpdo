@@ -12,12 +12,27 @@
  */
 
 use ezpdo\base\epConfig;
+use ezpdo\tests\src\UniversalClassLoader;
 use ezpdo\runtime\epManager;
 
 /**
  * Need basic definitions to src and lib directories
  */
 include_once(dirname(__FILE__).'/ezpdo.php');
+include_once(EP_TESTS_SRC . '/UniversalClassLoader.php');
+
+$loader = new UniversalClassLoader();
+
+// register classes with namespaces
+$loader->registerNamespaces(array(
+    'ezpdo' => EP_ROOT . '/src',
+));
+
+// to enable searching the include path (e.g. for PEAR packages)
+$loader->useIncludePath(true);
+
+// activate the autoloader
+$loader->register();
 
 /**
  * Need persistence manager ({@link epManager})

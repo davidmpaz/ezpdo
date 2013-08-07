@@ -2,14 +2,15 @@
 
 /**
  * $Id: find.php 1010 2006-07-17 21:55:39Z nauhygon $
- * 
+ *
  * Copyright(c) 2005 by Oak Nauhygon. All rights reserved.
- * 
+ *
  * @author Oak Nauhygon <ezpdo4php@gmail.com>
  * @version $Revision: 1010 $ $Date: 2006-07-17 17:55:39 -0400 (Mon, 17 Jul 2006) $
  * @package ezpdo_ex
  * @subpackage ezpdo_ex.bookstore
  */
+use ezpdo\runtime\epManager;
 
 /**
  * Need EZPDO runtime API
